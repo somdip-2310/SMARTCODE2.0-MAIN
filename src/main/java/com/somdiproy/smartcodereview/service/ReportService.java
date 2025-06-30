@@ -1,0 +1,61 @@
+package com.somdiproy.smartcodereview.service;
+
+import com.somdiproy.smartcodereview.dto.ReportResponse;
+import com.somdiproy.smartcodereview.model.AnalysisResult;
+import com.somdiproy.smartcodereview.model.Issue;
+import com.somdiproy.smartcodereview.repository.AnalysisRepository;
+import com.somdiproy.smartcodereview.repository.IssueDetailsRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ReportService {
+    
+    private final AnalysisRepository analysisRepository;
+    private final IssueDetailsRepository issueDetailsRepository;
+    
+    public ReportResponse getReport(String analysisId) {
+        AnalysisResult analysis = analysisRepository.findById(analysisId)
+                .orElseThrow(() -> new RuntimeException("Analysis not found"));
+        
+        List<Issue> issues = issueDetailsRepository.findByAnalysisId(analysisId);
+        
+        // Count issues by severity
+        long criticalCount = issues.stream().filter(i -> "CRITICAL".equals(i.getSeverity())).count();
+        long highCount = issues.stream().filter(i -> "HIGH".equals(i.getSeverity())).count();
+        long mediumCount = issues.stream().filter(i -> "MEDIUM".equals(i.getSeverity())).count();
+        long lowCount = issues.stream().filter(i -> "LOW".equals(i.getSeverity())).count();
+        
+        Map<String, Double> scores = new HashMap<>();
+        if (analysis.getScores() != null) {
+            scores.put("security", analysis.getScores().getSecurity());
+            scores.put("performance", analysis.getScores().getPerformance());
+            scores.put("quality", analysis.getScores().getQuality());
+        }
+        
+        return ReportResponse.builder()
+                .analysisId(analysisId)
+                .repository(analysis.getRepository())
+                .branch(analysis.getBranch())
+                .date(new Date(analysis.getCompletedAt() * 1000))
+                .filesAnalyzed(analysis.getFilesAnalyzed())
+                .totalIssues(issues.size())
+                .scanNumber(analysis.getScanNumber())
+                .criticalCount((int) criticalCount)
+                .highCount((int) highCount)
+                .mediumCount((int) mediumCount)
+                .lowCount((int) lowCount)
+                .processingTime(analysis.getProcessingTimeMs())
+                .issues(issues)
+                .scores(scores)
+                .build();
+    }
+}

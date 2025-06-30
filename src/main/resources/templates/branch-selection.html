@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Select Branch - Smart Code Review</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Select Branch to Analyze</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${repository.name}">Repository Name</h5>
+                <p class="text-muted">Scans remaining: <span th:text="${remainingScans}">3</span> of 3</p>
+                
+                <form th:action="@{/analyze}" method="post">
+                    <input type="hidden" name="sessionId" th:value="${sessionId}">
+                    <input type="hidden" name="repoUrl" th:value="${repository.url}">
+                    
+                    <div class="form-group">
+                        <label for="branch">Select Branch:</label>
+                        <select class="form-control" id="branch" name="branch" required>
+                            <option value="">-- Choose a branch --</option>
+                            <option th:each="branch : ${branches}" 
+                                    th:value="${branch.name}" 
+                                    th:text="${branch.name}">
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-3">
+                        Start Analysis
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
