@@ -95,8 +95,8 @@ public class AuthController {
         try {
             Session session = sessionService.verifyOtp(request.getSessionId(), request.getOtp());
             
-            // Redirect to repository selection
-            return "redirect:/repository/select?sessionId=" + session.getSessionId();
+         // Redirect to repository selection
+            return "redirect:/repository?sessionId=" + session.getSessionId();
             
         } catch (InvalidOtpException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

@@ -22,9 +22,19 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequestMapping("/")
 @RequiredArgsConstructor
 public class AnalysisController {
+    
+    @GetMapping("/repository")
+    public String showRepositorySelect(@RequestParam String sessionId, Model model) {
+        Session session = sessionService.getSession(sessionId);
+        if (!session.getVerified()) {
+            return "redirect:/";
+        }
+        
+        model.addAttribute("sessionId", sessionId);
+        return "repository-select";
+    }
 
 	private final AnalysisOrchestrator analysisOrchestrator;
 	private final SessionService sessionService;

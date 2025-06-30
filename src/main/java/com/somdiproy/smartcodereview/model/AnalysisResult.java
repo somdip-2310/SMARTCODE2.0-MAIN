@@ -48,7 +48,7 @@ public class AnalysisResult {
         return analysisId;
     }
     
-    @DynamoDbSecondaryPartitionKey(indexNames = "SessionIndex")
+    @DynamoDbSecondaryPartitionKey(indexNames = {"SessionIndex"})
     public String getSessionId() {
         return sessionId;
     }

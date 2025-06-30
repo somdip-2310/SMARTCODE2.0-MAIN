@@ -38,6 +38,7 @@ public class Issue {
     }
     
     @DynamoDbSortKey
+    @DynamoDbAttribute("issueId")
     public String getIssueId() {
         return issueId;
     }

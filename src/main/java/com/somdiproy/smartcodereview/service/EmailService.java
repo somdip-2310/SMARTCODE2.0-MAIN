@@ -24,7 +24,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
     
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:noreply@smartcodereview.com}")
     private String fromEmail;
     
     @Value("${spring.profiles.active:dev}")

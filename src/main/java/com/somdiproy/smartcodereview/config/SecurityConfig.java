@@ -15,9 +15,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/auth/**", "/css/**", "/js/**", "/actuator/health").permitAll()
-                .anyRequest().authenticated()
-            );
+                    .requestMatchers("/", "/auth/**", "/css/**", "/js/**", "/actuator/health").permitAll()
+                    .anyRequest().permitAll()  // For development, allow all
+                );
         return http.build();
     }
 }

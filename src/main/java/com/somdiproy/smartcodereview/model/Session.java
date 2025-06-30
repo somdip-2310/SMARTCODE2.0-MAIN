@@ -60,7 +60,7 @@ public class Session {
         return sessionId;
     }
     
-    @DynamoDbSecondaryPartitionKey(indexNames = "EmailIndex")
+    @DynamoDbSecondaryPartitionKey(indexNames = {"EmailIndex"})
     public String getEmail() {
         return email;
     }
