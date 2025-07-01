@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Authentication Required - Smart Code Review</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .auth-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .github-btn {
+            background: #24292e;
+            border: none;
+            transition: all 0.3s;
+        }
+        .github-btn:hover {
+            background: #1a1e22;
+            transform: translateY(-2px);
+        }
+        .security-badge {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card auth-card">
+                        <div class="card-body p-5 text-center">
+                            <!-- Lock Icon -->
+                            <div class="mb-4">
+                                <i class="bi bi-shield-lock display-1 text-warning"></i>
+                            </div>
+                            
+                            <!-- Title -->
+                            <h2 class="h3 mb-3">Private Repository Detected</h2>
+                            <p class="text-muted mb-4">
+                                This repository requires authentication to access. 
+                                Connect your GitHub account to analyze private repositories.
+                            </p>
+                            
+                            <!-- Repository Info -->
+                            <div class="alert alert-info mb-4">
+                                <h6><i class="bi bi-info-circle"></i> Repository Information</h6>
+                                <p class="mb-1">
+                                    <strong>URL:</strong> <code th:text="${repoUrl}">repository-url</code>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Status:</strong> 
+                                    <span class="badge bg-warning">Private Repository</span>
+                                </p>
+                            </div>
+                            
+                            <!-- Security Information -->
+                            <div class="card security-badge mb-4">
+                                <div class="card-body py-3">
+                                    <h6 class="mb-2">
+                                        <i class="bi bi-shield-check"></i> Secure OAuth Authentication
+                                    </h6>
+                                    <ul class="list-unstyled small mb-0">
+                                        <li>✅ We only request repository read access</li>
+                                        <li>✅ Your credentials are never stored</li>
+                                        <li>✅ You can revoke access anytime</li>
+                                        <li>✅ Analysis happens in secure AWS environment</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- GitHub Login Button -->
+                            <div class="d-grid gap-3 mb-4">
+                                <a th:href="@{/auth/github/login(sessionId=${sessionId}, repoUrl=${repoUrl})}" 
+                                   class="btn github-btn btn-lg text-white">
+                                    <i class="bi bi-github"></i> Connect with GitHub
+                                </a>
+                                
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a th:href="@{/repository(sessionId=${sessionId})}" 
+                                           class="btn btn-outline-secondary w-100">
+                                            <i class="bi bi-arrow-left"></i> Back
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-outline-primary w-100" 
+                                                onclick="tryPublicAccess()">
+                                            <i class="bi bi-unlock"></i> Try Public
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Alternative Options -->
+                            <div class="accordion" id="alternativeOptions">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapseAlternatives">
+                                            <i class="bi bi-question-circle me-2"></i> Alternative Options
+                                        </button>
+                                    </h2>
+                                    <div id="collapseAlternatives" class="accordion-collapse collapse" 
+                                         data-bs-parent="#alternativeOptions">
+                                        <div class="accordion-body text-start">
+                                            <h6>If you can't connect GitHub:</h6>
+                                            <ol class="small">
+                                                <li>
+                                                    <strong>Make repository public temporarily</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        Go to repository Settings → Change visibility → Public
+                                                    </small>
+                                                </li>
+                                                <li>
+                                                    <strong>Use a public fork</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        Fork to your personal account and make it public
+                                                    </small>
+                                                </li>
+                                                <li>
+                                                    <strong>Generate personal access token</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        GitHub Settings → Developer settings → Personal access tokens
+                                                    </small>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Session Info -->
+                            <hr class="my-4">
+                            <small class="text-muted">
+                                Session: <code th:text="${sessionId}">session-id</code> • 
+                                Scans remaining: <strong th:text="${remainingScans ?: 3}">3</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function tryPublicAccess() {
+            const confirmed = confirm(
+                "Are you sure this repository is public?\n\n" +
+                "If it's actually private, this will result in an error."
+            );
+            
+            if (confirmed) {
+                // Force retry as public repository
+                const url = new URL(window.location.href);
+                const sessionId = url.searchParams.get('sessionId') || '[[${sessionId}]]';
+                const repoUrl = url.searchParams.get('repoUrl') || '[[${repoUrl}]]';
+                
+                window.location.href = `/repository/branches?sessionId=${sessionId}&repoUrl=${encodeURIComponent(repoUrl)}&forcePublic=true`;
+            }
+        }
+        
+        // Auto-redirect if already connected (poll GitHub status)
+        async function checkGitHubConnection() {
+            try {
+                const sessionId = '[[${sessionId}]]';
+                const response = await fetch(`/auth/github/status?sessionId=${sessionId}`);
+                const status = await response.json();
+                
+                if (status.connected) {
+                    // Redirect to repository branches
+                    const repoUrl = '[[${repoUrl}]]';
+                    window.location.href = `/repository/branches?sessionId=${sessionId}&repoUrl=${encodeURIComponent(repoUrl)}`;
+                }
+            } catch (error) {
+                console.log('GitHub connection check failed:', error);
+            }
+        }
+        
+        // Check connection status every 5 seconds
+        setInterval(checkGitHubConnection, 5000);
+    </script>
+</body>
+</html>

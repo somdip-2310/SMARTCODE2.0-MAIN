@@ -70,30 +70,62 @@ public class AnalysisController {
         }
     }
 
-	@GetMapping("/repository/branches")
-	public String showBranches(@RequestParam String sessionId, @RequestParam String repoUrl, Model model) {
-		Session session = sessionService.getSession(sessionId);
-		if (!session.isVerified()) {
-		    return "redirect:/";
-		}
+    @GetMapping("/repository/branches")
+    public String showBranches(@RequestParam String sessionId, @RequestParam String repoUrl, Model model) {
+        try {
+            Session session = sessionService.getSession(sessionId);
+            if (!session.isVerified()) {
+                return "redirect:/";
+            }
 
-		int remainingScans = 3 - session.getScanCount();
-		if (remainingScans <= 0) {
-			model.addAttribute("error", "You have reached the maximum number of scans for this session");
-			return "error";
-		}
+            int remainingScans = 3 - session.getScanCount();
+            if (remainingScans <= 0) {
+                model.addAttribute("error", "You have reached the maximum number of scans for this session");
+                return "error";
+            }
 
-		Repository repo = gitHubService.getRepository(repoUrl);
-		List<Branch> branches = gitHubService.fetchBranches(repoUrl, session.getGithubToken());
+            // Validate repository URL
+            if (!gitHubService.isValidRepositoryUrl(repoUrl)) {
+                model.addAttribute("error", "Invalid GitHub repository URL format");
+                return "error";
+            }
 
-		model.addAttribute("sessionId", sessionId);
-		model.addAttribute("repository", repo);
-		model.addAttribute("branches", branches);
-		model.addAttribute("remainingScans", remainingScans);
-		model.addAttribute("scanCount", session.getScanCount());
+            // Get repository info with access token
+            Repository repo = gitHubService.getRepository(repoUrl, session.getGithubToken());
+            List<Branch> branches = gitHubService.fetchBranches(repoUrl, session.getGithubToken());
+            
+            // Get file analysis stats for cost estimation
+            GitHubService.FileAnalysisStats stats = gitHubService.getFileStats(repoUrl, repo.getDefaultBranch(), session.getGithubToken());
 
-		return "branch-selection";
-	}
+            model.addAttribute("sessionId", sessionId);
+            model.addAttribute("repository", repo);
+            model.addAttribute("branches", branches);
+            model.addAttribute("remainingScans", remainingScans);
+            model.addAttribute("scanCount", session.getScanCount());
+            model.addAttribute("fileStats", stats);
+            model.addAttribute("githubConnected", session.getGithubToken() != null);
+
+            log.info("📊 Repository analysis preview: {} eligible files, estimated cost: ${}", 
+                     stats.getEligibleFiles(), String.format("%.4f", stats.getEstimatedCost()));
+
+            return "branch-selection";
+            
+        } catch (Exception e) {
+            log.error("Error fetching repository branches", e);
+            
+            // Check if it's a private repo access issue
+            if (e.getMessage().contains("Not Found") && sessionService.getSession(sessionId).getGithubToken() == null) {
+                model.addAttribute("needsGitHubAuth", true);
+                model.addAttribute("repoUrl", repoUrl);
+                model.addAttribute("sessionId", sessionId);
+                model.addAttribute("error", "This repository appears to be private. Please connect your GitHub account to access it.");
+                return "github-auth-required";
+            }
+            
+            model.addAttribute("error", "Error accessing repository: " + e.getMessage());
+            return "error";
+        }
+    }
 
 	@PostMapping("/analyze")
 	public String startAnalysis(@RequestParam String sessionId, @RequestParam String repoUrl,

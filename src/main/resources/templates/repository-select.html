@@ -5,41 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Repository - Smart Code Review</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .github-connection {
+            border: 2px dashed #28a745;
+            background: #f8fff9;
+        }
+        .github-disconnected {
+            border: 2px dashed #6c757d;
+            background: #f8f9fa;
+        }
+        .private-repo-hint {
+            background: linear-gradient(45deg, #fff3cd, #fff8db);
+            border-left: 4px solid #ffc107;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-10">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">📊 Smart Code Review - Repository Selection</h4>
+                        <h4 class="mb-0">
+                            <i class="bi bi-github"></i> Smart Code Review - Repository Selection
+                        </h4>
                     </div>
                     <div class="card-body">
+                        <!-- Session Info -->
                         <div class="alert alert-success" role="alert">
-                            <h5>🎉 Welcome! Your session is verified.</h5>
-                            <p>You have <strong th:text="${remainingScans}">3</strong> scans remaining in this session.</p>
+                            <h5><i class="bi bi-check-circle"></i> Welcome! Your session is verified.</h5>
+                            <p class="mb-1">You have <strong th:text="${remainingScans}">3</strong> scans remaining in this session.</p>
+                            <small class="text-muted">Session expires in approximately 1 hour</small>
                         </div>
                         
-                        <form action="/repository/branches" method="get">
+                        <!-- GitHub Connection Status -->
+                        <div th:if="${session.githubToken != null}" class="alert github-connection" role="alert">
+                            <h6><i class="bi bi-shield-check text-success"></i> GitHub Connected</h6>
+                            <p class="mb-1">✅ You can access private repositories</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Connected via OAuth</small>
+                                <form th:action="@{/auth/github/disconnect}" method="post" class="d-inline">
+                                    <input type="hidden" name="sessionId" th:value="${sessionId}">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-x-circle"></i> Disconnect
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div th:if="${session.githubToken == null}" class="alert github-disconnected" role="alert">
+                            <h6><i class="bi bi-info-circle"></i> GitHub Not Connected</h6>
+                            <p class="mb-2">🔓 You can analyze public repositories only</p>
+                            <a th:href="@{/auth/github/login(sessionId=${sessionId})}" class="btn btn-outline-dark btn-sm">
+                                <i class="bi bi-github"></i> Connect GitHub for Private Repos
+                            </a>
+                        </div>
+                        
+                        <!-- Repository URL Form -->
+                        <form action="/repository/branches" method="get" id="repoForm">
                             <input type="hidden" name="sessionId" th:value="${sessionId}">
                             
                             <div class="mb-3">
-                                <label for="repoUrl" class="form-label">GitHub Repository URL</label>
-                                <input type="url" class="form-control" id="repoUrl" name="repoUrl" 
-                                       placeholder="https://github.com/username/repository" required>
-                                <div class="form-text">Enter the full GitHub repository URL you want to analyze</div>
+                                <label for="repoUrl" class="form-label">
+                                    <i class="bi bi-link-45deg"></i> GitHub Repository URL
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-github"></i>
+                                    </span>
+                                    <input type="url" class="form-control" id="repoUrl" name="repoUrl" 
+                                           placeholder="https://github.com/username/repository" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="validateBtn">
+                                        <i class="bi bi-search"></i> Validate
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Enter the full GitHub repository URL you want to analyze
+                                </div>
+                                
+                                <!-- URL Validation Feedback -->
+                                <div id="urlFeedback" class="mt-2"></div>
+                            </div>
+                            
+                            <!-- Repository Examples -->
+                            <div class="private-repo-hint p-3 rounded mb-3">
+                                <h6><i class="bi bi-lightbulb"></i> Example Repositories</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Public Repositories:</strong>
+                                        <ul class="list-unstyled small">
+                                            <li><a href="#" onclick="fillExample('https://github.com/spring-projects/spring-boot')">Spring Boot</a></li>
+                                            <li><a href="#" onclick="fillExample('https://github.com/microsoft/vscode')">VS Code</a></li>
+                                            <li><a href="#" onclick="fillExample('https://github.com/facebook/react')">React</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Supported Formats:</strong>
+                                        <ul class="list-unstyled small">
+                                            <li>✅ https://github.com/user/repo</li>
+                                            <li>✅ https://github.com/user/repo.git</li>
+                                            <li>❌ git@github.com:user/repo.git</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    🔍 Fetch Repository Branches
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                    <i class="bi bi-arrow-right-circle"></i> Fetch Repository Branches
                                 </button>
                             </div>
                         </form>
                         
+                        <!-- Recent Repositories (if any) -->
+                        <div th:if="${session.scans != null and !session.scans.isEmpty()}" class="mt-4">
+                            <h6><i class="bi bi-clock-history"></i> Recently Analyzed</h6>
+                            <div class="list-group">
+                                <div th:each="scan : ${session.scans}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong th:text="${scan.repository}">repository</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                Branch: <span th:text="${scan.branch}">main</span> • 
+                                                Scan #<span th:text="${scan.scanNumber}">1</span>
+                                            </small>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" 
+                                                onclick="fillExample(this.dataset.repo)" 
+                                                th:data-repo="${scan.repository}">
+                                            <i class="bi bi-arrow-repeat"></i> Re-analyze
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <hr>
                         <div class="text-muted text-center">
-                            <small>Session ID: <code th:text="${sessionId}">session-id</code></small>
+                            <small>
+                                Session ID: <code th:text="${sessionId}">session-id</code> • 
+                                <i class="bi bi-shield-lock"></i> Secure Analysis • 
+                                <i class="bi bi-cpu"></i> Powered by Amazon Nova
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -48,5 +157,81 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // URL validation patterns
+        const GITHUB_URL_PATTERN = /^https?:\/\/github\.com\/[\w\-\.]+\/[\w\-\.]+\/?(?:\.git)?$/;
+        
+        function validateGitHubUrl(url) {
+            return GITHUB_URL_PATTERN.test(url);
+        }
+        
+        function showFeedback(type, message) {
+            const feedback = document.getElementById('urlFeedback');
+            feedback.innerHTML = `
+                <div class="alert alert-${type} alert-sm">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                    ${message}
+                </div>
+            `;
+        }
+        
+        function fillExample(url) {
+            document.getElementById('repoUrl').value = url;
+            validateUrl();
+        }
+        
+        function validateUrl() {
+            const urlInput = document.getElementById('repoUrl');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                document.getElementById('urlFeedback').innerHTML = '';
+                return;
+            }
+            
+            if (validateGitHubUrl(url)) {
+                showFeedback('success', '✅ Valid GitHub repository URL format');
+                return true;
+            } else {
+                showFeedback('danger', '❌ Invalid GitHub URL format. Please use: https://github.com/username/repository');
+                return false;
+            }
+        }
+        
+        // Real-time validation
+        document.getElementById('repoUrl').addEventListener('input', validateUrl);
+        
+        // Validate button
+        document.getElementById('validateBtn').addEventListener('click', function() {
+            const url = document.getElementById('repoUrl').value.trim();
+            if (!url) {
+                showFeedback('warning', '⚠️ Please enter a repository URL first');
+                return;
+            }
+            
+            if (validateUrl()) {
+                // Optional: Test repository access via AJAX
+                showFeedback('info', '🔍 URL format is valid. Click "Fetch Repository Branches" to continue.');
+            }
+        });
+        
+        // Form submission validation
+        document.getElementById('repoForm').addEventListener('submit', function(e) {
+            const url = document.getElementById('repoUrl').value.trim();
+            if (!validateGitHubUrl(url)) {
+                e.preventDefault();
+                showFeedback('danger', '❌ Please enter a valid GitHub repository URL');
+                return false;
+            }
+        });
+        
+        // Auto-validate on page load if URL is pre-filled
+        window.addEventListener('load', function() {
+            const urlInput = document.getElementById('repoUrl');
+            if (urlInput.value.trim()) {
+                validateUrl();
+            }
+        });
+    </script>
 </body>
 </html>

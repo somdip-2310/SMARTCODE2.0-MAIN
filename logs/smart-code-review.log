@@ -7731,3 +7731,500 @@ java.lang.InterruptedException: sleep interrupted
 2025-07-01 13:39:47 [idle-connection-reaper] DEBUG s.a.a.h.a.i.c.IdleConnectionReaper - Shutting down reaper thread.
 2025-07-01 13:39:47 [RMI TCP Connection(43)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-07-01 13:39:47 [RMI TCP Connection(43)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-07-01 14:00:56 [main] INFO  c.s.s.SmartCodeReviewApplication - Starting SmartCodeReviewApplication using Java 17.0.14 with PID 67938 (/Users/somdiproy/Documents/SMARTCODE2.0/SMARTCODE2.0-MAIN/target/classes started by somdiproy in /Users/somdiproy/Documents/SMARTCODE2.0/SMARTCODE2.0-MAIN)
+2025-07-01 14:00:56 [main] DEBUG c.s.s.SmartCodeReviewApplication - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-01 14:00:56 [main] INFO  c.s.s.SmartCodeReviewApplication - The following 1 profile is active: "local"
+2025-07-01 14:00:58 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-07-01 14:00:58 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 22 ms. Found 0 JPA repository interfaces.
+2025-07-01 14:00:59 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8083 (http)
+2025-07-01 14:00:59 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-07-01 14:00:59 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-01 14:00:59 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-07-01 14:00:59 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2986 ms
+2025-07-01 14:00:59 [main] DEBUG o.s.w.f.ServerHttpObservationFilter - Filter 'webMvcObservationFilter' configured for use
+2025-07-01 14:00:59 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-07-01 14:00:59 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-07-01 14:00:59 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-07-01 14:01:00 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-07-01 14:01:00 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-07-01 14:01:00 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2025-07-01 14:01:00 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-07-01 14:01:00 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-07-01 14:01:00 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-07-01 14:01:01 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-01 14:01:01 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-07-01 14:01:01 [main] DEBUG s.a.a.c.e.p.EndpointDiscoveryProviderChain - Unable to load endpoint discovery from SystemPropertiesEndpointDiscoveryProvider():No endpoint discovery setting set.
+2025-07-01 14:01:01 [main] DEBUG s.a.a.c.e.p.EndpointDiscoveryProviderChain - Unable to load endpoint discovery from ProfileEndpointDiscoveryProvider():No endpoint discovery setting provided in profile: default
+2025-07-01 14:01:01 [main] DEBUG s.a.a.c.i.h.l.ClasspathSdkHttpServiceProvider - The HTTP implementation loaded is software.amazon.awssdk.http.apache.ApacheSdkHttpService@42684d86
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Constructor: public com.somdiproy.smartcodereview.model.Session()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property createdAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getCreatedAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property createdAt write method: public void com.somdiproy.smartcodereview.model.Session.setCreatedAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property email read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getEmail()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property email write method: public void com.somdiproy.smartcodereview.model.Session.setEmail(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property emailMasked read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getEmailMasked()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property emailMasked write method: public void com.somdiproy.smartcodereview.model.Session.setEmailMasked(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Ignoring bean property expired because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property expiresAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getExpiresAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property expiresAt write method: public void com.somdiproy.smartcodereview.model.Session.setExpiresAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property githubToken read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getGithubToken()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property githubToken write method: public void com.somdiproy.smartcodereview.model.Session.setGithubToken(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property ipAddress read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getIpAddress()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property ipAddress write method: public void com.somdiproy.smartcodereview.model.Session.setIpAddress(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property organization read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getOrganization()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property organization write method: public void com.somdiproy.smartcodereview.model.Session.setOrganization(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property otpAttempts read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getOtpAttempts()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property otpAttempts write method: public void com.somdiproy.smartcodereview.model.Session.setOtpAttempts(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Ignoring bean property otpExpired because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property otpExpiresAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getOtpExpiresAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property otpExpiresAt write method: public void com.somdiproy.smartcodereview.model.Session.setOtpExpiresAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property otpHash read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getOtpHash()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property otpHash write method: public void com.somdiproy.smartcodereview.model.Session.setOtpHash(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property remainingScans read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getRemainingScans()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property remainingScans write method: public void com.somdiproy.smartcodereview.model.Session.setRemainingScans(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property scanCount read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getScanCount()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property scanCount write method: public void com.somdiproy.smartcodereview.model.Session.setScanCount(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property scanLimit read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getScanLimit()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property scanLimit write method: public void com.somdiproy.smartcodereview.model.Session.setScanLimit(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Constructor: public com.somdiproy.smartcodereview.model.Session$Scan()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property analysisId read method: public java.lang.String com.somdiproy.smartcodereview.model.Session$Scan.getAnalysisId()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property analysisId write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setAnalysisId(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property branch read method: public java.lang.String com.somdiproy.smartcodereview.model.Session$Scan.getBranch()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property branch write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setBranch(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property completedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session$Scan.getCompletedAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property completedAt write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setCompletedAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property repository read method: public java.lang.String com.somdiproy.smartcodereview.model.Session$Scan.getRepository()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property repository write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setRepository(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property scanNumber read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session$Scan.getScanNumber()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property scanNumber write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setScanNumber(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property startedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session$Scan.getStartedAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session$Scan - Property startedAt write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setStartedAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property scans read method: public java.util.List com.somdiproy.smartcodereview.model.Session.getScans()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property scans write method: public void com.somdiproy.smartcodereview.model.Session.setScans(java.util.List)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property sessionId read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getSessionId()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property sessionId write method: public void com.somdiproy.smartcodereview.model.Session.setSessionId(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property ttl read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getTtl()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property ttl write method: public void com.somdiproy.smartcodereview.model.Session.setTtl(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property userAgent read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getUserAgent()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property userAgent write method: public void com.somdiproy.smartcodereview.model.Session.setUserAgent(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property verificationStatus read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getVerificationStatus()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Property verificationStatus write method: public void com.somdiproy.smartcodereview.model.Session.setVerificationStatus(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Session - Ignoring bean property verified because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(com.somdiproy.smartcodereview.model.Session$Scan): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.util.List<com.somdiproy.smartcodereview.model.Session$Scan>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.ListAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property analysisId read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getAnalysisId()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property analysisId write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setAnalysisId(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property branch read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getBranch()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property branch write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setBranch(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property branchSHA read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getBranchSHA()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property branchSHA write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setBranchSHA(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property completedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getCompletedAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property completedAt write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setCompletedAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$Costs()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property bedrock read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Costs.getBedrock()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property bedrock write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Costs.setBedrock(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property infrastructure read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Costs.getInfrastructure()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property infrastructure write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Costs.setInfrastructure(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property total read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Costs.getTotal()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property total write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Costs.setTotal(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property costs read method: public com.somdiproy.smartcodereview.model.AnalysisResult$Costs com.somdiproy.smartcodereview.model.AnalysisResult.getCosts()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property costs write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setCosts(com.somdiproy.smartcodereview.model.AnalysisResult$Costs)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property expiresAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getExpiresAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property expiresAt write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setExpiresAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property filesAnalyzed read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getFilesAnalyzed()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property filesAnalyzed write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setFilesAnalyzed(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSkipped read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getFilesSkipped()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSkipped write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setFilesSkipped(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSubmitted read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getFilesSubmitted()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSubmitted write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setFilesSubmitted(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property processingTimeMs read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getProcessingTimeMs()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property processingTimeMs write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setProcessingTimeMs(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property repository read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getRepository()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property repository write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setRepository(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property scanNumber read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getScanNumber()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property scanNumber write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setScanNumber(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$Scores()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property overall read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getOverall()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property overall write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setOverall(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property performance read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getPerformance()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property performance write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setPerformance(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property quality read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getQuality()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property quality write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setQuality(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property security read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getSecurity()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property security write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setSecurity(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property scores read method: public com.somdiproy.smartcodereview.model.AnalysisResult$Scores com.somdiproy.smartcodereview.model.AnalysisResult.getScores()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property scores write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setScores(com.somdiproy.smartcodereview.model.AnalysisResult$Scores)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property sessionId read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getSessionId()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property sessionId write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setSessionId(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property skipReasons read method: public java.util.Map com.somdiproy.smartcodereview.model.AnalysisResult.getSkipReasons()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property skipReasons write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setSkipReasons(java.util.Map)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property startedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getStartedAt()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property startedAt write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setStartedAt(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property status read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getStatus()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property status write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setStatus(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$Summary()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property bySeverity read method: public java.util.Map com.somdiproy.smartcodereview.model.AnalysisResult$Summary.getBySeverity()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property bySeverity write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Summary.setBySeverity(java.util.Map)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property byType read method: public java.util.Map com.somdiproy.smartcodereview.model.AnalysisResult$Summary.getByType()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property byType write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Summary.setByType(java.util.Map)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property totalIssues read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$Summary.getTotalIssues()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property totalIssues write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Summary.setTotalIssues(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.util.Map<java.lang.String, java.lang.Integer>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.MapAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.util.Map<java.lang.String, java.lang.Integer>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.MapAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property summary read method: public com.somdiproy.smartcodereview.model.AnalysisResult$Summary com.somdiproy.smartcodereview.model.AnalysisResult.getSummary()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property summary write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setSummary(com.somdiproy.smartcodereview.model.AnalysisResult$Summary)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property detection read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getDetection()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property detection write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setDetection(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property screening read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getScreening()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property screening write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setScreening(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property suggestions read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getSuggestions()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property suggestions write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setSuggestions(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property total read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getTotal()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property total write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setTotal(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property tokenUsage read method: public com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage com.somdiproy.smartcodereview.model.AnalysisResult.getTokenUsage()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property tokenUsage write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setTokenUsage(com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property ttl read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getTtl()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.AnalysisResult - Property ttl write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setTtl(java.lang.Long)
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$Costs): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$Scores): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.util.Map<java.lang.String, java.lang.Integer>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.MapAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$Summary): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Constructor: public com.somdiproy.smartcodereview.model.Issue()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property analysisId read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getAnalysisId()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property analysisId write method: public void com.somdiproy.smartcodereview.model.Issue.setAnalysisId(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property category read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getCategory()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property category write method: public void com.somdiproy.smartcodereview.model.Issue.setCategory(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property code read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getCode()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property code write method: public void com.somdiproy.smartcodereview.model.Issue.setCode(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property column read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Issue.getColumn()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property column write method: public void com.somdiproy.smartcodereview.model.Issue.setColumn(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property cvssScore read method: public java.lang.Double com.somdiproy.smartcodereview.model.Issue.getCvssScore()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property cvssScore write method: public void com.somdiproy.smartcodereview.model.Issue.setCvssScore(java.lang.Double)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property cwe read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getCwe()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property cwe write method: public void com.somdiproy.smartcodereview.model.Issue.setCwe(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property description read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getDescription()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property description write method: public void com.somdiproy.smartcodereview.model.Issue.setDescription(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property file read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getFile()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property file write method: public void com.somdiproy.smartcodereview.model.Issue.setFile(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property issueId read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getIssueId()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property issueId write method: public void com.somdiproy.smartcodereview.model.Issue.setIssueId(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property language read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getLanguage()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property language write method: public void com.somdiproy.smartcodereview.model.Issue.setLanguage(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property line read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Issue.getLine()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property line write method: public void com.somdiproy.smartcodereview.model.Issue.setLine(java.lang.Integer)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property severity read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getSeverity()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property severity write method: public void com.somdiproy.smartcodereview.model.Issue.setSeverity(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Suggestion - Creating bean schema
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Suggestion - Constructor: public com.somdiproy.smartcodereview.model.Suggestion()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Suggestion - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Suggestion - Ignoring bean property class because it has no write (set) method.
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property suggestion read method: public com.somdiproy.smartcodereview.model.Suggestion com.somdiproy.smartcodereview.model.Issue.getSuggestion()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property suggestion write method: public void com.somdiproy.smartcodereview.model.Issue.setSuggestion(com.somdiproy.smartcodereview.model.Suggestion)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property title read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getTitle()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property title write method: public void com.somdiproy.smartcodereview.model.Issue.setTitle(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property type read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getType()
+2025-07-01 14:01:02 [main] DEBUG s.a.awssdk.enhanced.dynamodb.beans - com.somdiproy.smartcodereview.model.Issue - Property type write method: public void com.somdiproy.smartcodereview.model.Issue.setType(java.lang.String)
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(com.somdiproy.smartcodereview.model.Suggestion): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:02 [main] DEBUG s.a.a.e.d.DefaultAttributeConverterProvider - Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-01 14:01:03 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Injection of autowired dependencies failed
+2025-07-01 14:01:03 [idle-connection-reaper] DEBUG s.a.a.h.a.i.c.IdleConnectionReaper - Reaper thread: 
+java.lang.InterruptedException: sleep interrupted
+	at java.base/java.lang.Thread.sleep(Native Method)
+	at software.amazon.awssdk.http.apache.internal.conn.IdleConnectionReaper$ReaperTask.run(IdleConnectionReaper.java:151)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2025-07-01 14:01:03 [idle-connection-reaper] DEBUG s.a.a.h.a.i.c.IdleConnectionReaper - Shutting down reaper thread.
+2025-07-01 14:01:03 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-01 14:01:03 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-07-01 14:01:03 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-07-01 14:01:03 [main] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2025-07-01 14:01:03 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-07-01 14:01:03 [main] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1459)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:606)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1222)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1188)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.somdiproy.smartcodereview.SmartCodeReviewApplication.main(SmartCodeReviewApplication.java:10)
+Caused by: java.lang.RuntimeException: Could not postProcess org.springframework.security.config.annotation.web.builders.WebSecurity@6903bec9 of type class org.springframework.security.config.annotation.web.builders.WebSecurity
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:71)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration.setFilterChainProxySecurityConfigurer(WebSecurityConfiguration.java:159)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:854)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509)
+	... 19 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvcHandlerMappingIntrospectorRequestTransformer': Cannot resolve reference to bean 'mvcHandlerMappingIntrospector' while setting constructor argument
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:691)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:206)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:227)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1598)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1556)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$1.getIfUnique(DefaultListableBeanFactory.java:489)
+	at org.springframework.security.config.annotation.web.builders.WebSecurity.setApplicationContext(WebSecurity.java:433)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.invokeAwareInterfaces(ApplicationContextAwareProcessor.java:110)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.postProcessBeforeInitialization(ApplicationContextAwareProcessor.java:85)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInitialization(AbstractAutowireCapableBeanFactory.java:429)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1818)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:419)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.initializeBeanIfNeeded(AutowireBeanFactoryObjectPostProcessor.java:98)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:67)
+	... 27 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration$EnableWebMvcConfiguration': Unsatisfied dependency expressed through method 'setConfigurers' parameter 0: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.OAuth2ClientConfiguration$OAuth2ClientWebMvcSecurityConfiguration': Failed to instantiate [org.springframework.security.config.annotation.web.configuration.OAuth2ClientConfiguration$OAuth2ClientWebMvcSecurityConfiguration]: Constructor threw exception
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.resolveMethodArguments(AutowiredAnnotationBeanPostProcessor.java:896)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:849)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1459)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:606)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:413)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 50 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.OAuth2ClientConfiguration$OAuth2ClientWebMvcSecurityConfiguration': Failed to instantiate [org.springframework.security.config.annotation.web.configuration.OAuth2ClientConfiguration$OAuth2ClientWebMvcSecurityConfiguration]: Constructor threw exception
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:321)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:309)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.addCandidateEntry(DefaultListableBeanFactory.java:1996)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.findAutowireCandidates(DefaultListableBeanFactory.java:1960)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveMultipleBeanCollection(DefaultListableBeanFactory.java:1850)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveMultipleBeans(DefaultListableBeanFactory.java:1818)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1694)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1628)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.resolveMethodArguments(AutowiredAnnotationBeanPostProcessor.java:888)
+	... 70 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.security.config.annotation.web.configuration.OAuth2ClientConfiguration$OAuth2ClientWebMvcSecurityConfiguration]: Constructor threw exception
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:223)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:145)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:318)
+	... 87 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'OAuth2AuthorizedClientManager': Failed to instantiate [org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager]: Factory method 'getAuthorizedClientManager' threw exception with message: Error creating bean with name 'clientRegistrationRepository' defined in class path resource [com/somdiproy/smartcodereview/config/GitHubOAuthConfig.class]: Failed to instantiate [org.springframework.security.oauth2.client.registration.ClientRegistrationRepository]: Factory method 'clientRegistrationRepository' threw exception with message: clientId cannot be empty
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:489)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1745)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$DependencyObjectProvider.getIfUnique(DefaultListableBeanFactory.java:2574)
+	at org.springframework.security.config.annotation.web.configuration.OAuth2ClientConfiguration$OAuth2ClientWebMvcSecurityConfiguration.<init>(OAuth2ClientConfiguration.java:131)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:481)
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:210)
+	... 89 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager]: Factory method 'getAuthorizedClientManager' threw exception with message: Error creating bean with name 'clientRegistrationRepository' defined in class path resource [com/somdiproy/smartcodereview/config/GitHubOAuthConfig.class]: Failed to instantiate [org.springframework.security.oauth2.client.registration.ClientRegistrationRepository]: Factory method 'clientRegistrationRepository' threw exception with message: clientId cannot be empty
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:199)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:88)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:168)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 108 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'clientRegistrationRepository' defined in class path resource [com/somdiproy/smartcodereview/config/GitHubOAuthConfig.class]: Failed to instantiate [org.springframework.security.oauth2.client.registration.ClientRegistrationRepository]: Factory method 'clientRegistrationRepository' threw exception with message: clientId cannot be empty
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:489)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeansOfType(DefaultListableBeanFactory.java:747)
+	at org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors(BeanFactoryUtils.java:372)
+	at org.springframework.beans.factory.BeanFactoryUtils.beanOfTypeIncludingAncestors(BeanFactoryUtils.java:450)
+	at org.springframework.security.config.annotation.web.configuration.OAuth2ClientConfiguration$OAuth2AuthorizedClientManagerRegistrar.getAuthorizedClientManager(OAuth2ClientConfiguration.java:224)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:171)
+	... 111 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.security.oauth2.client.registration.ClientRegistrationRepository]: Factory method 'clientRegistrationRepository' threw exception with message: clientId cannot be empty
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:199)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:88)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:168)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 129 common frames omitted
+Caused by: java.lang.IllegalArgumentException: clientId cannot be empty
+	at org.springframework.util.Assert.hasText(Assert.java:253)
+	at org.springframework.security.oauth2.client.registration.ClientRegistration$Builder.validateAuthorizationCodeGrantType(ClientRegistration.java:686)
+	at org.springframework.security.oauth2.client.registration.ClientRegistration$Builder.build(ClientRegistration.java:637)
+	at com.somdiproy.smartcodereview.config.GitHubOAuthConfig.githubClientRegistration(GitHubOAuthConfig.java:49)
+	at com.somdiproy.smartcodereview.config.GitHubOAuthConfig.clientRegistrationRepository(GitHubOAuthConfig.java:33)
+	at com.somdiproy.smartcodereview.config.GitHubOAuthConfig$$SpringCGLIB$$0.CGLIB$clientRegistrationRepository$0(<generated>)
+	at com.somdiproy.smartcodereview.config.GitHubOAuthConfig$$SpringCGLIB$$FastClass$$1.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:258)
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:400)
+	at com.somdiproy.smartcodereview.config.GitHubOAuthConfig$$SpringCGLIB$$0.clientRegistrationRepository(<generated>)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:171)
+	... 132 common frames omitted
