@@ -29,7 +29,7 @@ public class GitHubService {
     @Value("${analysis.excluded-patterns}")
     private List<String> excludedPatterns;
     
-    @Value("${analysis.max-file-size:5242880}") // 5MB default
+    @Value("${analysis.max-file-size:20971520}") // 20MB default in bytes
     private long maxFileSize;
     
     /**
@@ -50,7 +50,7 @@ public class GitHubService {
             repository.setDefaultBranch(ghRepo.getDefaultBranch());
             repository.setIsPrivate(ghRepo.isPrivate());
             repository.setLanguage(ghRepo.getLanguage());
-            repository.setSize(ghRepo.getSize());
+            repository.setSize((long) ghRepo.getSize());
             repository.setStarsCount(ghRepo.getStargazersCount());
             repository.setForksCount(ghRepo.getForksCount());
             
