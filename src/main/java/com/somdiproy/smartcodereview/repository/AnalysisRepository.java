@@ -21,9 +21,10 @@ import java.util.stream.Collectors;
 /**
  * Repository for Analysis Results using DynamoDB
  */
-@Slf4j
 @Repository
 public class AnalysisRepository {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AnalysisRepository.class);
     
     private final DynamoDbTable<AnalysisResult> analysisTable;
     
@@ -67,13 +68,12 @@ public class AnalysisRepository {
                 .queryConditional(QueryConditional.keyEqualTo(Key.builder()
                         .partitionValue(sessionId)
                         .build()))
-                .indexName("SessionIndex")
                 .build();
         
         return analysisTable.index("SessionIndex")
                 .query(queryRequest)
+                .items()
                 .stream()
-                .flatMap(page -> page.items().stream())
                 .collect(Collectors.toList());
     }
     

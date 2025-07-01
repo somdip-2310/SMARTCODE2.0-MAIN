@@ -19,6 +19,8 @@ import java.util.Optional;
 @Repository
 public class SessionRepository {
     
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SessionRepository.class);
+    
     private final DynamoDbTable<Session> sessionTable;
     
     @Autowired
@@ -46,14 +48,13 @@ public class SessionRepository {
                 .queryConditional(QueryConditional.keyEqualTo(Key.builder()
                         .partitionValue(email)
                         .build()))
-                .indexName("EmailIndex")
                 .build();
         
         return sessionTable.index("EmailIndex")
                 .query(queryRequest)
+                .items()
                 .stream()
-                .findFirst()
-                .map(page -> page.items().stream().findFirst().orElse(null));
+                .findFirst();
     }
     
     public void delete(String sessionId) {

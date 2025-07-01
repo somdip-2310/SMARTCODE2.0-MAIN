@@ -19,9 +19,10 @@ import java.util.stream.Collectors;
 /**
  * Repository for Issue Details using DynamoDB
  */
-@Slf4j
 @Repository
 public class IssueDetailsRepository {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IssueDetailsRepository.class);
     
     private final DynamoDbTable<Issue> issueTable;
     
