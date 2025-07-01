@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import com.somdiproy.smartcodereview.model.Session;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,5 +29,28 @@ public class ApiController {
         response.put("version", "1.0.0");
         response.put("build", "2024.01");
         return response;
+    }
+    
+    @GetMapping("/debug/session/{sessionId}")
+    @ResponseBody
+    public Map<String, Object> debugSession(@PathVariable String sessionId) {
+        try {
+            Session session = sessionService.getSession(sessionId);
+            Map<String, Object> debug = new HashMap<>();
+            debug.put("sessionId", session.getSessionId());
+            debug.put("verificationStatus", session.getVerificationStatus());
+            debug.put("isVerified", session.isVerified());
+            debug.put("getVerified", session.getVerified());
+            debug.put("email", session.getEmailMasked());
+            debug.put("scanCount", session.getScanCount());
+            debug.put("ttl", session.getTtl());
+            debug.put("expiresAt", session.getExpiresAt());
+            return debug;
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            error.put("type", e.getClass().getSimpleName());
+            return error;
+        }
     }
 }

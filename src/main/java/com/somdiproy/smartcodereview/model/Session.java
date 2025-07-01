@@ -20,7 +20,7 @@ public class Session {
     private String otpHash;
     private Integer otpAttempts = 0;
     private Long otpExpiresAt;
-    private Boolean verified = false;
+    private String verificationStatus = "PENDING"; // PENDING, VERIFIED, EXPIRED
     private Long createdAt;
     private Long expiresAt;
     private Long ttl;
@@ -35,7 +35,7 @@ public class Session {
     // Constructors
     public Session() {
         this.otpAttempts = 0;
-        this.verified = Boolean.FALSE;
+        this.verificationStatus = "PENDING";
         this.scanCount = 0;
         this.scanLimit = 3;
         this.remainingScans = 3;
@@ -84,10 +84,6 @@ public class Session {
     public boolean isOtpExpired() {
         return Instant.now().getEpochSecond() > this.otpExpiresAt;
     }
-
-    public boolean isVerified() {
-        return Boolean.TRUE.equals(this.verified);
-    }
     
     // Getters and Setters
     public String getEmailMasked() {
@@ -130,12 +126,26 @@ public class Session {
         this.otpExpiresAt = otpExpiresAt;
     }
 
-    public Boolean getVerified() {
-        return verified != null ? verified : false;
+    @DynamoDbAttribute("verificationStatus")
+    public String getVerificationStatus() {
+        return verificationStatus != null ? verificationStatus : "PENDING";
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus != null ? verificationStatus : "PENDING";
+    }
+
+    // Business logic methods for backward compatibility
+    public boolean isVerified() {
+        return "VERIFIED".equals(this.verificationStatus);
     }
 
     public void setVerified(Boolean verified) {
-        this.verified = verified;
+        this.verificationStatus = Boolean.TRUE.equals(verified) ? "VERIFIED" : "PENDING";
+    }
+
+    public Boolean getVerified() {
+        return "VERIFIED".equals(this.verificationStatus);
     }
 
     public Long getCreatedAt() {
@@ -270,7 +280,7 @@ public class Session {
         }
         
         public SessionBuilder verified(Boolean verified) {
-            session.setVerified(verified);
+            session.setVerificationStatus(Boolean.TRUE.equals(verified) ? "VERIFIED" : "PENDING");
             return this;
         }
         

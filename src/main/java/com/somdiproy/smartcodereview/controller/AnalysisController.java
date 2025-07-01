@@ -45,8 +45,11 @@ public class AnalysisController {
             log.info("🏛️ AnalysisController: Accessing repository page for sessionId: {}", sessionId);
             
             Session session = sessionService.getSession(sessionId);
-            log.info("📋 Session Details: verified={}, email={}, scanCount={}", 
-                     session.isVerified(), session.getEmailMasked(), session.getScanCount());
+            log.info("📋 Session Details: verificationStatus={}, isVerified={}, email={}, scanCount={}", 
+                     session.getVerificationStatus(), session.isVerified(), session.getEmailMasked(), session.getScanCount());
+
+            log.debug("🔍 Raw session data: sessionId={}, verificationStatus={}, ttl={}", 
+                      session.getSessionId(), session.getVerificationStatus(), session.getTtl());
 
             if (!session.isVerified()) {
                 log.warn("❌ Session not verified, redirecting to home");

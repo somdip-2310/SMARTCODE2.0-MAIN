@@ -82,7 +82,7 @@ public class SessionService {
                 .otpHash(otpHash)
                 .otpAttempts(0)
                 .otpExpiresAt(now + otpExpirySeconds)
-                .verified(Boolean.FALSE)
+                .verificationStatus("PENDING")
                 .createdAt(now)
                 .expiresAt(now + sessionDurationSeconds)
                 .ttl(now + sessionDurationSeconds)
@@ -138,17 +138,24 @@ public class SessionService {
         }
         
         // Mark session as verified
-        session.setVerified(Boolean.TRUE);
+     // Mark session as verified
+        session.setVerificationStatus("VERIFIED");
         session.setOtpHash(null); // Clear OTP hash for security
-        Session updatedSession = sessionRepository.update(session);
+
+        // Force a fresh save to DynamoDB
+        sessionRepository.save(session);
+
+        // Retrieve fresh copy to verify persistence
+        Session verifiedSession = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new SessionNotFoundException("Session not found after verification"));
 
         log.info("✅ Successfully verified OTP for sessionId: {}", sessionId);
-        log.info("🔄 Session updated in DynamoDB: verified={}, sessionId={}", 
-                 updatedSession.getVerified(), sessionId);
+        log.info("🔄 Session verification status: {}", verifiedSession.getVerificationStatus());
+        log.info("🔄 Session isVerified(): {}", verifiedSession.isVerified());
         log.info("🔓 Session now verified: email={}, remainingScans={}", 
-                 session.getEmailMasked(), session.getRemainingScans());
+                 verifiedSession.getEmailMasked(), verifiedSession.getRemainingScans());
 
-        return session;
+        return verifiedSession;
     }
     
     /**
