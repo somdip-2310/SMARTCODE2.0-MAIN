@@ -82,7 +82,7 @@ public class SessionService {
                 .otpHash(otpHash)
                 .otpAttempts(0)
                 .otpExpiresAt(now + otpExpirySeconds)
-                .verified(false)
+                .verified(Boolean.FALSE)
                 .createdAt(now)
                 .expiresAt(now + sessionDurationSeconds)
                 .ttl(now + sessionDurationSeconds)
@@ -137,12 +137,14 @@ public class SessionService {
             throw new InvalidOtpException("Invalid OTP");
         }
         
-     // Mark session as verified
-        session.setVerified(true);
+        // Mark session as verified
+        session.setVerified(Boolean.TRUE);
         session.setOtpHash(null); // Clear OTP hash for security
-        sessionRepository.update(session);
+        Session updatedSession = sessionRepository.update(session);
 
         log.info("✅ Successfully verified OTP for sessionId: {}", sessionId);
+        log.info("🔄 Session updated in DynamoDB: verified={}, sessionId={}", 
+                 updatedSession.getVerified(), sessionId);
         log.info("🔓 Session now verified: email={}, remainingScans={}", 
                  session.getEmailMasked(), session.getRemainingScans());
 

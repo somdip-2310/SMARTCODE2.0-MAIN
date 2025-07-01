@@ -73,6 +73,9 @@ public class SessionRepository {
     }
     
     public Session update(Session session) {
-        return sessionTable.updateItem(session);
+        sessionTable.putItem(session);
+        log.debug("Updated session in DynamoDB: sessionId={}, verified={}", 
+                  session.getSessionId(), session.getVerified());
+        return session;
     }
 }

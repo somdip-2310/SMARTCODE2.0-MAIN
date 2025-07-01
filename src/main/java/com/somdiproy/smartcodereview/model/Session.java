@@ -35,7 +35,7 @@ public class Session {
     // Constructors
     public Session() {
         this.otpAttempts = 0;
-        this.verified = false;
+        this.verified = Boolean.FALSE;
         this.scanCount = 0;
         this.scanLimit = 3;
         this.remainingScans = 3;
@@ -86,7 +86,7 @@ public class Session {
     }
 
     public boolean isVerified() {
-        return this.verified != null && this.verified;
+        return Boolean.TRUE.equals(this.verified);
     }
     
     // Getters and Setters
@@ -130,9 +130,8 @@ public class Session {
         this.otpExpiresAt = otpExpiresAt;
     }
 
-    @DynamoDbAttribute("verified")
     public Boolean getVerified() {
-        return verified;
+        return verified != null ? verified : false;
     }
 
     public void setVerified(Boolean verified) {
