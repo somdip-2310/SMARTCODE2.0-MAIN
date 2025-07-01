@@ -60,7 +60,7 @@ public class Session {
     }
     
     public boolean canPerformScan() {
-        return this.scanCount < this.scanLimit && this.verified;
+        return this.scanCount < this.scanLimit && isVerified();
     }
     
     public void addScan(String analysisId, String repository, String branch) {

@@ -31,11 +31,6 @@ public class SessionRepository {
         this.sessionTable = dynamoDbClient.table(tableName, TableSchema.fromBean(Session.class));
     }
     
-    public Session save(Session session) {
-        sessionTable.putItem(session);
-        return session;
-    }
-    
     public Optional<Session> findById(String sessionId) {
         Key key = Key.builder()
                 .partitionValue(sessionId)

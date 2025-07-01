@@ -2,9 +2,12 @@ package com.somdiproy.smartcodereview.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.somdiproy.smartcodereview.model.Session;
+import com.somdiproy.smartcodereview.service.SessionService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +15,14 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
-@RequiredArgsConstructor
 public class ApiController {
+    
+    private final SessionService sessionService;
+    
+    @Autowired
+    public ApiController(SessionService sessionService) {
+        this.sessionService = sessionService;
+    }
     
     @GetMapping("/health")
     public Map<String, String> health() {

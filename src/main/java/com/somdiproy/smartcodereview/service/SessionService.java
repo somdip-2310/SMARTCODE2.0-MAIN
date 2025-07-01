@@ -82,7 +82,7 @@ public class SessionService {
                 .otpHash(otpHash)
                 .otpAttempts(0)
                 .otpExpiresAt(now + otpExpirySeconds)
-                .verificationStatus("PENDING")
+                .verified(Boolean.FALSE)
                 .createdAt(now)
                 .expiresAt(now + sessionDurationSeconds)
                 .ttl(now + sessionDurationSeconds)
