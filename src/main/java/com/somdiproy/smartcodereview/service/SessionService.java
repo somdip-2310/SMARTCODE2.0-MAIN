@@ -7,7 +7,6 @@ import com.somdiproy.smartcodereview.repository.SessionRepository;
 import com.somdiproy.smartcodereview.util.EmailMasker;
 import com.somdiproy.smartcodereview.util.OtpGenerator;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +21,16 @@ import java.util.UUID;
 /**
  * Service for managing user sessions with OTP verification
  */
+@Slf4j
 @Service
 public class SessionService {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SessionService.class);
-    
     private final SessionRepository sessionRepository;
     private final EmailService emailService;
+    private final SecureTokenService secureTokenService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SessionService.class);
     
     @Value("${session.duration:3600}")
     private int sessionDurationSeconds;
@@ -41,32 +42,49 @@ public class SessionService {
     private int otpLength;
     
     @Autowired
-    public SessionService(SessionRepository sessionRepository, EmailService emailService) {
+    public SessionService(SessionRepository sessionRepository, 
+                         EmailService emailService,
+                         SecureTokenService secureTokenService) {
         this.sessionRepository = sessionRepository;
         this.emailService = emailService;
+        this.secureTokenService = secureTokenService;
     }
- 
     
     /**
-     * Create a new session and send OTP
+     * Create a new session with GitHub token validation and send OTP
      */
     public Session createSession(String email, String githubToken, HttpServletRequest request) {
         // Validate GitHub token first
         if (!secureTokenService.isValidGitHubToken(githubToken)) {
             throw new IllegalArgumentException("Invalid GitHub token format. Token must start with 'ghp_'");
         }
-    	Optional<Session> existingSession = sessionRepository.findByEmail(email);
-    	if (existingSession.isPresent() && !existingSession.get().isExpired()) {
-    	    // In local testing, delete existing session to see fresh OTP generation
-    	    if ("local".equals(System.getProperty("spring.profiles.active", "local"))) {
-    	        log.info("🔄 LOCAL TESTING: Deleting existing session to generate fresh OTP");
-    	        deleteSession(existingSession.get().getSessionId());
-    	        // Continue to create new session
-    	    } else {
-    	        log.info("Session already exists for email: {}", EmailMasker.mask(email));
-    	        return existingSession.get();
-    	    }
-    	}
+        
+        // Create the session
+        Session session = createSession(email, request);
+        
+        // Store the GitHub token in secure memory-only storage
+        secureTokenService.storeSessionToken(session.getSessionId(), githubToken);
+        
+        return session;
+    }
+    
+    /**
+     * Create a new session and send OTP (existing method for backward compatibility)
+     */
+    public Session createSession(String email, HttpServletRequest request) {
+        // Check if session already exists for this email
+        Optional<Session> existingSession = sessionRepository.findByEmail(email);
+        if (existingSession.isPresent() && !existingSession.get().isExpired()) {
+            // In local testing, delete existing session to see fresh OTP generation
+            if ("local".equals(System.getProperty("spring.profiles.active", "local"))) {
+                log.info("🔄 LOCAL TESTING: Deleting existing session to generate fresh OTP");
+                deleteSession(existingSession.get().getSessionId());
+                // Continue to create new session
+            } else {
+                log.info("Session already exists for email: {}", EmailMasker.mask(email));
+                return existingSession.get();
+            }
+        }
         
         // Generate OTP
         String otp = OtpGenerator.generate(otpLength);
@@ -99,7 +117,6 @@ public class SessionService {
         // Save session
         sessionRepository.save(session);
         
-     
         // Send OTP email (will be logged in local environment)
         emailService.sendOtpEmail(email, otp);
 
@@ -141,7 +158,6 @@ public class SessionService {
         }
         
         // Mark session as verified
-     // Mark session as verified
         session.setVerificationStatus("VERIFIED");
         session.setOtpHash(null); // Clear OTP hash for security
 
@@ -176,13 +192,23 @@ public class SessionService {
     }
     
     /**
-     * Update GitHub token - No-op since we only support public repositories
+     * Update GitHub token for existing session
      */
-	public Session updateGithubToken(String sessionId, String githubToken) {
-
-		log.info("📝 Note: GitHub token update requested but not supported in public-only mode");
-		return getSession(sessionId);
-	}
+    public Session updateGithubToken(String sessionId, String githubToken) {
+        // Validate the new token
+        if (!secureTokenService.isValidGitHubToken(githubToken)) {
+            throw new IllegalArgumentException("Invalid GitHub token format. Token must start with 'ghp_'");
+        }
+        
+        // Verify session exists and is valid
+        Session session = getSession(sessionId);
+        
+        // Update token in secure storage
+        secureTokenService.storeSessionToken(sessionId, githubToken);
+        
+        log.info("📝 Updated GitHub token for session: {}", sessionId);
+        return session;
+    }
     
     /**
      * Resend OTP for existing session
@@ -216,7 +242,12 @@ public class SessionService {
      * Delete session
      */
     public void deleteSession(String sessionId) {
+        // Remove associated GitHub token
+        secureTokenService.removeSessionToken(sessionId);
+        
+        // Delete session from repository
         sessionRepository.delete(sessionId);
+        
         log.info("Deleted session: {}", sessionId);
     }
     

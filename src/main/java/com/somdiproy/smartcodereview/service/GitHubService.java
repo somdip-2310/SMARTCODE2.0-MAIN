@@ -387,7 +387,26 @@ public class GitHubService {
         
         
          // No anonymous access - token is required
-        throw new IOException("GitHub personal access token is required. Please provide a valid token to access repositories.");
+     // User token is required - no anonymous access
+        if (!StringUtils.hasText(accessToken)) {
+            throw new IOException("GitHub personal access token is required. Please provide a valid token to access repositories.");
+        }
+
+        try {
+            GitHub github = new GitHubBuilder().withOAuthToken(accessToken).build();
+            GHRateLimit rateLimit = github.getRateLimit();
+            log.info("🔑 Using user-provided GitHub token. Rate limit: {}/{}", 
+                     rateLimit.getRemaining(), rateLimit.getLimit());
+            
+            if (rateLimit.getRemaining() < 10) {
+                throw new IOException("GitHub rate limit nearly exceeded. Please wait before making more requests.");
+            }
+            
+            return github;
+        } catch (Exception e) {
+            log.error("Failed to authenticate with GitHub token", e);
+            throw new IOException("Invalid GitHub token or authentication failed. Please check your token and try again.");
+        }
     }
     
     /**
