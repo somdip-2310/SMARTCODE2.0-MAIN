@@ -19,6 +19,7 @@ public class Analysis {
     private Integer totalFiles;
     private Integer issuesFound;
     private List<String> stages = new ArrayList<>();
+    private String error;
     
     public enum AnalysisStatus {
         PENDING,
@@ -81,6 +82,10 @@ public class Analysis {
         return stages;
     }
     
+    public String getError() {
+        return error;
+    }
+    
     // Setters
     public void setAnalysisId(String analysisId) {
         this.analysisId = analysisId;
@@ -128,6 +133,10 @@ public class Analysis {
     
     public void setStages(List<String> stages) {
         this.stages = stages;
+    }
+    
+    public void setError(String error) {
+        this.error = error;
     }
     
     // Builder pattern
@@ -195,6 +204,11 @@ public class Analysis {
         
         public AnalysisBuilder stages(List<String> stages) {
             analysis.setStages(stages);
+            return this;
+        }
+        
+        public AnalysisBuilder error(String error) {
+            analysis.setError(error);
             return this;
         }
         

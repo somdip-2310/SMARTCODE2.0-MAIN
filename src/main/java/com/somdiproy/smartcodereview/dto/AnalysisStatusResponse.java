@@ -10,6 +10,7 @@ public class AnalysisStatusResponse {
     private Integer totalFiles;
     private Integer issuesFound;
     private Integer estimatedTimeRemaining;
+    private String error;
     
     // Constructors
     public AnalysisStatusResponse() {}
@@ -71,6 +72,14 @@ public class AnalysisStatusResponse {
         this.estimatedTimeRemaining = estimatedTimeRemaining;
     }
     
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+    
     // Builder pattern
     public static AnalysisStatusResponseBuilder builder() {
         return new AnalysisStatusResponseBuilder();
@@ -111,6 +120,11 @@ public class AnalysisStatusResponse {
         
         public AnalysisStatusResponseBuilder estimatedTimeRemaining(Integer estimatedTimeRemaining) {
             response.setEstimatedTimeRemaining(estimatedTimeRemaining);
+            return this;
+        }
+        
+        public AnalysisStatusResponseBuilder error(String error) {
+            response.setError(error);
             return this;
         }
         

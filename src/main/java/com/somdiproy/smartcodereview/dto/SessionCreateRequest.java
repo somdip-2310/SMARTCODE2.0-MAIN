@@ -3,7 +3,7 @@ package com.somdiproy.smartcodereview.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-
+import jakarta.validation.constraints.Pattern;
 /**
  * Request DTO for session creation
  */

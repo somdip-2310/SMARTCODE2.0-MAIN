@@ -5,7 +5,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 /**
  * Session entity for managing user sessions with DynamoDB
  * Supports 1-hour sessions with 3 scan limit

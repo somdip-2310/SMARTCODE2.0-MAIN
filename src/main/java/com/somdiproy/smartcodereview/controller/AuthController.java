@@ -24,7 +24,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.somdiproy.smartcodereview.service.SecureTokenService;
 
 /**
  * Controller for authentication and session management
@@ -37,10 +37,12 @@ public class AuthController {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
     
     private final SessionService sessionService;
+    private final SecureTokenService secureTokenService;
     
     @Autowired
-    public AuthController(SessionService sessionService) {
+    public AuthController(SessionService sessionService, SecureTokenService secureTokenService) {
         this.sessionService = sessionService;
+        this.secureTokenService = secureTokenService;
     }
     
     /**

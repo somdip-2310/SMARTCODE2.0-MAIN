@@ -246,6 +246,11 @@ public class AnalysisResult {
             return this;
         }
         
+        public AnalysisResultBuilder filesSubmitted(Integer filesSubmitted) {
+            analysisResult.setFilesSubmitted(filesSubmitted);
+            return this;
+        }
+        
         public AnalysisResult build() {
             return analysisResult;
         }
