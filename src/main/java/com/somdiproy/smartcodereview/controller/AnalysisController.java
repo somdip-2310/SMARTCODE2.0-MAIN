@@ -90,12 +90,12 @@ public class AnalysisController {
                 return "error";
             }
 
-            // Get repository info with access token
-            Repository repo = gitHubService.getRepository(repoUrl, session.getGithubToken());
-            List<Branch> branches = gitHubService.fetchBranches(repoUrl, session.getGithubToken());
-            
+         // Get repository info (public only)
+            Repository repo = gitHubService.getRepository(repoUrl, null);
+            List<Branch> branches = gitHubService.fetchBranches(repoUrl, null);
+
             // Get file analysis stats for cost estimation
-            GitHubService.FileAnalysisStats stats = gitHubService.getFileStats(repoUrl, repo.getDefaultBranch(), session.getGithubToken());
+            GitHubService.FileAnalysisStats stats = gitHubService.getFileStats(repoUrl, repo.getDefaultBranch(), null);
 
             model.addAttribute("sessionId", sessionId);
             model.addAttribute("repository", repo);
@@ -103,7 +103,7 @@ public class AnalysisController {
             model.addAttribute("remainingScans", remainingScans);
             model.addAttribute("scanCount", session.getScanCount());
             model.addAttribute("fileStats", stats);
-            model.addAttribute("githubConnected", session.getGithubToken() != null);
+            model.addAttribute("publicOnly", true);
 
             log.info("📊 Repository analysis preview: {} eligible files, estimated cost: ${}", 
                      stats.getEligibleFiles(), String.format("%.4f", stats.getEstimatedCost()));
@@ -114,12 +114,10 @@ public class AnalysisController {
             log.error("Error fetching repository branches", e);
             
             // Check if it's a private repo access issue
-            if (e.getMessage().contains("Not Found") && sessionService.getSession(sessionId).getGithubToken() == null) {
-                model.addAttribute("needsGitHubAuth", true);
-                model.addAttribute("repoUrl", repoUrl);
-                model.addAttribute("sessionId", sessionId);
-                model.addAttribute("error", "This repository appears to be private. Please connect your GitHub account to access it.");
-                return "github-auth-required";
+         // Check if it's a private repo that we can't access
+            if (e.getMessage().contains("Not Found")) {
+                model.addAttribute("error", "Repository not found or is private. Please ensure the repository URL is correct and the repository is public.");
+                return "error";
             }
             
             model.addAttribute("error", "Error accessing repository: " + e.getMessage());

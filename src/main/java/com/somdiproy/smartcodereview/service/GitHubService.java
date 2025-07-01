@@ -249,10 +249,13 @@ public class GitHubService {
      */
     public FileAnalysisStats getFileStats(String repoUrl, String branch, String accessToken) {
         try {
+            log.info("🔍 Analyzing file stats for repo: {} branch: {}", repoUrl, branch);
+            
             GitHub github = createGitHubClient(accessToken);
             GHRepository ghRepo = getGHRepository(github, repoUrl);
             
             GHTree tree = ghRepo.getTreeRecursive(branch, 1);
+            log.info("📁 Found {} total entries in branch: {}", tree.getTree().size(), branch);
             
             Map<String, Integer> languageStats = new HashMap<>();
             Map<String, Integer> sizeDistribution = new HashMap<>();
@@ -366,31 +369,23 @@ public class GitHubService {
     /**
      * Create GitHub client with fallback options
      */
+    /**
+     * Create GitHub client for public repositories only
+     */
     private GitHub createGitHubClient(String accessToken) throws IOException {
-        // Use provided token first
-        if (StringUtils.hasText(accessToken)) {
-            try {
-                GitHub github = new GitHubBuilder().withOAuthToken(accessToken).build();
-                // Test the token
-                github.getRateLimit();
-                return github;
-            } catch (Exception e) {
-                log.warn("⚠️ Provided GitHub token is invalid, falling back to default");
-            }
-        }
-        
-        // Use default token
+        // Use default token if available
         if (StringUtils.hasText(defaultGithubToken)) {
             try {
                 GitHub github = new GitHubBuilder().withOAuthToken(defaultGithubToken).build();
                 github.getRateLimit();
+                log.info("🔑 Using configured GitHub token for API access");
                 return github;
             } catch (Exception e) {
                 log.warn("⚠️ Default GitHub token is invalid, using anonymous access");
             }
         }
         
-        // Anonymous access (limited rate limit)
+        // Anonymous access for public repositories only
         GitHub github = GitHub.connectAnonymously();
         GHRateLimit rateLimit = github.getRateLimit();
         

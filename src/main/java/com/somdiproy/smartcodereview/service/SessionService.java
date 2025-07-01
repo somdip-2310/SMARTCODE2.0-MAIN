@@ -173,13 +173,13 @@ public class SessionService {
     }
     
     /**
-     * Update GitHub token for session
+     * Update GitHub token - No-op since we only support public repositories
      */
-    public Session updateGithubToken(String sessionId, String githubToken) {
-        Session session = getSession(sessionId);
-        session.setGithubToken(githubToken);
-        return sessionRepository.update(session);
-    }
+	public Session updateGithubToken(String sessionId, String githubToken) {
+
+		log.info("📝 Note: GitHub token update requested but not supported in public-only mode");
+		return getSession(sessionId);
+	}
     
     /**
      * Resend OTP for existing session

@@ -39,28 +39,12 @@
                             <small class="text-muted">Session expires in approximately 1 hour</small>
                         </div>
                         
-                        <!-- GitHub Connection Status -->
-                        <div th:if="${session.githubToken != null}" class="alert github-connection" role="alert">
-                            <h6><i class="bi bi-shield-check text-success"></i> GitHub Connected</h6>
-                            <p class="mb-1">✅ You can access private repositories</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Connected via OAuth</small>
-                                <form th:action="@{/auth/github/disconnect}" method="post" class="d-inline">
-                                    <input type="hidden" name="sessionId" th:value="${sessionId}">
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                        <i class="bi bi-x-circle"></i> Disconnect
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        
-                        <div th:if="${session.githubToken == null}" class="alert github-disconnected" role="alert">
-                            <h6><i class="bi bi-info-circle"></i> GitHub Not Connected</h6>
-                            <p class="mb-2">🔓 You can analyze public repositories only</p>
-                            <a th:href="@{/auth/github/login(sessionId=${sessionId})}" class="btn btn-outline-dark btn-sm">
-                                <i class="bi bi-github"></i> Connect GitHub for Private Repos
-                            </a>
-                        </div>
+						<!-- GitHub Connection Status (Public Only) -->
+						<div class="alert alert-info" role="alert">
+						    <h6><i class="bi bi-info-circle"></i> Public Repository Analysis</h6>
+						    <p class="mb-1">🔓 You can analyze public GitHub repositories</p>
+						    <small class="text-muted">Private repository support is not currently available</small>
+						</div>
                         
                         <!-- Repository URL Form -->
                         <form action="/repository/branches" method="get" id="repoForm">

@@ -330,8 +330,7 @@ public class Session {
         }
         
         public SessionBuilder githubToken(String githubToken) {
-            session.setGithubToken(githubToken);
-            return this;
+            return null;
         }
         
         public Session build() {
