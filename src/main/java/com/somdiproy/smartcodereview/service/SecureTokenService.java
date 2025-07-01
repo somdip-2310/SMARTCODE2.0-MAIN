@@ -2,7 +2,10 @@ package com.somdiproy.smartcodereview.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+
+import jakarta.annotation.PreDestroy;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -66,5 +69,17 @@ public class SecureTokenService {
      */
     public boolean isValidGitHubToken(String token) {
         return token != null && token.matches("ghp_[a-zA-Z0-9]{36,}");
+    }
+    @EventListener
+    public void handleSessionExpired(SessionExpiredEvent event) {
+        removeSessionToken(event.getSessionId());
+        log.info("Cleaned up token for expired session: {}", event.getSessionId());
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        scheduler.shutdown();
+        sessionTokens.clear();
+        log.info("Cleaned up all temporary tokens on shutdown");
     }
 }
