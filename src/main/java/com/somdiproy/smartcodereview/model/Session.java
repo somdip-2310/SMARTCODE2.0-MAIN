@@ -33,8 +33,16 @@ public class Session {
     private String githubToken;
    
     
-    @DynamoDbAttribute("githubTokenEncrypted")
     private String githubTokenEncrypted;  // Encrypted token stored temporarily
+    
+    @DynamoDbAttribute("githubTokenEncrypted")
+    public String getGithubTokenEncrypted() {
+        return githubTokenEncrypted;
+    }
+
+    public void setGithubTokenEncrypted(String githubTokenEncrypted) {
+        this.githubTokenEncrypted = githubTokenEncrypted;
+    }
     
     // Constructors
     public Session() {

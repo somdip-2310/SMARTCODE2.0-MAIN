@@ -11,13 +11,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.HttpException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.somdiproy.smartcodereview.service.SecureTokenService;
+import java.io.IOException;
 
 /**
  * Controller for authentication and session management
@@ -84,14 +88,56 @@ public class AuthController {
             GHMyself myself = github.getMyself();
             GHRateLimit rateLimit = github.getRateLimit();
             
+            // Basic validation successful
             response.put("valid", true);
             response.put("username", myself.getLogin());
-            response.put("rateLimit", rateLimit.getRemaining() + "/" + rateLimit.getLimit());
-            response.put("scopes", github.getMeta().getScopes());
+            response.put("email", myself.getEmail());
+            response.put("name", myself.getName());
+            
+            // Rate limit information
+            response.put("rateLimit", Map.of(
+                "remaining", rateLimit.getRemaining(),
+                "limit", rateLimit.getLimit(),
+                "resetAt", new Date(rateLimit.getResetEpochSeconds() * 1000L)
+            ));
+            
+            // Permission checks
+            response.put("canReadRepo", true); // If we got this far, token has basic access
+            response.put("publicRepos", myself.getPublicRepoCount());
+            response.put("privateRepos", myself.getTotalPrivateRepoCount());
+            
+            // Token validation status
+            response.put("tokenValid", github.isCredentialValid());
+            
+            // Additional user info that might be useful
+            response.put("userType", myself.getType());
+            response.put("company", myself.getCompany());
+            
+        } catch (GHFileNotFoundException e) {
+            response.put("valid", false);
+            response.put("error", "Token does not have required permissions. Please ensure your token has 'repo' scope.");
+            response.put("errorType", "INSUFFICIENT_PERMISSIONS");
+            
+        } catch (HttpException e) {
+            response.put("valid", false);
+            if (e.getResponseCode() == 401) {
+                response.put("error", "Invalid GitHub token. Please check your token and try again.");
+                response.put("errorType", "INVALID_TOKEN");
+            } else {
+                response.put("error", "GitHub API error: " + e.getMessage());
+                response.put("errorType", "API_ERROR");
+            }
+            
+        } catch (IOException e) {
+            response.put("valid", false);
+            response.put("error", "Network error while validating token. Please try again.");
+            response.put("errorType", "NETWORK_ERROR");
             
         } catch (Exception e) {
             response.put("valid", false);
-            response.put("error", "Invalid token or insufficient permissions");
+            response.put("error", "Unexpected error during token validation: " + e.getMessage());
+            response.put("errorType", "UNKNOWN_ERROR");
+            log.error("Token validation failed", e);
         }
         
         return response;
