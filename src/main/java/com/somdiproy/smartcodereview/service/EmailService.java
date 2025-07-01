@@ -31,6 +31,9 @@ public class EmailService {
     
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
+
+    @Value("${session.otp-expiry:300}")
+    private int otpExpirySeconds;
     
     @Autowired
     public EmailService(JavaMailSender mailSender, SpringTemplateEngine templateEngine) {
@@ -41,10 +44,16 @@ public class EmailService {
     /**
      * Send OTP email
      */
+    /**
+     * Send OTP email
+     */
     public void sendOtpEmail(String toEmail, String otp) {
-        // In dev mode, just log the OTP
-        if ("dev".equals(activeProfile)) {
-            log.info("DEV MODE - OTP for {}: {}", toEmail, otp);
+        // In local/dev mode, just log the OTP
+        if ("local".equals(activeProfile) || "dev".equals(activeProfile)) {
+            log.info("🔐 LOCAL TESTING - OTP Code for {}: {} (Valid for {} minutes)", 
+                     toEmail, otp, otpExpirySeconds / 60);
+            log.info("📧 Email: {} | 🔢 OTP: {} | ⏰ Expires in: {} seconds", 
+                     toEmail, otp, otpExpirySeconds);
             return;
         }
         
@@ -69,7 +78,15 @@ public class EmailService {
             
         } catch (MessagingException e) {
             log.error("Failed to send OTP email to: {}", toEmail, e);
-            // Fallback to simple email
+            
+            // In local/dev mode, log the OTP as fallback
+            if ("local".equals(activeProfile) || "dev".equals(activeProfile)) {
+                log.warn("📧 EMAIL FALLBACK - Since email sending failed, here's your OTP:");
+                log.warn("🔐 OTP for {}: {} (Copy this for testing)", toEmail, otp);
+                return;
+            }
+            
+            // Fallback to simple email in production
             sendSimpleOtpEmail(toEmail, otp);
         }
     }
@@ -78,10 +95,11 @@ public class EmailService {
      * Send analysis complete notification
      */
     public void sendAnalysisCompleteEmail(String toEmail, String repository, String branch, String reportUrl) {
-        if ("dev".equals(activeProfile)) {
-            log.info("DEV MODE - Analysis complete for {}: {} - {}", toEmail, repository, branch);
-            return;
-        }
+    	if ("local".equals(activeProfile) || "dev".equals(activeProfile)) {
+    	    log.info("🎉 LOCAL MODE - Analysis complete for {}: {} - Branch: {} - Report URL: {}", 
+    	             toEmail, repository, branch, reportUrl);
+    	    return;
+    	}
         
         try {
             MimeMessage message = mailSender.createMimeMessage();

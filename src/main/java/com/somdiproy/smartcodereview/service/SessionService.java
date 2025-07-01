@@ -89,11 +89,14 @@ public class SessionService {
         // Save session
         sessionRepository.save(session);
         
-        // Send OTP email
+     
+        // Send OTP email (will be logged in local environment)
         emailService.sendOtpEmail(email, otp);
-        
-        log.info("Created new session for email: {} with sessionId: {}", 
-                EmailMasker.mask(email), session.getSessionId());
+
+        log.info("✅ Created new session for email: {} with sessionId: {}", 
+                 EmailMasker.mask(email), session.getSessionId());
+        log.info("🔐 Session Details - Email: {} | SessionId: {} | OTP Length: {} | Expires: {} minutes", 
+                 EmailMasker.mask(email), session.getSessionId(), otpLength, otpExpirySeconds / 60);
         
         return session;
     }
@@ -182,10 +185,10 @@ public class SessionService {
         
         sessionRepository.update(session);
         
-        // Send OTP email
+        // Send OTP email (will be logged in local environment)
         emailService.sendOtpEmail(session.getEmail(), otp);
-        
-        log.info("Resent OTP for sessionId: {}", sessionId);
+
+        log.info("🔄 Resent OTP for sessionId: {} | Email: {}", sessionId, EmailMasker.mask(session.getEmail()));
     }
     
     /**
