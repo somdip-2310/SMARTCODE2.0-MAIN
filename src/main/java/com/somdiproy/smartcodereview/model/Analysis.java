@@ -12,16 +12,61 @@ import java.util.List;
 /**
  * Analysis model (for tracking in-progress analyses)
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class Analysis {
     private String analysisId;
     private String sessionId;
     private String repository;
     private String branch;
-    private AnalysisStatus status;
+    public void setAnalysisId(String analysisId) {
+		this.analysisId = analysisId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public void setRepository(String repository) {
+		this.repository = repository;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+
+	public void setStatus(AnalysisStatus status) {
+		this.status = status;
+	}
+
+	public void setProgress(Integer progress) {
+		this.progress = progress;
+	}
+
+	public void setStartedAt(Long startedAt) {
+		this.startedAt = startedAt;
+	}
+
+	public void setCompletedAt(Long completedAt) {
+		this.completedAt = completedAt;
+	}
+
+	public void setFilesProcessed(List<String> filesProcessed) {
+		this.filesProcessed = filesProcessed;
+	}
+
+	public void setTotalFiles(Integer totalFiles) {
+		this.totalFiles = totalFiles;
+	}
+
+	public void setIssuesFound(Integer issuesFound) {
+		this.issuesFound = issuesFound;
+	}
+
+	public void setStages(List<String> stages) {
+		this.stages = stages;
+	}
+
+	private AnalysisStatus status;
     private Integer progress;
     private Long startedAt;
     private Long completedAt;

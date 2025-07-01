@@ -10,6 +10,8 @@ import com.somdiproy.smartcodereview.repository.SessionRepository;
 import com.somdiproy.smartcodereview.service.GitHubService.GitHubFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class AnalysisOrchestrator {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AnalysisOrchestrator.class);
     
     private final SessionRepository sessionRepository;
     private final AnalysisRepository analysisRepository;
@@ -30,6 +32,19 @@ public class AnalysisOrchestrator {
     
     // In-memory storage for analysis progress (replace with Redis in production)
     private final ConcurrentHashMap<String, Analysis> analysisProgress = new ConcurrentHashMap<>();
+    
+    @Autowired
+    public AnalysisOrchestrator(SessionRepository sessionRepository,
+                               AnalysisRepository analysisRepository,
+                               GitHubService gitHubService,
+                               LambdaInvokerService lambdaInvokerService) {
+        this.sessionRepository = sessionRepository;
+        this.analysisRepository = analysisRepository;
+        this.gitHubService = gitHubService;
+        this.lambdaInvokerService = lambdaInvokerService;
+    }
+    
+    
     
     public Analysis analyzeRepository(String repoUrl, String branch, String sessionId) {
         // Validate session and scan limit

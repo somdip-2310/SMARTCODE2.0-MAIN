@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.somdiproy.smartcodereview.service.GitHubService.GitHubFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.SdkBytes;
@@ -15,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class LambdaInvokerService {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
     
     private final LambdaClient lambdaClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -32,6 +34,11 @@ public class LambdaInvokerService {
     @Value("${aws.lambda.functions.suggestions}")
     private String suggestionsFunctionArn;
     
+    @Autowired
+    public LambdaInvokerService(LambdaClient lambdaClient) {
+        this.lambdaClient = lambdaClient;
+    }
+
     public List<String> invokeScreening(List<GitHubFile> files) {
         try {
             Map<String, Object> payload = Map.of(

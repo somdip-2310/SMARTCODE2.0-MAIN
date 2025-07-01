@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 /**
  * Service for interacting with GitHub API
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class GitHubService {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GitHubService.class);
     
     @Value("${github.api.token:}")
     private String defaultGithubToken;
@@ -34,6 +34,7 @@ public class GitHubService {
     
     @Value("${analysis.max-file-size:5242880}") // 5MB default
     private long maxFileSize;
+    
     
     /**
      * Get repository information
@@ -272,8 +273,9 @@ public class GitHubService {
     /**
      * Data class for GitHub file
      */
-    @Data
-    @lombok.Builder
+    /**
+     * Data class for GitHub file
+     */
     public static class GitHubFile {
         private String path;
         private String name;
@@ -281,5 +283,79 @@ public class GitHubService {
         private long size;
         private String sha;
         private String language;
+        
+        public GitHubFile() {}
+        
+        private GitHubFile(Builder builder) {
+            this.path = builder.path;
+            this.name = builder.name;
+            this.content = builder.content;
+            this.size = builder.size;
+            this.sha = builder.sha;
+            this.language = builder.language;
+        }
+        
+        // Getters
+        public String getPath() { return path; }
+        public String getName() { return name; }
+        public String getContent() { return content; }
+        public long getSize() { return size; }
+        public String getSha() { return sha; }
+        public String getLanguage() { return language; }
+        
+        // Setters
+        public void setPath(String path) { this.path = path; }
+        public void setName(String name) { this.name = name; }
+        public void setContent(String content) { this.content = content; }
+        public void setSize(long size) { this.size = size; }
+        public void setSha(String sha) { this.sha = sha; }
+        public void setLanguage(String language) { this.language = language; }
+        
+        public static Builder builder() {
+            return new Builder();
+        }
+        
+        public static class Builder {
+            private String path;
+            private String name;
+            private String content;
+            private long size;
+            private String sha;
+            private String language;
+            
+            public Builder path(String path) {
+                this.path = path;
+                return this;
+            }
+            
+            public Builder name(String name) {
+                this.name = name;
+                return this;
+            }
+            
+            public Builder content(String content) {
+                this.content = content;
+                return this;
+            }
+            
+            public Builder size(long size) {
+                this.size = size;
+                return this;
+            }
+            
+            public Builder sha(String sha) {
+                this.sha = sha;
+                return this;
+            }
+            
+            public Builder language(String language) {
+                this.language = language;
+                return this;
+            }
+            
+            public GitHubFile build() {
+                return new GitHubFile(this);
+            }
+        }
     }
 }

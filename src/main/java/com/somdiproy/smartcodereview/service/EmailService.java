@@ -2,6 +2,8 @@ package com.somdiproy.smartcodereview.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,10 +18,10 @@ import jakarta.mail.internet.MimeMessage;
 /**
  * Service for sending emails including OTP emails
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmailService {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EmailService.class);
     
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
@@ -29,6 +31,12 @@ public class EmailService {
     
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
+    
+    @Autowired
+    public EmailService(JavaMailSender mailSender, SpringTemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
     
     /**
      * Send OTP email

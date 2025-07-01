@@ -9,6 +9,8 @@ import com.somdiproy.smartcodereview.util.OtpGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,10 @@ import java.util.UUID;
 /**
  * Service for managing user sessions with OTP verification
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class SessionService {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SessionService.class);
     
     private final SessionRepository sessionRepository;
     private final EmailService emailService;
@@ -37,6 +39,13 @@ public class SessionService {
     
     @Value("${session.otp-length:6}")
     private int otpLength;
+    
+    @Autowired
+    public SessionService(SessionRepository sessionRepository, EmailService emailService) {
+        this.sessionRepository = sessionRepository;
+        this.emailService = emailService;
+    }
+ 
     
     /**
      * Create a new session and send OTP
