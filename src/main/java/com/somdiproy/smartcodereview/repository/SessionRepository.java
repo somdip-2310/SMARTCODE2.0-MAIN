@@ -8,9 +8,11 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 /**
@@ -50,11 +52,16 @@ public class SessionRepository {
                         .build()))
                 .build();
         
-        return sessionTable.index("EmailIndex")
+        Iterator<Page<Session>> pages = sessionTable.index("EmailIndex")
                 .query(queryRequest)
-                .items()
-                .stream()
-                .findFirst();
+                .iterator();
+        
+        if (pages.hasNext()) {
+            Page<Session> firstPage = pages.next();
+            return firstPage.items().stream().findFirst();
+        }
+        
+        return Optional.empty();
     }
     
     public void delete(String sessionId) {

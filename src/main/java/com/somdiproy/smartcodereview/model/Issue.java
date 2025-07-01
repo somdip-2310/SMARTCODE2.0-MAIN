@@ -1,18 +1,10 @@
 package com.somdiproy.smartcodereview.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 
 /**
  * Issue entity for DynamoDB storage
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @DynamoDbBean
 public class Issue {
     
@@ -32,14 +24,130 @@ public class Issue {
     private Double cvssScore;
     private Suggestion suggestion;
     
+    // Constructors
+    public Issue() {}
+    
+    // Getters and Setters
     @DynamoDbPartitionKey
     public String getAnalysisId() {
         return analysisId;
+    }
+    
+    public void setAnalysisId(String analysisId) {
+        this.analysisId = analysisId;
     }
     
     @DynamoDbSortKey
     @DynamoDbAttribute("issueId")
     public String getIssueId() {
         return issueId;
+    }
+    
+    public void setIssueId(String issueId) {
+        this.issueId = issueId;
+    }
+    
+    public String getType() {
+        return type;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
+    }
+    
+    public String getTitle() {
+        return title;
+    }
+    
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public String getSeverity() {
+        return severity;
+    }
+    
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+    
+    public String getCategory() {
+        return category;
+    }
+    
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    
+    public String getFile() {
+        return file;
+    }
+    
+    public void setFile(String file) {
+        this.file = file;
+    }
+    
+    public Integer getLine() {
+        return line;
+    }
+    
+    public void setLine(Integer line) {
+        this.line = line;
+    }
+    
+    public Integer getColumn() {
+        return column;
+    }
+    
+    public void setColumn(Integer column) {
+        this.column = column;
+    }
+    
+    public String getCode() {
+        return code;
+    }
+    
+    public void setCode(String code) {
+        this.code = code;
+    }
+    
+    public String getLanguage() {
+        return language;
+    }
+    
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+    
+    public String getCwe() {
+        return cwe;
+    }
+    
+    public void setCwe(String cwe) {
+        this.cwe = cwe;
+    }
+    
+    public Double getCvssScore() {
+        return cvssScore;
+    }
+    
+    public void setCvssScore(Double cvssScore) {
+        this.cvssScore = cvssScore;
+    }
+    
+    public Suggestion getSuggestion() {
+        return suggestion;
+    }
+    
+    public void setSuggestion(Suggestion suggestion) {
+        this.suggestion = suggestion;
     }
 }

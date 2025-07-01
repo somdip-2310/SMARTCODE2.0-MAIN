@@ -14,6 +14,7 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,11 +71,12 @@ public class AnalysisRepository {
                         .build()))
                 .build();
         
-        return analysisTable.index("SessionIndex")
+        List<AnalysisResult> results = new ArrayList<>();
+        analysisTable.index("SessionIndex")
                 .query(queryRequest)
-                .items()
-                .stream()
-                .collect(Collectors.toList());
+                .forEach(page -> results.addAll(page.items()));
+        
+        return results;
     }
     
     /**

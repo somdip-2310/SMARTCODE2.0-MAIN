@@ -155,8 +155,6 @@ public class IssueDetailsRepository {
     /**
      * Statistics class
      */
-    @lombok.Data
-    @lombok.Builder
     public static class IssueStatistics {
         private long total;
         private long critical;
@@ -166,5 +164,126 @@ public class IssueDetailsRepository {
         private long security;
         private long performance;
         private long quality;
+        
+        // Constructors
+        public IssueStatistics() {}
+        
+        // Getters and Setters
+        public long getTotal() {
+            return total;
+        }
+        
+        public void setTotal(long total) {
+            this.total = total;
+        }
+        
+        public long getCritical() {
+            return critical;
+        }
+        
+        public void setCritical(long critical) {
+            this.critical = critical;
+        }
+        
+        public long getHigh() {
+            return high;
+        }
+        
+        public void setHigh(long high) {
+            this.high = high;
+        }
+        
+        public long getMedium() {
+            return medium;
+        }
+        
+        public void setMedium(long medium) {
+            this.medium = medium;
+        }
+        
+        public long getLow() {
+            return low;
+        }
+        
+        public void setLow(long low) {
+            this.low = low;
+        }
+        
+        public long getSecurity() {
+            return security;
+        }
+        
+        public void setSecurity(long security) {
+            this.security = security;
+        }
+        
+        public long getPerformance() {
+            return performance;
+        }
+        
+        public void setPerformance(long performance) {
+            this.performance = performance;
+        }
+        
+        public long getQuality() {
+            return quality;
+        }
+        
+        public void setQuality(long quality) {
+            this.quality = quality;
+        }
+        
+        // Builder pattern
+        public static IssueStatisticsBuilder builder() {
+            return new IssueStatisticsBuilder();
+        }
+        
+        public static class IssueStatisticsBuilder {
+            private IssueStatistics stats = new IssueStatistics();
+            
+            public IssueStatisticsBuilder total(long total) {
+                stats.setTotal(total);
+                return this;
+            }
+            
+            public IssueStatisticsBuilder critical(long critical) {
+                stats.setCritical(critical);
+                return this;
+            }
+            
+            public IssueStatisticsBuilder high(long high) {
+                stats.setHigh(high);
+                return this;
+            }
+            
+            public IssueStatisticsBuilder medium(long medium) {
+                stats.setMedium(medium);
+                return this;
+            }
+            
+            public IssueStatisticsBuilder low(long low) {
+                stats.setLow(low);
+                return this;
+            }
+            
+            public IssueStatisticsBuilder security(long security) {
+                stats.setSecurity(security);
+                return this;
+            }
+            
+            public IssueStatisticsBuilder performance(long performance) {
+                stats.setPerformance(performance);
+                return this;
+            }
+            
+            public IssueStatisticsBuilder quality(long quality) {
+                stats.setQuality(quality);
+                return this;
+            }
+            
+            public IssueStatistics build() {
+                return stats;
+            }
+        }
     }
 }
