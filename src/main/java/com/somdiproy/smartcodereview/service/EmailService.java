@@ -48,15 +48,17 @@ public class EmailService {
      * Send OTP email
      */
     public void sendOtpEmail(String toEmail, String otp) {
-        // In local/dev mode, just log the OTP
+        // In local/dev mode, just log the OTP and return immediately
         if ("local".equals(activeProfile) || "dev".equals(activeProfile)) {
             log.info("🔐 LOCAL TESTING - OTP Code for {}: {} (Valid for {} minutes)", 
                      toEmail, otp, otpExpirySeconds / 60);
-            log.info("📧 Email: {} | 🔢 OTP: {} | ⏰ Expires in: {} seconds", 
-                     toEmail, otp, otpExpirySeconds);
+            log.info("📧 Email: {} | 🔢 OTP: {} | ⏰ Copy this code for verification!", 
+                     toEmail, otp);
+            log.info("💡 Profile: {} | Skip Real Email: true", activeProfile);
             return;
         }
         
+        // Production email sending logic
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

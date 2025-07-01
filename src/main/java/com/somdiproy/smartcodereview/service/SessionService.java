@@ -51,12 +51,19 @@ public class SessionService {
      * Create a new session and send OTP
      */
     public Session createSession(String email, HttpServletRequest request) {
-        // Check if session already exists for this email
-        Optional<Session> existingSession = sessionRepository.findByEmail(email);
-        if (existingSession.isPresent() && !existingSession.get().isExpired()) {
-            log.info("Session already exists for email: {}", EmailMasker.mask(email));
-            return existingSession.get();
-        }
+    	// Check if session already exists for this email
+    	Optional<Session> existingSession = sessionRepository.findByEmail(email);
+    	if (existingSession.isPresent() && !existingSession.get().isExpired()) {
+    	    // In local testing, delete existing session to see fresh OTP generation
+    	    if ("local".equals(System.getProperty("spring.profiles.active", "local"))) {
+    	        log.info("🔄 LOCAL TESTING: Deleting existing session to generate fresh OTP");
+    	        deleteSession(existingSession.get().getSessionId());
+    	        // Continue to create new session
+    	    } else {
+    	        log.info("Session already exists for email: {}", EmailMasker.mask(email));
+    	        return existingSession.get();
+    	    }
+    	}
         
         // Generate OTP
         String otp = OtpGenerator.generate(otpLength);
