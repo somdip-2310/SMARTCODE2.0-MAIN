@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @Controller
 public class AnalysisController {
-    
+	 private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
     private final AnalysisOrchestrator analysisOrchestrator;
     private final SessionService sessionService;
     private final GitHubService gitHubService;
@@ -41,13 +41,30 @@ public class AnalysisController {
     
     @GetMapping("/repository")
     public String showRepositorySelect(@RequestParam String sessionId, Model model) {
-        Session session = sessionService.getSession(sessionId);
-        if (!session.getVerified()) {
+        try {
+            log.info("🏛️ AnalysisController: Accessing repository page for sessionId: {}", sessionId);
+            
+            Session session = sessionService.getSession(sessionId);
+            log.info("📋 Session Details: verified={}, email={}, scanCount={}", 
+                     session.getVerified(), session.getEmailMasked(), session.getScanCount());
+            
+            if (!session.getVerified()) {
+                log.warn("❌ Session not verified, redirecting to home");
+                return "redirect:/";
+            }
+            
+            model.addAttribute("sessionId", sessionId);
+            model.addAttribute("session", session);
+            model.addAttribute("remainingScans", session.getRemainingScans());
+            
+            log.info("✅ Repository page prepared successfully, rendering template: repository-select");
+            return "repository-select";
+            
+        } catch (Exception e) {
+            log.error("💥 Error in repository page for sessionId: {}", sessionId, e);
+            model.addAttribute("error", "Session error: " + e.getMessage());
             return "redirect:/";
         }
-        
-        model.addAttribute("sessionId", sessionId);
-        return "repository-select";
     }
 
 	@GetMapping("/repository/branches")

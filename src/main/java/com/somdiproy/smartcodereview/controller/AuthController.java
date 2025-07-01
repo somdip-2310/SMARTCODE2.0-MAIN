@@ -18,9 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Controller for authentication and session management
- */
+
 /**
  * Controller for authentication and session management
  */
@@ -106,7 +104,8 @@ public class AuthController {
         try {
             Session session = sessionService.verifyOtp(request.getSessionId(), request.getOtp());
             
-         // Redirect to repository selection
+            // Redirect to repository selection with clear logging
+            log.info("🎯 OTP verified successfully! Redirecting to repository selection for session: {}", session.getSessionId());
             return "redirect:/repository?sessionId=" + session.getSessionId();
             
         } catch (InvalidOtpException e) {

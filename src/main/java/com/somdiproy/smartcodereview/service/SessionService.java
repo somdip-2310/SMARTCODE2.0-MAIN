@@ -137,13 +137,15 @@ public class SessionService {
             throw new InvalidOtpException("Invalid OTP");
         }
         
-        // Mark session as verified
+     // Mark session as verified
         session.setVerified(true);
         session.setOtpHash(null); // Clear OTP hash for security
         sessionRepository.update(session);
-        
-        log.info("Successfully verified OTP for sessionId: {}", sessionId);
-        
+
+        log.info("✅ Successfully verified OTP for sessionId: {}", sessionId);
+        log.info("🔓 Session now verified: email={}, remainingScans={}", 
+                 session.getEmailMasked(), session.getRemainingScans());
+
         return session;
     }
     
