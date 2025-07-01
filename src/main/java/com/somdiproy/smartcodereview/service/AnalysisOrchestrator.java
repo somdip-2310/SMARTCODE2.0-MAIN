@@ -87,6 +87,11 @@ public class AnalysisOrchestrator {
             Analysis analysis = analysisProgress.get(analysisId);
             analysis.setStatus(Analysis.AnalysisStatus.IN_PROGRESS);
             
+            // Get session from analysis
+            String sessionId = analysis.getSessionId();
+            Session session = sessionRepository.findById(sessionId)
+                    .orElseThrow(() -> new RuntimeException("Session not found"));
+            
             // Stage 1: Fetch code from GitHub
             List<GitHubFile> files = gitHubService.fetchBranchCode(repoUrl, branch, githubToken);
             analysis.setTotalFiles(files.size());
@@ -94,7 +99,14 @@ public class AnalysisOrchestrator {
             
             // Stage 2: Screening with Nova Micro
             log.info("Starting screening for analysis: {}", analysisId);
-            List<String> validFiles = lambdaInvokerService.invokeScreening(files);
+            List<String> validFiles = lambdaInvokerService.invokeScreening(
+                    sessionId, 
+                    analysisId, 
+                    repoUrl, 
+                    branch, 
+                    files,
+                    session.getScanCount()  // Don't add 1 here since it's already incremented
+            );
             analysis.setProgress(33);
             
             // Stage 3: Detection with Nova Lite

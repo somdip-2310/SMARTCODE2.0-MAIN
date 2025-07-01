@@ -10187,3 +10187,9 @@ This generated password is for development use only. Your security configuration
 2025-07-01T15:11:46.101+05:30  INFO 69011 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 🔓 Using anonymous GitHub access. Rate limit: 20/60
 2025-07-01T15:11:46.141+05:30  INFO 69011 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 📁 Found 68 total entries in branch: temp
 2025-07-01T15:11:46.146+05:30  INFO 69011 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.controller.ApiController           : 📊 Branch stats for temp: 20 eligible files, 20000 tokens
+2025-07-01T15:13:13.286+05:30  INFO 69011 --- [smart-code-review] [RMI TCP Connection(16)-127.0.0.1] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2025-07-01T15:13:13.290+05:30  INFO 69011 --- [smart-code-review] [RMI TCP Connection(16)-127.0.0.1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-01T15:13:13.294+05:30  INFO 69011 --- [smart-code-review] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-01T15:13:13.347+05:30  INFO 69011 --- [smart-code-review] [RMI TCP Connection(16)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-01T15:13:13.351+05:30  INFO 69011 --- [smart-code-review] [RMI TCP Connection(16)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-07-01T15:13:13.355+05:30  INFO 69011 --- [smart-code-review] [RMI TCP Connection(16)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
