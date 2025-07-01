@@ -46,9 +46,9 @@ public class AnalysisController {
             
             Session session = sessionService.getSession(sessionId);
             log.info("📋 Session Details: verified={}, email={}, scanCount={}", 
-                     session.getVerified(), session.getEmailMasked(), session.getScanCount());
-            
-            if (!session.getVerified()) {
+                     session.isVerified(), session.getEmailMasked(), session.getScanCount());
+
+            if (!session.isVerified()) {
                 log.warn("❌ Session not verified, redirecting to home");
                 return "redirect:/";
             }
@@ -70,8 +70,8 @@ public class AnalysisController {
 	@GetMapping("/repository/branches")
 	public String showBranches(@RequestParam String sessionId, @RequestParam String repoUrl, Model model) {
 		Session session = sessionService.getSession(sessionId);
-		if (!session.getVerified()) {
-			return "redirect:/";
+		if (!session.isVerified()) {
+		    return "redirect:/";
 		}
 
 		int remainingScans = 3 - session.getScanCount();

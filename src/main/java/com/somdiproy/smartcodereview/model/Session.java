@@ -130,6 +130,7 @@ public class Session {
         this.otpExpiresAt = otpExpiresAt;
     }
 
+    @DynamoDbAttribute("verified")
     public Boolean getVerified() {
         return verified;
     }
