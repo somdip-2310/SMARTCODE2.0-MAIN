@@ -13,6 +13,8 @@ import com.somdiproy.smartcodereview.service.GitHubService;
 import com.somdiproy.smartcodereview.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +24,20 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequiredArgsConstructor
 public class AnalysisController {
+    
+    private final AnalysisOrchestrator analysisOrchestrator;
+    private final SessionService sessionService;
+    private final GitHubService gitHubService;
+    
+    @Autowired
+    public AnalysisController(AnalysisOrchestrator analysisOrchestrator,
+                             SessionService sessionService,
+                             GitHubService gitHubService) {
+        this.analysisOrchestrator = analysisOrchestrator;
+        this.sessionService = sessionService;
+        this.gitHubService = gitHubService;
+    }
     
     @GetMapping("/repository")
     public String showRepositorySelect(@RequestParam String sessionId, Model model) {
@@ -35,10 +49,6 @@ public class AnalysisController {
         model.addAttribute("sessionId", sessionId);
         return "repository-select";
     }
-
-	private final AnalysisOrchestrator analysisOrchestrator;
-	private final SessionService sessionService;
-	private final GitHubService gitHubService;
 
 	@GetMapping("/repository/branches")
 	public String showBranches(@RequestParam String sessionId, @RequestParam String repoUrl, Model model) {

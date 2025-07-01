@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,13 +21,22 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /**
  * Controller for authentication and session management
  */
+/**
+ * Controller for authentication and session management
+ */
 @Slf4j
 @Controller
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 public class AuthController {
     
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
+    
     private final SessionService sessionService;
+    
+    @Autowired
+    public AuthController(SessionService sessionService) {
+        this.sessionService = sessionService;
+    }
     
     /**
      * Create session and send OTP

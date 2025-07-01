@@ -38,4 +38,53 @@ public class Analysis {
         COMPLETED,
         FAILED
     }
+
+    // Add getter methods
+    public String getAnalysisId() {
+        return analysisId;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public String getRepository() {
+        return repository;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public AnalysisStatus getStatus() {
+        return status;
+    }
+
+    public Integer getProgress() {
+        return progress;
+    }
+
+    public Long getStartedAt() {
+        return startedAt;
+    }
+
+    public Long getCompletedAt() {
+        return completedAt;
+    }
+
+    public List<String> getFilesProcessed() {
+        return filesProcessed;
+    }
+
+    public Integer getTotalFiles() {
+        return totalFiles;
+    }
+
+    public Integer getIssuesFound() {
+        return issuesFound;
+    }
+
+    public List<String> getStages() {
+        return stages;
+    }
 }

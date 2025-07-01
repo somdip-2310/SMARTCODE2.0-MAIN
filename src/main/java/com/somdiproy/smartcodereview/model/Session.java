@@ -92,9 +92,13 @@ public class Session {
     public boolean isExpired() {
         return Instant.now().getEpochSecond() > this.expiresAt;
     }
-    
+
     public boolean isOtpExpired() {
         return Instant.now().getEpochSecond() > this.otpExpiresAt;
+    }
+
+    public boolean isVerified() {
+        return this.verified != null && this.verified;
     }
     
     

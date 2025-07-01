@@ -7,7 +7,6 @@ import lombok.Data;
 /**
  * Request DTO for OTP verification
  */
-@Data
 public class OtpVerificationRequest {
     
     @NotBlank(message = "Session ID is required")
@@ -16,4 +15,20 @@ public class OtpVerificationRequest {
     @NotBlank(message = "OTP is required")
     @Pattern(regexp = "^[0-9]{6}$", message = "OTP must be 6 digits")
     private String otp;
+    
+    public String getSessionId() {
+        return sessionId;
+    }
+    
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+    
+    public String getOtp() {
+        return otp;
+    }
+    
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
 }

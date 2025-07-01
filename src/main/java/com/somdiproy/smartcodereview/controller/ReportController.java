@@ -5,6 +5,8 @@ import com.somdiproy.smartcodereview.service.ReportService;
 import com.somdiproy.smartcodereview.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +14,16 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequestMapping("/report")
-@RequiredArgsConstructor
 public class ReportController {
     
     private final ReportService reportService;
     private final SessionService sessionService;
+    
+    @Autowired
+    public ReportController(ReportService reportService, SessionService sessionService) {
+        this.reportService = reportService;
+        this.sessionService = sessionService;
+    }
     
     @GetMapping("/{analysisId}")
     public String showReport(@PathVariable String analysisId,
