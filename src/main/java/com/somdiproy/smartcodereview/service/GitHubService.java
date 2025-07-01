@@ -2,9 +2,6 @@ package com.somdiproy.smartcodereview.service;
 
 import com.somdiproy.smartcodereview.model.Branch;
 import com.somdiproy.smartcodereview.model.Repository;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,7 +32,6 @@ public class GitHubService {
     @Value("${analysis.max-file-size:5242880}") // 5MB default
     private long maxFileSize;
     
-    
     /**
      * Get repository information
      */
@@ -45,19 +41,20 @@ public class GitHubService {
             GitHub github = createGitHubClient(null);
             GHRepository ghRepo = getGHRepository(github, repoUrl);
             
-            return Repository.builder()
-                    .url(repoUrl)
-                    .name(ghRepo.getName())
-                    .fullName(ghRepo.getFullName())
-                    .description(ghRepo.getDescription())
-                    .owner(ghRepo.getOwnerName())
-                    .defaultBranch(ghRepo.getDefaultBranch())
-                    .isPrivate(ghRepo.isPrivate())
-                    .language(ghRepo.getLanguage())
-                    .size(ghRepo.getSize())
-                    .starsCount(ghRepo.getStargazersCount())
-                    .forksCount(ghRepo.getForksCount())
-                    .build();
+            Repository repository = new Repository();
+            repository.setUrl(repoUrl);
+            repository.setName(ghRepo.getName());
+            repository.setFullName(ghRepo.getFullName());
+            repository.setDescription(ghRepo.getDescription());
+            repository.setOwner(ghRepo.getOwnerName());
+            repository.setDefaultBranch(ghRepo.getDefaultBranch());
+            repository.setIsPrivate(ghRepo.isPrivate());
+            repository.setLanguage(ghRepo.getLanguage());
+            repository.setSize(ghRepo.getSize());
+            repository.setStarsCount(ghRepo.getStargazersCount());
+            repository.setForksCount(ghRepo.getForksCount());
+            
+            return repository;
                     
         } catch (IOException e) {
             log.error("Failed to fetch repository info: {}", repoUrl, e);
@@ -80,13 +77,13 @@ public class GitHubService {
             return branches.entrySet().stream()
                     .map(entry -> {
                         GHBranch ghBranch = entry.getValue();
-                        return Branch.builder()
-                                .name(entry.getKey())
-                                .isDefault(entry.getKey().equals(defaultBranch))
-                                .isProtected(ghBranch.isProtected())
-                                .sha(ghBranch.getSHA1())
-                                .lastCommitDate(getLastCommitDate(ghBranch))
-                                .build();
+                        Branch branch = new Branch();
+                        branch.setName(entry.getKey());
+                        branch.setIsDefault(entry.getKey().equals(defaultBranch));
+                        branch.setIsProtected(ghBranch.isProtected());
+                        branch.setSha(ghBranch.getSHA1());
+                        branch.setLastCommitDate(getLastCommitDate(ghBranch));
+                        return branch;
                     })
                     .sorted((a, b) -> {
                         // Sort: default first, then alphabetically
@@ -270,9 +267,6 @@ public class GitHubService {
         return languageMap.getOrDefault(extension, "unknown");
     }
     
-    /**
-     * Data class for GitHub file
-     */
     /**
      * Data class for GitHub file
      */
