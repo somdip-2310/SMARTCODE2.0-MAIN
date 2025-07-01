@@ -385,18 +385,9 @@ public class GitHubService {
             }
         }
         
-        // Anonymous access for public repositories only
-        GitHub github = GitHub.connectAnonymously();
-        GHRateLimit rateLimit = github.getRateLimit();
         
-        log.info("🔓 Using anonymous GitHub access. Rate limit: {}/{}", 
-                 rateLimit.getRemaining(), rateLimit.getLimit());
-        
-        if (rateLimit.getRemaining() < 10) {
-            throw new IOException("GitHub rate limit nearly exceeded. Please provide a GitHub token for better access.");
-        }
-        
-        return github;
+         // No anonymous access - token is required
+        throw new IOException("GitHub personal access token is required. Please provide a valid token to access repositories.");
     }
     
     /**

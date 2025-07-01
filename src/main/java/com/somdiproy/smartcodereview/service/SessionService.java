@@ -50,8 +50,11 @@ public class SessionService {
     /**
      * Create a new session and send OTP
      */
-    public Session createSession(String email, HttpServletRequest request) {
-    	// Check if session already exists for this email
+    public Session createSession(String email, String githubToken, HttpServletRequest request) {
+        // Validate GitHub token first
+        if (!secureTokenService.isValidGitHubToken(githubToken)) {
+            throw new IllegalArgumentException("Invalid GitHub token format. Token must start with 'ghp_'");
+        }
     	Optional<Session> existingSession = sessionRepository.findByEmail(email);
     	if (existingSession.isPresent() && !existingSession.get().isExpired()) {
     	    // In local testing, delete existing session to see fresh OTP generation

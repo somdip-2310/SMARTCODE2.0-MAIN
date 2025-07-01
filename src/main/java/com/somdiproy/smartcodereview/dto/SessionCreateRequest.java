@@ -9,9 +9,21 @@ import lombok.Data;
  */
 public class SessionCreateRequest {
     
-    @NotBlank(message = "Email is required")
+	@NotBlank(message = "Email is required")
     @Email(message = "Please provide a valid email address")
     private String email;
+    
+    @NotBlank(message = "GitHub token is required")
+    @Pattern(regexp = "ghp_[a-zA-Z0-9]{36,}", message = "Invalid GitHub token format")
+    private String githubToken;
+    
+    public String getGithubToken() {
+        return githubToken;
+    }
+    
+    public void setGithubToken(String githubToken) {
+        this.githubToken = githubToken;
+    }
     
     public String getEmail() {
         return email;

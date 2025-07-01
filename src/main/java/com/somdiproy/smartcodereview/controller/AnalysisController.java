@@ -90,10 +90,16 @@ public class AnalysisController {
                 return "error";
             }
 
-         // Get repository info (public only)
-            Repository repo = gitHubService.getRepository(repoUrl, null);
-            List<Branch> branches = gitHubService.fetchBranches(repoUrl, null);
+         // Get user's GitHub token from secure storage
+            String githubToken = secureTokenService.getSessionToken(sessionId);
+            if (githubToken == null) {
+                model.addAttribute("error", "GitHub token not found. Please start a new session.");
+                return "error";
+            }
 
+            // Fetch repository info and branches using user's token
+            Repository repo = gitHubService.getRepository(repoUrl, githubToken);
+            List<Branch> branches = gitHubService.fetchBranches(repoUrl, githubToken);
             // Get file analysis stats for cost estimation
             GitHubService.FileAnalysisStats stats = gitHubService.getFileStats(repoUrl, repo.getDefaultBranch(), null);
 

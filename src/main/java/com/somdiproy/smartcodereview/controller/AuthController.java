@@ -51,6 +51,7 @@ public class AuthController {
         }
         
         try {
+        	secureTokenService.storeSessionToken(request.getEmail(), request.getGithubToken());
             Session session = sessionService.createSession(request.getEmail(), httpRequest);
             
             // Redirect to OTP verification page
@@ -61,6 +62,30 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("error", "Failed to create session. Please try again.");
             return "redirect:/";
         }
+    }
+    
+    @PostMapping("/validate-token")
+    @ResponseBody
+    public Map<String, Object> validateToken(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            GitHub github = new GitHubBuilder().withOAuthToken(token).build();
+            GHMyself myself = github.getMyself();
+            GHRateLimit rateLimit = github.getRateLimit();
+            
+            response.put("valid", true);
+            response.put("username", myself.getLogin());
+            response.put("rateLimit", rateLimit.getRemaining() + "/" + rateLimit.getLimit());
+            response.put("scopes", github.getMeta().getScopes());
+            
+        } catch (Exception e) {
+            response.put("valid", false);
+            response.put("error", "Invalid token or insufficient permissions");
+        }
+        
+        return response;
     }
     
     /**

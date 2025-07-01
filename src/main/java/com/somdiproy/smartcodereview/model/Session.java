@@ -27,10 +27,14 @@ public class Session {
     private Integer scanCount = 0;
     private Integer scanLimit = 3;
     private Integer remainingScans = 3;
-    private List<Scan> scans = new ArrayList<>();
+    private List<Scan> scans;
     private String ipAddress;
     private String userAgent;
     private String githubToken;
+   
+    
+    @DynamoDbAttribute("githubTokenEncrypted")
+    private String githubTokenEncrypted;  // Encrypted token stored temporarily
     
     // Constructors
     public Session() {
