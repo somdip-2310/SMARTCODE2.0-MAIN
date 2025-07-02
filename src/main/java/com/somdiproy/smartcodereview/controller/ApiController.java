@@ -2,6 +2,7 @@ package com.somdiproy.smartcodereview.controller;
 
 import com.somdiproy.smartcodereview.model.Session;
 import com.somdiproy.smartcodereview.service.GitHubService;
+import com.somdiproy.smartcodereview.service.SecureTokenService;
 import com.somdiproy.smartcodereview.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,13 @@ public class ApiController {
     
     private final SessionService sessionService;
     private final GitHubService gitHubService;
-    
+    private final SecureTokenService secureTokenService;
+
     @Autowired
-    public ApiController(SessionService sessionService, GitHubService gitHubService) {
+    public ApiController(SessionService sessionService, GitHubService gitHubService, SecureTokenService secureTokenService) {
         this.sessionService = sessionService;
         this.gitHubService = gitHubService;
+        this.secureTokenService = secureTokenService;
     }
     
     @GetMapping("/v1/health")
@@ -53,8 +56,15 @@ public class ApiController {
             // Validate session
             sessionService.getSession(sessionId);
             
+          
+         // Get GitHub token from secure storage
+            String githubToken = secureTokenService.getSessionToken(sessionId);
+            if (githubToken == null) {
+                throw new RuntimeException("GitHub token not found. Please start a new session.");
+            }
+
             // Get file stats for the specific branch
-            GitHubService.FileAnalysisStats stats = gitHubService.getFileStats(repoUrl, branch, null);
+            GitHubService.FileAnalysisStats stats = gitHubService.getFileStats(repoUrl, branch, githubToken);
             
             Map<String, Object> response = new HashMap<>();
             response.put("totalFiles", stats.getTotalFiles());
