@@ -1128,3 +1128,780 @@ This generated password is for development use only. Your security configuration
 2025-07-02T10:12:22.615+05:30  INFO 75183 --- [smart-code-review] [http-nio-8083-exec-10] c.s.s.service.GitHubService              : 🔍 Testing GitHub connection with provided token
 2025-07-02T10:12:23.058+05:30 ERROR 75183 --- [smart-code-review] [http-nio-8083-exec-10] c.s.s.service.GitHubService              : ❌ GitHub authentication failed: Invalid token
 2025-07-02T10:12:23.445+05:30 DEBUG 75183 --- [smart-code-review] [http-nio-8083-exec-2] c.s.s.exception.GlobalExceptionHandler   : Static resource not found: No static resource .well-known/appspecific/com.chrome.devtools.json.
+2025-07-02T10:17:09.723+05:30  INFO 75183 --- [smart-code-review] [RMI TCP Connection(19)-127.0.0.1] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2025-07-02T10:17:09.750+05:30  INFO 75183 --- [smart-code-review] [RMI TCP Connection(19)-127.0.0.1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-02T10:17:09.770+05:30  INFO 75183 --- [smart-code-review] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-02T10:17:10.135+05:30  INFO 75183 --- [smart-code-review] [RMI TCP Connection(19)-127.0.0.1] c.s.s.service.SessionService             : Shutting down SecureTokenService, clearing 0 tokens
+2025-07-02T10:17:10.136+05:30  INFO 75183 --- [smart-code-review] [RMI TCP Connection(19)-127.0.0.1] c.s.s.service.SessionService             : Cleaned up all temporary tokens on shutdown
+2025-07-02T10:17:10.149+05:30  INFO 75183 --- [smart-code-review] [RMI TCP Connection(19)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-02T10:17:10.186+05:30  INFO 75183 --- [smart-code-review] [RMI TCP Connection(19)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-07-02T10:17:10.213+05:30  INFO 75183 --- [smart-code-review] [RMI TCP Connection(19)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-07-02T10:22:40.761+05:30  INFO 75375 --- [smart-code-review] [main] c.s.s.SmartCodeReviewApplication         : Starting SmartCodeReviewApplication using Java 17.0.14 with PID 75375 (/Users/somdiproy/Documents/SMARTCODE2.0/SMARTCODE2.0-MAIN/target/classes started by somdiproy in /Users/somdiproy/Documents/SMARTCODE2.0/SMARTCODE2.0-MAIN)
+2025-07-02T10:22:40.768+05:30 DEBUG 75375 --- [smart-code-review] [main] c.s.s.SmartCodeReviewApplication         : Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-02T10:22:40.769+05:30  INFO 75375 --- [smart-code-review] [main] c.s.s.SmartCodeReviewApplication         : The following 1 profile is active: "local"
+2025-07-02T10:22:43.388+05:30  INFO 75375 --- [smart-code-review] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-07-02T10:22:43.443+05:30  INFO 75375 --- [smart-code-review] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 29 ms. Found 0 JPA repository interfaces.
+2025-07-02T10:22:45.033+05:30  INFO 75375 --- [smart-code-review] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
+2025-07-02T10:22:45.062+05:30  INFO 75375 --- [smart-code-review] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-07-02T10:22:45.063+05:30  INFO 75375 --- [smart-code-review] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-02T10:22:45.184+05:30  INFO 75375 --- [smart-code-review] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-07-02T10:22:45.184+05:30  INFO 75375 --- [smart-code-review] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4306 ms
+2025-07-02T10:22:45.725+05:30  INFO 75375 --- [smart-code-review] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-07-02T10:22:45.884+05:30  INFO 75375 --- [smart-code-review] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-07-02T10:22:45.989+05:30  INFO 75375 --- [smart-code-review] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-07-02T10:22:46.766+05:30  INFO 75375 --- [smart-code-review] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-07-02T10:22:46.834+05:30  INFO 75375 --- [smart-code-review] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-07-02T10:22:47.280+05:30  INFO 75375 --- [smart-code-review] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2025-07-02T10:22:47.284+05:30  INFO 75375 --- [smart-code-review] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-07-02T10:22:47.365+05:30  WARN 75375 --- [smart-code-review] [main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-07-02T10:22:47.409+05:30  INFO 75375 --- [smart-code-review] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-07-02T10:22:48.176+05:30  INFO 75375 --- [smart-code-review] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-02T10:22:48.186+05:30  INFO 75375 --- [smart-code-review] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-07-02T10:22:49.672+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Creating bean schema
+2025-07-02T10:22:49.688+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Constructor: public com.somdiproy.smartcodereview.model.Session()
+2025-07-02T10:22:49.748+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:49.750+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:49.752+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:49.763+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property createdAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getCreatedAt()
+2025-07-02T10:22:49.766+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property createdAt write method: public void com.somdiproy.smartcodereview.model.Session.setCreatedAt(java.lang.Long)
+2025-07-02T10:22:49.768+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property email read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getEmail()
+2025-07-02T10:22:49.769+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property email write method: public void com.somdiproy.smartcodereview.model.Session.setEmail(java.lang.String)
+2025-07-02T10:22:49.786+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property emailMasked read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getEmailMasked()
+2025-07-02T10:22:49.787+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property emailMasked write method: public void com.somdiproy.smartcodereview.model.Session.setEmailMasked(java.lang.String)
+2025-07-02T10:22:49.788+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Ignoring bean property expired because it has no write (set) method.
+2025-07-02T10:22:49.788+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property expiresAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getExpiresAt()
+2025-07-02T10:22:49.788+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property expiresAt write method: public void com.somdiproy.smartcodereview.model.Session.setExpiresAt(java.lang.Long)
+2025-07-02T10:22:49.789+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property githubToken read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getGithubToken()
+2025-07-02T10:22:49.789+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property githubToken write method: public void com.somdiproy.smartcodereview.model.Session.setGithubToken(java.lang.String)
+2025-07-02T10:22:49.790+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property githubTokenEncrypted read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getGithubTokenEncrypted()
+2025-07-02T10:22:49.790+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property githubTokenEncrypted write method: public void com.somdiproy.smartcodereview.model.Session.setGithubTokenEncrypted(java.lang.String)
+2025-07-02T10:22:49.791+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property ipAddress read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getIpAddress()
+2025-07-02T10:22:49.792+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property ipAddress write method: public void com.somdiproy.smartcodereview.model.Session.setIpAddress(java.lang.String)
+2025-07-02T10:22:49.793+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property organization read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getOrganization()
+2025-07-02T10:22:49.793+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property organization write method: public void com.somdiproy.smartcodereview.model.Session.setOrganization(java.lang.String)
+2025-07-02T10:22:49.794+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property otpAttempts read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getOtpAttempts()
+2025-07-02T10:22:49.795+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property otpAttempts write method: public void com.somdiproy.smartcodereview.model.Session.setOtpAttempts(java.lang.Integer)
+2025-07-02T10:22:49.797+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Ignoring bean property otpExpired because it has no write (set) method.
+2025-07-02T10:22:49.797+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property otpExpiresAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getOtpExpiresAt()
+2025-07-02T10:22:49.798+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property otpExpiresAt write method: public void com.somdiproy.smartcodereview.model.Session.setOtpExpiresAt(java.lang.Long)
+2025-07-02T10:22:49.799+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property otpHash read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getOtpHash()
+2025-07-02T10:22:49.800+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property otpHash write method: public void com.somdiproy.smartcodereview.model.Session.setOtpHash(java.lang.String)
+2025-07-02T10:22:49.800+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property remainingScans read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getRemainingScans()
+2025-07-02T10:22:49.801+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property remainingScans write method: public void com.somdiproy.smartcodereview.model.Session.setRemainingScans(java.lang.Integer)
+2025-07-02T10:22:49.801+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property scanCount read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getScanCount()
+2025-07-02T10:22:49.802+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property scanCount write method: public void com.somdiproy.smartcodereview.model.Session.setScanCount(java.lang.Integer)
+2025-07-02T10:22:49.802+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property scanLimit read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session.getScanLimit()
+2025-07-02T10:22:49.803+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property scanLimit write method: public void com.somdiproy.smartcodereview.model.Session.setScanLimit(java.lang.Integer)
+2025-07-02T10:22:49.803+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Creating bean schema
+2025-07-02T10:22:49.805+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Constructor: public com.somdiproy.smartcodereview.model.Session$Scan()
+2025-07-02T10:22:49.806+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:49.806+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:49.807+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property analysisId read method: public java.lang.String com.somdiproy.smartcodereview.model.Session$Scan.getAnalysisId()
+2025-07-02T10:22:49.807+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property analysisId write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setAnalysisId(java.lang.String)
+2025-07-02T10:22:49.808+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property branch read method: public java.lang.String com.somdiproy.smartcodereview.model.Session$Scan.getBranch()
+2025-07-02T10:22:49.808+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property branch write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setBranch(java.lang.String)
+2025-07-02T10:22:49.809+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:49.809+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property completedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session$Scan.getCompletedAt()
+2025-07-02T10:22:49.810+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property completedAt write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setCompletedAt(java.lang.Long)
+2025-07-02T10:22:49.811+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property repository read method: public java.lang.String com.somdiproy.smartcodereview.model.Session$Scan.getRepository()
+2025-07-02T10:22:49.812+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property repository write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setRepository(java.lang.String)
+2025-07-02T10:22:49.813+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property scanNumber read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Session$Scan.getScanNumber()
+2025-07-02T10:22:49.814+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property scanNumber write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setScanNumber(java.lang.Integer)
+2025-07-02T10:22:49.815+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property startedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session$Scan.getStartedAt()
+2025-07-02T10:22:49.816+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session$Scan - Property startedAt write method: public void com.somdiproy.smartcodereview.model.Session$Scan.setStartedAt(java.lang.Long)
+2025-07-02T10:22:49.820+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.827+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.827+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:49.827+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.827+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:49.827+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:49.829+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property scans read method: public java.util.List com.somdiproy.smartcodereview.model.Session.getScans()
+2025-07-02T10:22:49.829+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property scans write method: public void com.somdiproy.smartcodereview.model.Session.setScans(java.util.List)
+2025-07-02T10:22:49.830+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property sessionId read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getSessionId()
+2025-07-02T10:22:49.830+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property sessionId write method: public void com.somdiproy.smartcodereview.model.Session.setSessionId(java.lang.String)
+2025-07-02T10:22:49.832+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property ttl read method: public java.lang.Long com.somdiproy.smartcodereview.model.Session.getTtl()
+2025-07-02T10:22:49.833+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property ttl write method: public void com.somdiproy.smartcodereview.model.Session.setTtl(java.lang.Long)
+2025-07-02T10:22:49.833+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property userAgent read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getUserAgent()
+2025-07-02T10:22:49.834+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property userAgent write method: public void com.somdiproy.smartcodereview.model.Session.setUserAgent(java.lang.String)
+2025-07-02T10:22:49.835+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property verificationStatus read method: public java.lang.String com.somdiproy.smartcodereview.model.Session.getVerificationStatus()
+2025-07-02T10:22:49.835+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Property verificationStatus write method: public void com.somdiproy.smartcodereview.model.Session.setVerificationStatus(java.lang.String)
+2025-07-02T10:22:49.836+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Session - Ignoring bean property verified because it has no write (set) method.
+2025-07-02T10:22:49.836+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:49.836+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.839+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.839+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:49.839+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.840+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.840+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.840+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.840+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:49.840+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:49.840+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.841+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:49.841+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:49.841+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:49.842+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(com.somdiproy.smartcodereview.model.Session$Scan): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-02T10:22:49.846+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.util.List<com.somdiproy.smartcodereview.model.Session$Scan>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.ListAttributeConverter
+2025-07-02T10:22:49.846+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.847+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:49.847+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.847+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:49.903+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Creating bean schema
+2025-07-02T10:22:49.907+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult()
+2025-07-02T10:22:49.908+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:49.908+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:49.911+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property analysisId read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getAnalysisId()
+2025-07-02T10:22:49.912+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property analysisId write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setAnalysisId(java.lang.String)
+2025-07-02T10:22:49.914+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property branch read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getBranch()
+2025-07-02T10:22:49.915+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property branch write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setBranch(java.lang.String)
+2025-07-02T10:22:49.916+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property branchSHA read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getBranchSHA()
+2025-07-02T10:22:49.917+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property branchSHA write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setBranchSHA(java.lang.String)
+2025-07-02T10:22:49.918+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:49.918+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property completedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getCompletedAt()
+2025-07-02T10:22:49.919+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property completedAt write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setCompletedAt(java.lang.Long)
+2025-07-02T10:22:49.919+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Creating bean schema
+2025-07-02T10:22:49.922+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$Costs()
+2025-07-02T10:22:49.922+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:49.923+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:49.924+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property bedrock read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Costs.getBedrock()
+2025-07-02T10:22:49.925+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property bedrock write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Costs.setBedrock(java.lang.Double)
+2025-07-02T10:22:49.926+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:49.927+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property infrastructure read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Costs.getInfrastructure()
+2025-07-02T10:22:49.930+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property infrastructure write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Costs.setInfrastructure(java.lang.Double)
+2025-07-02T10:22:49.931+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property total read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Costs.getTotal()
+2025-07-02T10:22:49.932+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Costs - Property total write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Costs.setTotal(java.lang.Double)
+2025-07-02T10:22:49.933+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:49.933+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:49.933+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:49.933+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property costs read method: public com.somdiproy.smartcodereview.model.AnalysisResult$Costs com.somdiproy.smartcodereview.model.AnalysisResult.getCosts()
+2025-07-02T10:22:49.934+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property costs write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setCosts(com.somdiproy.smartcodereview.model.AnalysisResult$Costs)
+2025-07-02T10:22:49.934+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property expiresAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getExpiresAt()
+2025-07-02T10:22:49.935+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property expiresAt write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setExpiresAt(java.lang.Long)
+2025-07-02T10:22:49.936+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property filesAnalyzed read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getFilesAnalyzed()
+2025-07-02T10:22:49.937+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property filesAnalyzed write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setFilesAnalyzed(java.lang.Integer)
+2025-07-02T10:22:49.937+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSkipped read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getFilesSkipped()
+2025-07-02T10:22:49.938+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSkipped write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setFilesSkipped(java.lang.Integer)
+2025-07-02T10:22:49.939+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSubmitted read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getFilesSubmitted()
+2025-07-02T10:22:49.939+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property filesSubmitted write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setFilesSubmitted(java.lang.Integer)
+2025-07-02T10:22:49.940+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property processingTimeMs read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getProcessingTimeMs()
+2025-07-02T10:22:49.941+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property processingTimeMs write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setProcessingTimeMs(java.lang.Long)
+2025-07-02T10:22:49.941+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property repository read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getRepository()
+2025-07-02T10:22:49.942+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property repository write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setRepository(java.lang.String)
+2025-07-02T10:22:49.944+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property scanNumber read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult.getScanNumber()
+2025-07-02T10:22:49.945+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property scanNumber write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setScanNumber(java.lang.Integer)
+2025-07-02T10:22:49.947+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Creating bean schema
+2025-07-02T10:22:49.949+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$Scores()
+2025-07-02T10:22:49.950+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:49.950+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:49.950+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:49.951+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property overall read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getOverall()
+2025-07-02T10:22:49.951+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property overall write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setOverall(java.lang.Double)
+2025-07-02T10:22:49.952+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property performance read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getPerformance()
+2025-07-02T10:22:49.952+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property performance write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setPerformance(java.lang.Double)
+2025-07-02T10:22:49.953+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property quality read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getQuality()
+2025-07-02T10:22:49.954+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property quality write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setQuality(java.lang.Double)
+2025-07-02T10:22:49.954+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property security read method: public java.lang.Double com.somdiproy.smartcodereview.model.AnalysisResult$Scores.getSecurity()
+2025-07-02T10:22:49.955+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Scores - Property security write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Scores.setSecurity(java.lang.Double)
+2025-07-02T10:22:49.956+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:49.956+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:49.957+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:49.957+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:49.957+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property scores read method: public com.somdiproy.smartcodereview.model.AnalysisResult$Scores com.somdiproy.smartcodereview.model.AnalysisResult.getScores()
+2025-07-02T10:22:49.958+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property scores write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setScores(com.somdiproy.smartcodereview.model.AnalysisResult$Scores)
+2025-07-02T10:22:49.959+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property sessionId read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getSessionId()
+2025-07-02T10:22:49.959+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property sessionId write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setSessionId(java.lang.String)
+2025-07-02T10:22:49.961+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property skipReasons read method: public java.util.Map com.somdiproy.smartcodereview.model.AnalysisResult.getSkipReasons()
+2025-07-02T10:22:49.962+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property skipReasons write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setSkipReasons(java.util.Map)
+2025-07-02T10:22:49.962+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property startedAt read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getStartedAt()
+2025-07-02T10:22:49.965+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property startedAt write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setStartedAt(java.lang.Long)
+2025-07-02T10:22:49.965+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property status read method: public java.lang.String com.somdiproy.smartcodereview.model.AnalysisResult.getStatus()
+2025-07-02T10:22:49.966+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property status write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setStatus(java.lang.String)
+2025-07-02T10:22:49.966+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Creating bean schema
+2025-07-02T10:22:49.970+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$Summary()
+2025-07-02T10:22:49.970+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:49.970+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:49.971+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property bySeverity read method: public java.util.Map com.somdiproy.smartcodereview.model.AnalysisResult$Summary.getBySeverity()
+2025-07-02T10:22:49.972+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property bySeverity write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Summary.setBySeverity(java.util.Map)
+2025-07-02T10:22:49.973+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property byType read method: public java.util.Map com.somdiproy.smartcodereview.model.AnalysisResult$Summary.getByType()
+2025-07-02T10:22:49.973+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property byType write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Summary.setByType(java.util.Map)
+2025-07-02T10:22:49.974+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:49.974+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property totalIssues read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$Summary.getTotalIssues()
+2025-07-02T10:22:49.975+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$Summary - Property totalIssues write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$Summary.setTotalIssues(java.lang.Integer)
+2025-07-02T10:22:49.986+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:49.989+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.util.Map<java.lang.String, java.lang.Integer>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.MapAttributeConverter
+2025-07-02T10:22:49.990+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.util.Map<java.lang.String, java.lang.Integer>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.MapAttributeConverter
+2025-07-02T10:22:49.990+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:49.990+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property summary read method: public com.somdiproy.smartcodereview.model.AnalysisResult$Summary com.somdiproy.smartcodereview.model.AnalysisResult.getSummary()
+2025-07-02T10:22:49.991+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property summary write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setSummary(com.somdiproy.smartcodereview.model.AnalysisResult$Summary)
+2025-07-02T10:22:49.992+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Creating bean schema
+2025-07-02T10:22:49.994+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Constructor: public com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage()
+2025-07-02T10:22:49.994+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:49.995+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:49.995+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:49.996+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property detection read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getDetection()
+2025-07-02T10:22:49.996+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property detection write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setDetection(java.lang.Integer)
+2025-07-02T10:22:49.997+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property screening read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getScreening()
+2025-07-02T10:22:49.997+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property screening write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setScreening(java.lang.Integer)
+2025-07-02T10:22:49.999+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property suggestions read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getSuggestions()
+2025-07-02T10:22:50.000+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property suggestions write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setSuggestions(java.lang.Integer)
+2025-07-02T10:22:50.000+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property total read method: public java.lang.Integer com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.getTotal()
+2025-07-02T10:22:50.001+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage - Property total write method: public void com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage.setTotal(java.lang.Integer)
+2025-07-02T10:22:50.001+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.002+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.002+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.002+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.003+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property tokenUsage read method: public com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage com.somdiproy.smartcodereview.model.AnalysisResult.getTokenUsage()
+2025-07-02T10:22:50.003+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property tokenUsage write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setTokenUsage(com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage)
+2025-07-02T10:22:50.003+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property ttl read method: public java.lang.Long com.somdiproy.smartcodereview.model.AnalysisResult.getTtl()
+2025-07-02T10:22:50.004+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.AnalysisResult - Property ttl write method: public void com.somdiproy.smartcodereview.model.AnalysisResult.setTtl(java.lang.Long)
+2025-07-02T10:22:50.004+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.004+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.004+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$Costs): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$Scores): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-02T10:22:50.005+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.006+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.006+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.util.Map<java.lang.String, java.lang.Integer>): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.MapAttributeConverter
+2025-07-02T10:22:50.006+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:50.006+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.006+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$Summary): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-02T10:22:50.006+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(com.somdiproy.smartcodereview.model.AnalysisResult$TokenUsage): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-02T10:22:50.006+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Long): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.LongAttributeConverter
+2025-07-02T10:22:50.645+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Creating bean schema
+2025-07-02T10:22:50.650+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Constructor: public com.somdiproy.smartcodereview.model.Issue()
+2025-07-02T10:22:50.650+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:50.651+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:50.651+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property analysisId read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getAnalysisId()
+2025-07-02T10:22:50.652+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property analysisId write method: public void com.somdiproy.smartcodereview.model.Issue.setAnalysisId(java.lang.String)
+2025-07-02T10:22:50.652+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property category read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getCategory()
+2025-07-02T10:22:50.653+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property category write method: public void com.somdiproy.smartcodereview.model.Issue.setCategory(java.lang.String)
+2025-07-02T10:22:50.653+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:50.654+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property code read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getCode()
+2025-07-02T10:22:50.655+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property code write method: public void com.somdiproy.smartcodereview.model.Issue.setCode(java.lang.String)
+2025-07-02T10:22:50.655+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property column read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Issue.getColumn()
+2025-07-02T10:22:50.655+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property column write method: public void com.somdiproy.smartcodereview.model.Issue.setColumn(java.lang.Integer)
+2025-07-02T10:22:50.656+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property cvssScore read method: public java.lang.Double com.somdiproy.smartcodereview.model.Issue.getCvssScore()
+2025-07-02T10:22:50.656+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property cvssScore write method: public void com.somdiproy.smartcodereview.model.Issue.setCvssScore(java.lang.Double)
+2025-07-02T10:22:50.657+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property cwe read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getCwe()
+2025-07-02T10:22:50.657+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property cwe write method: public void com.somdiproy.smartcodereview.model.Issue.setCwe(java.lang.String)
+2025-07-02T10:22:50.658+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property description read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getDescription()
+2025-07-02T10:22:50.659+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property description write method: public void com.somdiproy.smartcodereview.model.Issue.setDescription(java.lang.String)
+2025-07-02T10:22:50.659+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property file read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getFile()
+2025-07-02T10:22:50.660+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property file write method: public void com.somdiproy.smartcodereview.model.Issue.setFile(java.lang.String)
+2025-07-02T10:22:50.660+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property issueId read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getIssueId()
+2025-07-02T10:22:50.661+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property issueId write method: public void com.somdiproy.smartcodereview.model.Issue.setIssueId(java.lang.String)
+2025-07-02T10:22:50.662+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property language read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getLanguage()
+2025-07-02T10:22:50.662+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property language write method: public void com.somdiproy.smartcodereview.model.Issue.setLanguage(java.lang.String)
+2025-07-02T10:22:50.663+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property line read method: public java.lang.Integer com.somdiproy.smartcodereview.model.Issue.getLine()
+2025-07-02T10:22:50.664+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property line write method: public void com.somdiproy.smartcodereview.model.Issue.setLine(java.lang.Integer)
+2025-07-02T10:22:50.665+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property severity read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getSeverity()
+2025-07-02T10:22:50.666+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property severity write method: public void com.somdiproy.smartcodereview.model.Issue.setSeverity(java.lang.String)
+2025-07-02T10:22:50.667+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Suggestion - Creating bean schema
+2025-07-02T10:22:50.669+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Suggestion - Constructor: public com.somdiproy.smartcodereview.model.Suggestion()
+2025-07-02T10:22:50.669+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Suggestion - Adding Converter: software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider
+2025-07-02T10:22:50.669+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider - Constructor: public software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider()
+2025-07-02T10:22:50.670+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Suggestion - Ignoring bean property class because it has no write (set) method.
+2025-07-02T10:22:50.670+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property suggestion read method: public com.somdiproy.smartcodereview.model.Suggestion com.somdiproy.smartcodereview.model.Issue.getSuggestion()
+2025-07-02T10:22:50.670+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property suggestion write method: public void com.somdiproy.smartcodereview.model.Issue.setSuggestion(com.somdiproy.smartcodereview.model.Suggestion)
+2025-07-02T10:22:50.671+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property title read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getTitle()
+2025-07-02T10:22:50.671+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property title write method: public void com.somdiproy.smartcodereview.model.Issue.setTitle(java.lang.String)
+2025-07-02T10:22:50.672+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property type read method: public java.lang.String com.somdiproy.smartcodereview.model.Issue.getType()
+2025-07-02T10:22:50.672+05:30 DEBUG 75375 --- [smart-code-review] [main] s.amazon.awssdk.enhanced.dynamodb.beans  : com.somdiproy.smartcodereview.model.Issue - Property type write method: public void com.somdiproy.smartcodereview.model.Issue.setType(java.lang.String)
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Double): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DoubleAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.Integer): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.IntegerAttributeConverter
+2025-07-02T10:22:50.673+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.674+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(com.somdiproy.smartcodereview.model.Suggestion): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.DocumentAttributeConverter
+2025-07-02T10:22:50.674+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:50.674+05:30 DEBUG 75375 --- [smart-code-review] [main] .a.e.d.DefaultAttributeConverterProvider : Converter for EnhancedType(java.lang.String): software.amazon.awssdk.enhanced.dynamodb.internal.converter.attribute.StringAttributeConverter
+2025-07-02T10:22:52.070+05:30  WARN 75375 --- [smart-code-review] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-07-02T10:22:52.629+05:30  INFO 75375 --- [smart-code-review] [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
+2025-07-02T10:22:52.692+05:30  WARN 75375 --- [smart-code-review] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 6b4e5ee2-f6ba-442a-93df-c9c83a7b4e59
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-07-02T10:22:53.605+05:30  INFO 75375 --- [smart-code-review] [main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+2025-07-02T10:22:53.937+05:30  INFO 75375 --- [smart-code-review] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path '/'
+2025-07-02T10:22:53.969+05:30  INFO 75375 --- [smart-code-review] [main] c.s.s.SmartCodeReviewApplication         : Started SmartCodeReviewApplication in 14.317 seconds (process running for 16.234)
+2025-07-02T10:22:55.186+05:30  INFO 75375 --- [smart-code-review] [RMI TCP Connection(10)-127.0.0.1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-02T10:22:55.186+05:30  INFO 75375 --- [smart-code-review] [RMI TCP Connection(10)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-07-02T10:22:55.189+05:30  INFO 75375 --- [smart-code-review] [RMI TCP Connection(10)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2025-07-02T10:23:08.872+05:30 DEBUG 75375 --- [smart-code-review] [http-nio-8083-exec-2] c.s.s.exception.GlobalExceptionHandler   : Static resource not found: No static resource .well-known/appspecific/com.chrome.devtools.json.
+2025-07-02T10:23:11.278+05:30 DEBUG 75375 --- [smart-code-review] [http-nio-8083-exec-4] c.s.s.exception.GlobalExceptionHandler   : Static resource not found: No static resource .well-known/appspecific/com.chrome.devtools.json.
+2025-07-02T10:23:23.986+05:30  INFO 75375 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.controller.AuthController          : 🔍 Testing GitHub connection with provided token
+2025-07-02T10:23:24.890+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : Failed to authenticate with GitHub token
+
+org.kohsuke.github.HttpException: {"message":"Bad credentials","documentation_url":"https://docs.github.com/rest","status":"401"}
+	at org.kohsuke.github.GitHubConnectorResponseErrorHandler$1.onError(GitHubConnectorResponseErrorHandler.java:62) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.detectKnownErrors(GitHubClient.java:504) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.sendRequest(GitHubClient.java:464) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.lambda$getRateLimit$5(GitHubClient.java:294) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubSanityCachedValue.get(GitHubSanityCachedValue.java:44) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.getRateLimit(GitHubClient.java:283) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.getRateLimit(GitHubClient.java:255) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHub.getRateLimit(GitHub.java:534) ~[github-api-1.318.jar:na]
+	at com.somdiproy.smartcodereview.service.GitHubService.createGitHubClient(GitHubService.java:397) ~[classes/:na]
+	at com.somdiproy.smartcodereview.service.GitHubService.testGitHubConnection(GitHubService.java:626) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.8.jar:6.2.8]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:724) ~[spring-aop-6.2.8.jar:6.2.8]
+	at com.somdiproy.smartcodereview.service.GitHubService$$SpringCGLIB$$0.testGitHubConnection(<generated>) ~[classes/:na]
+	at com.somdiproy.smartcodereview.controller.AuthController.createSession(AuthController.java:84) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2025-07-02T10:23:24.900+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : ❌ Network error while testing GitHub connection: Invalid GitHub token or authentication failed. Please check your token and try again.
+2025-07-02T10:23:24.900+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.controller.AuthController          : ❌ GitHub connection test failed
+2025-07-02T10:23:34.869+05:30  INFO 75375 --- [smart-code-review] [http-nio-8083-exec-10] c.s.s.controller.AuthController          : 🔍 Testing GitHub connection with provided token
+2025-07-02T10:23:35.298+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-10] c.s.s.service.GitHubService              : Failed to authenticate with GitHub token
+
+org.kohsuke.github.HttpException: {"message":"Bad credentials","documentation_url":"https://docs.github.com/rest","status":"401"}
+	at org.kohsuke.github.GitHubConnectorResponseErrorHandler$1.onError(GitHubConnectorResponseErrorHandler.java:62) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.detectKnownErrors(GitHubClient.java:504) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.sendRequest(GitHubClient.java:464) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.lambda$getRateLimit$5(GitHubClient.java:294) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubSanityCachedValue.get(GitHubSanityCachedValue.java:44) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.getRateLimit(GitHubClient.java:283) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.getRateLimit(GitHubClient.java:255) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHub.getRateLimit(GitHub.java:534) ~[github-api-1.318.jar:na]
+	at com.somdiproy.smartcodereview.service.GitHubService.createGitHubClient(GitHubService.java:397) ~[classes/:na]
+	at com.somdiproy.smartcodereview.service.GitHubService.testGitHubConnection(GitHubService.java:626) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.8.jar:6.2.8]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:724) ~[spring-aop-6.2.8.jar:6.2.8]
+	at com.somdiproy.smartcodereview.service.GitHubService$$SpringCGLIB$$0.testGitHubConnection(<generated>) ~[classes/:na]
+	at com.somdiproy.smartcodereview.controller.AuthController.createSession(AuthController.java:84) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2025-07-02T10:23:35.302+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-10] c.s.s.service.GitHubService              : ❌ Network error while testing GitHub connection: Invalid GitHub token or authentication failed. Please check your token and try again.
+2025-07-02T10:23:35.303+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-10] c.s.s.controller.AuthController          : ❌ GitHub connection test failed
+2025-07-02T10:23:41.371+05:30 DEBUG 75375 --- [smart-code-review] [http-nio-8083-exec-2] c.s.s.exception.GlobalExceptionHandler   : Static resource not found: No static resource .well-known/appspecific/com.chrome.devtools.json.
+2025-07-02T10:25:07.904+05:30  INFO 75375 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.controller.AuthController          : 🔍 Testing GitHub connection with provided token
+2025-07-02T10:25:08.349+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.service.GitHubService              : Failed to authenticate with GitHub token
+
+org.kohsuke.github.HttpException: {"message":"Bad credentials","documentation_url":"https://docs.github.com/rest","status":"401"}
+	at org.kohsuke.github.GitHubConnectorResponseErrorHandler$1.onError(GitHubConnectorResponseErrorHandler.java:62) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.detectKnownErrors(GitHubClient.java:504) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.sendRequest(GitHubClient.java:464) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.lambda$getRateLimit$5(GitHubClient.java:294) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubSanityCachedValue.get(GitHubSanityCachedValue.java:44) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.getRateLimit(GitHubClient.java:283) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHubClient.getRateLimit(GitHubClient.java:255) ~[github-api-1.318.jar:na]
+	at org.kohsuke.github.GitHub.getRateLimit(GitHub.java:534) ~[github-api-1.318.jar:na]
+	at com.somdiproy.smartcodereview.service.GitHubService.createGitHubClient(GitHubService.java:397) ~[classes/:na]
+	at com.somdiproy.smartcodereview.service.GitHubService.testGitHubConnection(GitHubService.java:626) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.8.jar:6.2.8]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:724) ~[spring-aop-6.2.8.jar:6.2.8]
+	at com.somdiproy.smartcodereview.service.GitHubService$$SpringCGLIB$$0.testGitHubConnection(<generated>) ~[classes/:na]
+	at com.somdiproy.smartcodereview.controller.AuthController.createSession(AuthController.java:84) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2025-07-02T10:25:08.351+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.service.GitHubService              : ❌ Network error while testing GitHub connection: Invalid GitHub token or authentication failed. Please check your token and try again.
+2025-07-02T10:25:08.352+05:30 ERROR 75375 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.controller.AuthController          : ❌ GitHub connection test failed
+2025-07-02T10:25:08.579+05:30 DEBUG 75375 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.exception.GlobalExceptionHandler   : Static resource not found: No static resource .well-known/appspecific/com.chrome.devtools.json.

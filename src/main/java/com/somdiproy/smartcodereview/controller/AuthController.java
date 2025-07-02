@@ -40,12 +40,17 @@ public class AuthController {
     
     private final SessionService sessionService;
     private final SecureTokenService secureTokenService;
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GitHubService.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
     
+    private final GitHubService gitHubService;
+
     @Autowired
-    public AuthController(SessionService sessionService, SecureTokenService secureTokenService) {
+    public AuthController(SessionService sessionService, 
+                         SecureTokenService secureTokenService,
+                         GitHubService gitHubService) {
         this.sessionService = sessionService;
         this.secureTokenService = secureTokenService;
+        this.gitHubService = gitHubService;
     }
     
     /**
@@ -76,35 +81,14 @@ public class AuthController {
             // Test GitHub connection before creating session
             log.info("🔍 Testing GitHub connection with provided token");
             
-            try {
-                GitHub github = new GitHubBuilder().withOAuthToken(githubToken).build();
-                GHMyself myself = github.getMyself();
-                String login = myself.getLogin(); // This will throw exception if token is invalid
-                
-                log.info("✅ GitHub connection successful. Authenticated as: {}", login);
-                
-                // Check rate limit
-                GHRateLimit rateLimit = github.getRateLimit();
-                if (rateLimit.getRemaining() < 100) {
-                    log.warn("⚠️ Low GitHub API rate limit: {} remaining", rateLimit.getRemaining());
-                }
-                
-            } catch (HttpException e) {
-                if (e.getResponseCode() == 401) {
-                    log.error("❌ GitHub authentication failed: Invalid token");
-                    redirectAttributes.addFlashAttribute("error", "Invalid GitHub token. Please check your token and try again.");
-                } else {
-                    log.error("❌ GitHub API error: {}", e.getMessage());
-                    redirectAttributes.addFlashAttribute("error", "GitHub API error: " + e.getMessage());
-                }
-                redirectAttributes.addFlashAttribute("email", request.getEmail());
-                return "redirect:/";
-            } catch (IOException e) {
-                log.error("❌ Network error while testing GitHub connection: {}", e.getMessage());
-                redirectAttributes.addFlashAttribute("error", "Network error while validating GitHub token. Please try again.");
+            if (!gitHubService.testGitHubConnection(githubToken)) {
+                log.error("❌ GitHub connection test failed");
+                redirectAttributes.addFlashAttribute("error", "Invalid GitHub token or authentication failed. Please check your token and try again.");
                 redirectAttributes.addFlashAttribute("email", request.getEmail());
                 return "redirect:/";
             }
+            
+            log.info("✅ GitHub connection test successful");
             
             // Create session only after successful GitHub validation
             Session session = sessionService.createSession(request.getEmail(), httpRequest);
