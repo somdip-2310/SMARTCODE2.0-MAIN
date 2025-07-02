@@ -86,6 +86,7 @@ public class AWSConfig {
     /**
      * Lambda client configuration
      */
+    @Bean
     public LambdaClient lambdaClient(AwsCredentialsProvider credentialsProvider) {
         return LambdaClient.builder()
                 .region(Region.of(awsRegion))
