@@ -82,23 +82,17 @@ public class AWSConfig {
                 .build();
     }
 
+    
     /**
      * Lambda client configuration
      */
-    /**
-     * Lambda client configuration
-     */
-    /**
-     * Lambda client configuration
-     */
-    @Bean
     public LambdaClient lambdaClient(AwsCredentialsProvider credentialsProvider) {
         return LambdaClient.builder()
                 .region(Region.of(awsRegion))
                 .credentialsProvider(credentialsProvider)
                 .overrideConfiguration(ClientOverrideConfiguration.builder()
-                    .apiCallTimeout(Duration.ofMinutes(30))
-                    .apiCallAttemptTimeout(Duration.ofMinutes(30))
+                    .apiCallTimeout(Duration.ofMinutes(20))
+                    .apiCallAttemptTimeout(Duration.ofMinutes(20))
                     .build())
                 .build();
     }

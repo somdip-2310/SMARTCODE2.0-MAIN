@@ -8,11 +8,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.core.retry.RetryPolicy;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.lambda.LambdaClient;
+import software.amazon.awssdk.services.lambda.model.InvocationType;
 import software.amazon.awssdk.services.lambda.model.InvokeRequest;
 import software.amazon.awssdk.services.lambda.model.InvokeResponse;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +32,9 @@ public class LambdaInvokerService {
 	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
 
 	private final LambdaClient lambdaClient;
+	private static final int DETECTION_BATCH_SIZE = 5; // Reduced from 10
+	private static final int MAX_PAYLOAD_SIZE = 50000; // 50KB max
+	private static final Duration LAMBDA_TIMEOUT = Duration.ofMinutes(6);
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Value("${aws.lambda.functions.screening}")
@@ -38,6 +48,7 @@ public class LambdaInvokerService {
 
 	@Autowired
 	public LambdaInvokerService(LambdaClient lambdaClient) {
+		// Use the injected LambdaClient from AWSConfig
 		this.lambdaClient = lambdaClient;
 	}
 
@@ -79,7 +90,7 @@ public class LambdaInvokerService {
 
 	            InvokeRequest request = InvokeRequest.builder()
 	                .functionName(screeningFunctionArn)
-	                .invocationType("RequestResponse")
+	                .invocationType(InvocationType.REQUEST_RESPONSE)
 	                .payload(SdkBytes.fromUtf8String(payloadJson))
 	                .build();
 
@@ -129,7 +140,7 @@ public class LambdaInvokerService {
 
 	                    InvokeRequest request = InvokeRequest.builder()
 	                        .functionName(screeningFunctionArn)
-	                        .invocationType("RequestResponse")
+	                        .invocationType(InvocationType.REQUEST_RESPONSE)
 	                        .payload(SdkBytes.fromUtf8String(payloadJson))
 	                        .build();
 
@@ -153,7 +164,7 @@ public class LambdaInvokerService {
 	                    
 	                    // Add small delay between batches to avoid rate limiting
 	                    if (i < batches.size() - 1) {
-	                        Thread.sleep(5000); // 5000ms delay between batches
+	                        Thread.sleep(2000); // Reduced from 5000ms to 2000ms
 	                    }
 	                    
 	                } catch (Exception batchError) {
@@ -174,12 +185,18 @@ public class LambdaInvokerService {
 	    }
 	}
 
-	
-
 	public List<Map<String, Object>> invokeDetection(String sessionId, String analysisId, String repository, String branch,
-			List<Map<String, Object>> screenedFiles, int scanNumber) {
-		try {
-			Thread.sleep(5000);
+	        List<Map<String, Object>> screenedFiles, int scanNumber) {
+	    try {
+	        // Check if batch processing is needed based on payload size or file count
+	        String testPayload = objectMapper.writeValueAsString(screenedFiles);
+	        if (testPayload.length() > MAX_PAYLOAD_SIZE || screenedFiles.size() > DETECTION_BATCH_SIZE) {
+	            log.info("📦 Large payload detected ({} files, {} bytes). Using batch processing...", 
+	                screenedFiles.size(), testPayload.length());
+	            return invokeDetectionInBatches(sessionId, analysisId, repository, branch, screenedFiles, scanNumber);
+	        }
+	        
+	        // Single invocation for small payloads
 			Map<String, Object> payload = new HashMap<>();
 			payload.put("sessionId", sessionId);
 			payload.put("analysisId", analysisId);
@@ -191,13 +208,28 @@ public class LambdaInvokerService {
 			payload.put("timestamp", System.currentTimeMillis());
 			String payloadJson = objectMapper.writeValueAsString(payload);
 
-			InvokeRequest request = InvokeRequest.builder().functionName(detectionFunctionArn)
-					.payload(SdkBytes.fromUtf8String(payloadJson)).build();
+			InvokeRequest request = InvokeRequest.builder()
+					.functionName(detectionFunctionArn)
+					.invocationType(InvocationType.REQUEST_RESPONSE)
+					.payload(SdkBytes.fromUtf8String(payloadJson))
+					.build();
 
 			InvokeResponse response = lambdaClient.invoke(request);
 			String responseJson = response.payload().asUtf8String();
 
-			log.info("Detection Lambda response: {}", responseJson);
+			// Check for Lambda function errors
+			if (response.functionError() != null) {
+			    log.error("❌ Lambda function error: {}", response.functionError());
+			    return new ArrayList<>();
+			}
+
+			// Check response status code
+			if (response.statusCode() != 200) {
+			    log.error("❌ Lambda invocation failed with status code: {}", response.statusCode());
+			    return new ArrayList<>();
+			}
+
+			log.debug("Detection Lambda response received, size: {} bytes", responseJson.length());
 
 			// Parse detection response
 			Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
@@ -217,6 +249,91 @@ public class LambdaInvokerService {
 			return new ArrayList<>();
 		}
 	}
+	
+	private List<Map<String, Object>> invokeDetectionInBatches(String sessionId, String analysisId, 
+	        String repository, String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
+	    
+	    List<Map<String, Object>> allIssues = new ArrayList<>();
+	    List<List<Map<String, Object>>> batches = createBatches(screenedFiles, DETECTION_BATCH_SIZE);
+	    
+	    log.info("📦 Processing {} files in {} batches for detection", screenedFiles.size(), batches.size());
+	    
+	    int successfulBatches = 0;
+	    int failedBatches = 0;
+	    
+	    for (int i = 0; i < batches.size(); i++) {
+	        try {
+	            Map<String, Object> batchPayload = new HashMap<>();
+	            batchPayload.put("sessionId", sessionId);
+	            batchPayload.put("analysisId", analysisId);
+	            batchPayload.put("repository", repository);
+	            batchPayload.put("branch", branch);
+	            batchPayload.put("files", batches.get(i));
+	            batchPayload.put("stage", "detection");
+	            batchPayload.put("scanNumber", scanNumber);
+	            batchPayload.put("batchInfo", Map.of(
+	                "batchNumber", i + 1,
+	                "totalBatches", batches.size(),
+	                "batchSize", batches.get(i).size()
+	            ));
+	            batchPayload.put("timestamp", System.currentTimeMillis());
+	            
+	            String payloadJson = objectMapper.writeValueAsString(batchPayload);
+	            log.info("🔍 Invoking detection batch {}/{}, payload size: {} bytes", 
+	                i + 1, batches.size(), payloadJson.length());
+	            
+	            InvokeRequest request = InvokeRequest.builder()
+	                .functionName(detectionFunctionArn)
+	                .invocationType(InvocationType.REQUEST_RESPONSE)
+	                .payload(SdkBytes.fromUtf8String(payloadJson))
+	                .build();
+	            
+	            InvokeResponse response = lambdaClient.invoke(request);
+	            String responseJson = response.payload().asUtf8String();
+	            
+	            // Check for Lambda errors
+	            if (response.functionError() != null) {
+	                log.error("❌ Lambda function error in batch {}/{}: {}", 
+	                    i + 1, batches.size(), response.functionError());
+	                failedBatches++;
+	                continue;
+	            }
+	            
+	            Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
+	            String status = (String) responseMap.get("status");
+	            
+	            if ("success".equals(status) || status == null) {
+	                List<Map<String, Object>> batchIssues = (List<Map<String, Object>>) responseMap.get("issues");
+	                if (batchIssues != null) {
+	                    allIssues.addAll(batchIssues);
+	                    log.info("✅ Batch {}/{} completed: {} issues found", 
+	                        i + 1, batches.size(), batchIssues.size());
+	                    successfulBatches++;
+	                }
+	            } else {
+	                log.warn("⚠️ Batch {}/{} returned error: {}", 
+	                    i + 1, batches.size(), responseMap.get("errors"));
+	                failedBatches++;
+	            }
+	            
+	            // Small delay between batches to avoid throttling
+	            if (i < batches.size() - 1) {
+	                Thread.sleep(1000);
+	            }
+	            
+	        } catch (Exception e) {
+	            log.error("❌ Failed to process detection batch {}/{}: {}", 
+	                i + 1, batches.size(), e.getMessage());
+	            failedBatches++;
+	        }
+	    }
+	    
+	    log.info("📊 Detection batch processing complete: {} successful, {} failed, {} total issues found", 
+	        successfulBatches, failedBatches, allIssues.size());
+	    
+	    return allIssues;
+	}
+	
 	private List<List<Map<String, Object>>> createBatches(List<Map<String, Object>> items, int batchSize) {
 	    List<List<Map<String, Object>>> batches = new ArrayList<>();
 	    for (int i = 0; i < items.size(); i += batchSize) {
@@ -225,10 +342,11 @@ public class LambdaInvokerService {
 	    }
 	    return batches;
 	}
+	
 	public void invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
 			List<Map<String, Object>> issues, int scanNumber) {
 		try {
-			Thread.sleep(5000);
+			// Remove artificial delay
 			Map<String, Object> payload = new HashMap<>();
 			payload.put("sessionId", sessionId);
 			payload.put("analysisId", analysisId);
@@ -240,13 +358,22 @@ public class LambdaInvokerService {
 			payload.put("timestamp", System.currentTimeMillis());
 			String payloadJson = objectMapper.writeValueAsString(payload);
 
-			InvokeRequest request = InvokeRequest.builder().functionName(suggestionsFunctionArn)
-					.payload(SdkBytes.fromUtf8String(payloadJson)).build();
+			InvokeRequest request = InvokeRequest.builder()
+					.functionName(suggestionsFunctionArn)
+					.invocationType(InvocationType.REQUEST_RESPONSE)
+					.payload(SdkBytes.fromUtf8String(payloadJson))
+					.build();
 
 			InvokeResponse response = lambdaClient.invoke(request);
 			String responseJson = response.payload().asUtf8String();
 
-			log.info("Suggestions Lambda response: {}", responseJson);
+			// Check for Lambda function errors
+			if (response.functionError() != null) {
+			    log.error("❌ Suggestions Lambda function error: {}", response.functionError());
+			    return;
+			}
+
+			log.debug("Suggestions Lambda response received, size: {} bytes", responseJson.length());
 
 		} catch (Exception e) {
 			log.error("Failed to invoke suggestions Lambda", e);
