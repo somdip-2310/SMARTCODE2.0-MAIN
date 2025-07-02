@@ -2,6 +2,7 @@ package com.somdiproy.smartcodereview.service;
 
 import com.somdiproy.smartcodereview.exception.InvalidOtpException;
 import com.somdiproy.smartcodereview.exception.SessionNotFoundException;
+import com.somdiproy.smartcodereview.model.AnalysisResult;
 import com.somdiproy.smartcodereview.model.Session;
 import com.somdiproy.smartcodereview.repository.SessionRepository;
 import com.somdiproy.smartcodereview.util.EmailMasker;

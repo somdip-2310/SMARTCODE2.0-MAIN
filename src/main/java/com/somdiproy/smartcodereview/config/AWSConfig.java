@@ -97,8 +97,8 @@ public class AWSConfig {
                 .region(Region.of(awsRegion))
                 .credentialsProvider(credentialsProvider)
                 .overrideConfiguration(ClientOverrideConfiguration.builder()
-                    .apiCallTimeout(Duration.ofMinutes(10))
-                    .apiCallAttemptTimeout(Duration.ofMinutes(4))
+                    .apiCallTimeout(Duration.ofMinutes(30))
+                    .apiCallAttemptTimeout(Duration.ofMinutes(30))
                     .build())
                 .build();
     }
