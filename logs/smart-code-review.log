@@ -16299,3 +16299,388 @@ This generated password is for development use only. Your security configuration
 2025-07-02T19:34:59.161+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(8)-127.0.0.1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2025-07-02T19:34:59.162+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(8)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2025-07-02T19:34:59.174+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(8)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 12 ms
+2025-07-02T19:35:47.555+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.controller.AuthController          : 🔍 Testing GitHub connection with provided token
+2025-07-02T19:35:48.550+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.GitHubService              : 🔑 Using user-provided GitHub token. Rate limit: 4994/5000
+2025-07-02T19:35:48.551+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.GitHubService              : ✅ GitHub connection successful. Authenticated as: somdip-2310
+2025-07-02T19:35:48.552+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.controller.AuthController          : ✅ GitHub connection test successful
+2025-07-02T19:35:49.806+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.SessionService             : 🔄 LOCAL TESTING: Deleting existing session to generate fresh OTP
+2025-07-02T19:35:50.073+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.SessionService             : Deleted session: a7c9e693-1baa-4754-b1c8-a9758e081a0c
+2025-07-02T19:35:50.515+05:30 DEBUG 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.repository.SessionRepository       : Saved session to DynamoDB: sessionId=9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b, verificationStatus=PENDING
+2025-07-02T19:35:50.515+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.EmailService               : 🔐 LOCAL TESTING - OTP Code for somdiproy.roy@gmail.com: 484635 (Valid for 5 minutes)
+2025-07-02T19:35:50.516+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.EmailService               : 📧 Email: somdiproy.roy@gmail.com | 🔢 OTP: 484635 | ⏰ Copy this code for verification!
+2025-07-02T19:35:50.516+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.EmailService               : 💡 Profile: local | Skip Real Email: true
+2025-07-02T19:35:50.516+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.SessionService             : ✅ Created new session for email: s***@gmail.com with sessionId: 9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b
+2025-07-02T19:35:50.517+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.SessionService             : 🔐 Session Details - Email: s***@gmail.com | SessionId: 9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b | OTP Length: 6 | Expires: 5 minutes
+2025-07-02T19:35:50.518+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-3] c.s.s.service.SessionService             : Temporarily stored GitHub token for session: 9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b
+2025-07-02T19:36:00.141+05:30 DEBUG 83074 --- [smart-code-review] [http-nio-8083-exec-5] c.s.s.repository.SessionRepository       : Saved session to DynamoDB: sessionId=9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b, verificationStatus=VERIFIED
+2025-07-02T19:36:00.365+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-5] c.s.s.service.SessionService             : ✅ Successfully verified OTP for sessionId: 9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b
+2025-07-02T19:36:00.366+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-5] c.s.s.service.SessionService             : 🔄 Session verification status: VERIFIED
+2025-07-02T19:36:00.367+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-5] c.s.s.service.SessionService             : 🔄 Session isVerified(): true
+2025-07-02T19:36:00.367+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-5] c.s.s.service.SessionService             : 🔓 Session now verified: email=s***@gmail.com, remainingScans=3
+2025-07-02T19:36:00.368+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-5] c.s.s.controller.AuthController          : 🎯 OTP verified successfully! Redirecting to repository selection for session: 9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b
+2025-07-02T19:36:00.386+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.service.SessionService             : 🏛️ AnalysisController: Accessing repository page for sessionId: 9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b
+2025-07-02T19:36:00.646+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.service.SessionService             : 📋 Session Details: verificationStatus=VERIFIED, isVerified=true, email=s***@gmail.com, scanCount=0
+2025-07-02T19:36:00.647+05:30 DEBUG 83074 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.service.SessionService             : 🔍 Raw session data: sessionId=9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b, verificationStatus=VERIFIED, ttl=1751468750
+2025-07-02T19:36:00.647+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-6] c.s.s.service.SessionService             : ✅ Repository page prepared successfully, rendering template: repository-select
+2025-07-02T19:36:10.839+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 🔑 Using user-provided GitHub token. Rate limit: 4993/5000
+2025-07-02T19:36:11.289+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 📚 Fetched repository info: somdip-2310/SMARTCODE2.0-MAIN (Private: false, Language: Java)
+2025-07-02T19:36:11.913+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 🔑 Using user-provided GitHub token. Rate limit: 4991/5000
+2025-07-02T19:36:12.535+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 🌿 Found 1 branches in repository: https://github.com/somdip-2310/SMARTCODE2.0-MAIN.git
+2025-07-02T19:36:12.538+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 🔍 Analyzing file stats for repo: https://github.com/somdip-2310/SMARTCODE2.0-MAIN.git branch: main
+2025-07-02T19:36:13.140+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 🔑 Using user-provided GitHub token. Rate limit: 4988/5000
+2025-07-02T19:36:13.863+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.GitHubService              : 📁 Found 100 total entries in branch: main
+2025-07-02T19:36:13.878+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.SessionService             : 📊 Repository analysis preview: 47 eligible files, estimated cost: $0.0376
+2025-07-02T19:36:22.250+05:30 DEBUG 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.repository.SessionRepository       : Updated session in DynamoDB: sessionId=9c2c08d4-f0b1-48c5-a706-7c1fa64fc77b, verificationStatus=VERIFIED
+2025-07-02T19:36:22.562+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : 🚀 Starting analysis 4c797b4d-5d7b-41fb-95ca-0bfb6419b7aa for repository https://github.com/somdip-2310/SMARTCODE2.0-MAIN.git branch main
+2025-07-02T19:36:22.562+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : 📥 Stage 1: Fetching code from GitHub
+2025-07-02T19:36:23.212+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.GitHubService              : 🔑 Using user-provided GitHub token. Rate limit: 4985/5000
+2025-07-02T19:36:23.571+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.GitHubService              : 🔍 Fetching files from https://github.com/somdip-2310/SMARTCODE2.0-MAIN.git:main
+2025-07-02T19:36:23.901+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.GitHubService              : 📁 Processing 47 eligible files (filtered from 100 total)
+2025-07-02T19:36:24.333+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.GitHubService              : ✅ Successfully fetched 47 files from https://github.com/somdip-2310/SMARTCODE2.0-MAIN.git branch main
+2025-07-02T19:36:24.334+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : ✓ Fetched 47 files from repository
+2025-07-02T19:36:24.334+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : 🔍 Stage 2: Screening files with Nova Micro
+2025-07-02T19:36:24.354+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📦 Large payload detected (47 files, 231982 bytes). Using batch processing...
+2025-07-02T19:36:24.357+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📤 Invoking screening Lambda batch 1/5 with 10 files, payload size: 44881 bytes
+2025-07-02T19:36:36.321+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 1/5 processed successfully: 5 files screened
+2025-07-02T19:36:38.330+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📤 Invoking screening Lambda batch 2/5 with 10 files, payload size: 24724 bytes
+2025-07-02T19:36:44.580+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 2/5 processed successfully: 3 files screened
+2025-07-02T19:36:46.582+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📤 Invoking screening Lambda batch 3/5 with 10 files, payload size: 39927 bytes
+2025-07-02T19:36:52.916+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 3/5 processed successfully: 6 files screened
+2025-07-02T19:36:54.921+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📤 Invoking screening Lambda batch 4/5 with 10 files, payload size: 110939 bytes
+2025-07-02T19:37:02.259+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 4/5 processed successfully: 5 files screened
+2025-07-02T19:37:04.260+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📤 Invoking screening Lambda batch 5/5 with 7 files, payload size: 12960 bytes
+2025-07-02T19:37:10.761+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 5/5 processed successfully: 2 files screened
+2025-07-02T19:37:10.763+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📊 Batch processing complete: 21 files screened out of 47 total files
+2025-07-02T19:37:10.765+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : ✓ Screening complete: 21 valid files out of 47
+2025-07-02T19:37:10.765+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : 🎯 Stage 3: Detecting issues with Nova Lite
+2025-07-02T19:37:10.769+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📦 Large payload detected (21 files, 119032 bytes). Using batch processing...
+2025-07-02T19:37:10.770+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📦 Processing 21 files in 11 batches for detection
+2025-07-02T19:37:10.771+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 1/11, payload size: 4297 bytes
+2025-07-02T19:37:28.406+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 1/11 completed: 37 issues found
+2025-07-02T19:37:29.414+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 2/11, payload size: 3544 bytes
+2025-07-02T19:37:44.500+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 2/11 completed: 29 issues found
+2025-07-02T19:37:45.503+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 3/11, payload size: 2320 bytes
+2025-07-02T19:37:57.382+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 3/11 completed: 26 issues found
+2025-07-02T19:37:58.386+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 4/11, payload size: 9079 bytes
+2025-07-02T19:38:16.581+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 4/11 completed: 36 issues found
+2025-07-02T19:38:17.584+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 5/11, payload size: 8161 bytes
+2025-07-02T19:40:21.140+05:30 ERROR 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ❌ Failed to process detection batch 5/11: Unable to execute HTTP request: Read timed out
+2025-07-02T19:40:21.142+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 6/11, payload size: 8496 bytes
+2025-07-02T19:41:12.858+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 6/11 completed: 38 issues found
+2025-07-02T19:41:13.860+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 7/11, payload size: 15257 bytes
+2025-07-02T19:41:34.858+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 7/11 completed: 44 issues found
+2025-07-02T19:41:35.864+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 8/11, payload size: 36094 bytes
+2025-07-02T19:41:57.301+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 8/11 completed: 28 issues found
+2025-07-02T19:41:58.306+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 9/11, payload size: 10732 bytes
+2025-07-02T19:42:19.932+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 9/11 completed: 45 issues found
+2025-07-02T19:42:20.936+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 10/11, payload size: 15701 bytes
+2025-07-02T19:42:36.736+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 10/11 completed: 35 issues found
+2025-07-02T19:42:37.737+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 🔍 Invoking detection batch 11/11, payload size: 8883 bytes
+2025-07-02T19:43:35.947+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : ✅ Batch 11/11 completed: 18 issues found
+2025-07-02T19:43:35.947+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : 📊 Detection batch processing complete: 10 successful, 1 failed, 336 total issues found
+2025-07-02T19:43:35.948+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : ✓ Detection complete: 336 issues found
+2025-07-02T19:43:35.948+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : 💡 Stage 4: Generating suggestions with Nova Premier
+2025-07-02T19:43:56.909+05:30 DEBUG 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.LambdaInvokerService       : Suggestions Lambda response received, size: 164343 bytes
+2025-07-02T19:43:56.909+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : ✓ Suggestions generated successfully
+2025-07-02T19:43:56.909+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : ✅ Analysis 4c797b4d-5d7b-41fb-95ca-0bfb6419b7aa completed successfully in 454 seconds
+2025-07-02T19:43:57.572+05:30 DEBUG 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.repository.AnalysisRepository      : Saved analysis: 4c797b4d-5d7b-41fb-95ca-0bfb6419b7aa
+2025-07-02T19:43:57.572+05:30  INFO 83074 --- [smart-code-review] [http-nio-8083-exec-8] c.s.s.service.SessionService             : 💾 Analysis result saved to database: 4c797b4d-5d7b-41fb-95ca-0bfb6419b7aa
+2025-07-02T19:43:58.137+05:30 ERROR 83074 --- [smart-code-review] [http-nio-8083-exec-2] org.thymeleaf.TemplateEngine             : [THYMELEAF][http-nio-8083-exec-2] Exception processing template "report": Exception evaluating SpringEL expression: "report.repository" (template: "report" - line 14, col 55)
+
+org.thymeleaf.exceptions.TemplateProcessingException: Exception evaluating SpringEL expression: "report.repository" (template: "report" - line 14, col 55)
+	at org.thymeleaf.spring6.expression.SPELVariableExpressionEvaluator.evaluate(SPELVariableExpressionEvaluator.java:292) ~[thymeleaf-spring6-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.VariableExpression.executeVariableExpression(VariableExpression.java:166) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:66) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1314) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.OpenElementTag.beHandled(OpenElementTag.java:205) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.TemplateModel.process(TemplateModel.java:136) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:661) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1077) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.spring6.view.ThymeleafView.renderFragment(ThymeleafView.java:372) ~[thymeleaf-spring6-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.spring6.view.ThymeleafView.render(ThymeleafView.java:192) ~[thymeleaf-spring6-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.springframework.web.servlet.DispatcherServlet.render(DispatcherServlet.java:1437) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.processDispatchResult(DispatcherServlet.java:1168) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1106) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+Caused by: org.springframework.expression.spel.SpelEvaluationException: EL1007E: Property or field 'repository' cannot be found on null
+	at org.springframework.expression.spel.ast.PropertyOrFieldReference.readProperty(PropertyOrFieldReference.java:225) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.PropertyOrFieldReference.getValueInternal(PropertyOrFieldReference.java:112) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.PropertyOrFieldReference$AccessorValueRef.getValue(PropertyOrFieldReference.java:376) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.CompoundExpression.getValueInternal(CompoundExpression.java:97) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.SpelNodeImpl.getValue(SpelNodeImpl.java:116) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.standard.SpelExpression.getValue(SpelExpression.java:338) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.thymeleaf.spring6.expression.SPELVariableExpressionEvaluator.evaluate(SPELVariableExpressionEvaluator.java:265) ~[thymeleaf-spring6-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	... 133 common frames omitted
+
+2025-07-02T19:43:58.157+05:30 ERROR 83074 --- [smart-code-review] [http-nio-8083-exec-2] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: org.thymeleaf.exceptions.TemplateProcessingException: Exception evaluating SpringEL expression: "report.repository" (template: "report" - line 14, col 55)] with root cause
+
+org.springframework.expression.spel.SpelEvaluationException: EL1007E: Property or field 'repository' cannot be found on null
+	at org.springframework.expression.spel.ast.PropertyOrFieldReference.readProperty(PropertyOrFieldReference.java:225) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.PropertyOrFieldReference.getValueInternal(PropertyOrFieldReference.java:112) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.PropertyOrFieldReference$AccessorValueRef.getValue(PropertyOrFieldReference.java:376) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.CompoundExpression.getValueInternal(CompoundExpression.java:97) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.ast.SpelNodeImpl.getValue(SpelNodeImpl.java:116) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.springframework.expression.spel.standard.SpelExpression.getValue(SpelExpression.java:338) ~[spring-expression-6.2.8.jar:6.2.8]
+	at org.thymeleaf.spring6.expression.SPELVariableExpressionEvaluator.evaluate(SPELVariableExpressionEvaluator.java:265) ~[thymeleaf-spring6-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.VariableExpression.executeVariableExpression(VariableExpression.java:166) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:66) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1314) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.OpenElementTag.beHandled(OpenElementTag.java:205) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.TemplateModel.process(TemplateModel.java:136) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:661) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1077) ~[thymeleaf-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.spring6.view.ThymeleafView.renderFragment(ThymeleafView.java:372) ~[thymeleaf-spring6-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.thymeleaf.spring6.view.ThymeleafView.render(ThymeleafView.java:192) ~[thymeleaf-spring6-3.1.3.RELEASE.jar:3.1.3.RELEASE]
+	at org.springframework.web.servlet.DispatcherServlet.render(DispatcherServlet.java:1437) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.processDispatchResult(DispatcherServlet.java:1168) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1106) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.42.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267) ~[spring-webmvc-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240) ~[spring-security-config-6.5.1.jar:6.5.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.8.jar:6.2.8]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2025-07-02T19:46:35.386+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(22)-127.0.0.1] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2025-07-02T19:46:35.396+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(22)-127.0.0.1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-02T19:46:35.408+05:30  INFO 83074 --- [smart-code-review] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-02T19:46:35.556+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(22)-127.0.0.1] c.s.s.service.SessionService             : Shutting down SecureTokenService, clearing 1 tokens
+2025-07-02T19:46:40.560+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(22)-127.0.0.1] c.s.s.service.SessionService             : Cleaned up all temporary tokens on shutdown
+2025-07-02T19:46:40.564+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(22)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-02T19:46:40.600+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(22)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-07-02T19:46:40.616+05:30  INFO 83074 --- [smart-code-review] [RMI TCP Connection(22)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

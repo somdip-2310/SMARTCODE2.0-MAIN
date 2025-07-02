@@ -276,7 +276,7 @@ public class LambdaInvokerService {
 	    }
 	}
 	
-	private List<Map<String, Object>> invokeDetectionInBatches(String sessionId, String analysisId, 
+	private List<Map<String, Object>> invokeDetectionInBatches(String sessionId, String analysisId,
 	        String repository, String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
 	    
 	    List<Map<String, Object>> allIssues = new ArrayList<>();
@@ -288,7 +288,18 @@ public class LambdaInvokerService {
 	    int failedBatches = 0;
 	    
 	    for (int i = 0; i < batches.size(); i++) {
+	        long batchStartTime = System.currentTimeMillis();
+	        
 	        try {
+	            // Add delay between batches to avoid overwhelming Lambda
+	            if (i > 0) {
+	                try {
+	                    Thread.sleep(1000); // 1 second delay between batches
+	                } catch (InterruptedException e) {
+	                    Thread.currentThread().interrupt();
+	                }
+	            }
+	            
 	            Map<String, Object> batchPayload = new HashMap<>();
 	            batchPayload.put("sessionId", sessionId);
 	            batchPayload.put("analysisId", analysisId);
@@ -304,23 +315,61 @@ public class LambdaInvokerService {
 	            ));
 	            batchPayload.put("timestamp", System.currentTimeMillis());
 	            
-	            String payloadJson = objectMapper.writeValueAsString(batchPayload);
+	            String batchPayloadJson = objectMapper.writeValueAsString(batchPayload);
 	            log.info("🔍 Invoking detection batch {}/{}, payload size: {} bytes", 
-	                i + 1, batches.size(), payloadJson.length());
+	                    i + 1, batches.size(), batchPayloadJson.length());
 	            
 	            InvokeRequest request = InvokeRequest.builder()
-	                .functionName(detectionFunctionArn)
-	                .invocationType(InvocationType.REQUEST_RESPONSE)
-	                .payload(SdkBytes.fromUtf8String(payloadJson))
-	                .build();
+	                    .functionName(detectionFunctionArn)
+	                    .invocationType(InvocationType.REQUEST_RESPONSE)
+	                    .payload(SdkBytes.fromUtf8String(batchPayloadJson))
+	                    .build();
 	            
-	            InvokeResponse response = lambdaClient.invoke(request);
+	            // Add retry logic for batch processing
+	            InvokeResponse response = null;
+	            int maxRetries = 3;
+	            int retryCount = 0;
+	            
+	            while (retryCount < maxRetries) {
+	                try {
+	                    response = lambdaClient.invoke(request);
+	                    break; // Success, exit retry loop
+	                } catch (SdkClientException e) {
+	                    retryCount++;
+	                    if (retryCount >= maxRetries) {
+	                        throw e; // Max retries reached, throw exception
+	                    }
+	                    
+	                    // Calculate wait time: 5, 10, 15 seconds
+	                    int waitSeconds = retryCount * 5;
+	                    
+	                    log.warn("⚠️ Batch {}/{} Lambda invocation failed, retrying ({}/{}) after {} seconds: {}", 
+	                            i + 1, batches.size(), retryCount, maxRetries, waitSeconds, e.getMessage());
+	                    
+	                    // Wait before retry with increased intervals
+	                    try {
+	                        TimeUnit.SECONDS.sleep(waitSeconds);
+	                    } catch (InterruptedException ie) {
+	                        Thread.currentThread().interrupt();
+	                        throw new RuntimeException("Retry interrupted", ie);
+	                    }
+	                }
+	            }
+	            
 	            String responseJson = response.payload().asUtf8String();
 	            
 	            // Check for Lambda errors
 	            if (response.functionError() != null) {
 	                log.error("❌ Lambda function error in batch {}/{}: {}", 
-	                    i + 1, batches.size(), response.functionError());
+	                        i + 1, batches.size(), response.functionError());
+	                failedBatches++;
+	                continue;
+	            }
+	            
+	            // Check response status code
+	            if (response.statusCode() != 200) {
+	                log.error("❌ Batch {}/{} invocation failed with status code: {}", 
+	                        i + 1, batches.size(), response.statusCode());
 	                failedBatches++;
 	                continue;
 	            }
@@ -332,30 +381,27 @@ public class LambdaInvokerService {
 	                List<Map<String, Object>> batchIssues = (List<Map<String, Object>>) responseMap.get("issues");
 	                if (batchIssues != null) {
 	                    allIssues.addAll(batchIssues);
-	                    log.info("✅ Batch {}/{} completed: {} issues found", 
-	                        i + 1, batches.size(), batchIssues.size());
+	                    long batchDuration = System.currentTimeMillis() - batchStartTime;
+	                    log.info("✅ Batch {}/{} completed in {} seconds: {} issues found", 
+	                            i + 1, batches.size(), batchDuration / 1000, batchIssues.size());
 	                    successfulBatches++;
 	                }
 	            } else {
 	                log.warn("⚠️ Batch {}/{} returned error: {}", 
-	                    i + 1, batches.size(), responseMap.get("errors"));
+	                        i + 1, batches.size(), responseMap.get("errors"));
 	                failedBatches++;
 	            }
 	            
-	            // Small delay between batches to avoid throttling
-	            if (i < batches.size() - 1) {
-	                Thread.sleep(1000);
-	            }
-	            
 	        } catch (Exception e) {
-	            log.error("❌ Failed to process detection batch {}/{}: {}", 
-	                i + 1, batches.size(), e.getMessage());
+	            long batchDuration = System.currentTimeMillis() - batchStartTime;
+	            log.error("❌ Failed to process detection batch {}/{} after {} seconds: {}", 
+	                    i + 1, batches.size(), batchDuration / 1000, e.getMessage());
 	            failedBatches++;
 	        }
 	    }
 	    
 	    log.info("📊 Detection batch processing complete: {} successful, {} failed, {} total issues found", 
-	        successfulBatches, failedBatches, allIssues.size());
+	            successfulBatches, failedBatches, allIssues.size());
 	    
 	    return allIssues;
 	}
