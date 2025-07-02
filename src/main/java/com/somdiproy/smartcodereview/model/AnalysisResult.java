@@ -34,6 +34,171 @@ public class AnalysisResult {
     // Constructors
     public AnalysisResult() {}
     
+ // Nested classes
+    @DynamoDbBean
+    public static class Summary {
+        private Integer totalIssues;
+        private Map<String, Integer> bySeverity;
+        private Map<String, Integer> byCategory;
+        private Map<String, Integer> byType;
+        
+        // Default constructor
+        public Summary() {
+            this.bySeverity = new HashMap<>();
+            this.byCategory = new HashMap<>();
+            this.byType = new HashMap<>();
+        }
+        
+        // Getters and Setters
+        public Integer getTotalIssues() { return totalIssues; }
+        public void setTotalIssues(Integer totalIssues) { this.totalIssues = totalIssues; }
+        
+        public Map<String, Integer> getBySeverity() { return bySeverity; }
+        public void setBySeverity(Map<String, Integer> bySeverity) { this.bySeverity = bySeverity; }
+        
+        public Map<String, Integer> getByCategory() { return byCategory; }
+        public void setByCategory(Map<String, Integer> byCategory) { this.byCategory = byCategory; }
+        
+        public Map<String, Integer> getByType() { return byType; }
+        public void setByType(Map<String, Integer> byType) { this.byType = byType; }
+    }
+
+    @DynamoDbBean
+    public static class Scores {
+        private Double security;
+        private Double performance;
+        private Double quality;
+        private Double overall;
+        
+        // Getters and Setters
+        public Double getSecurity() { return security; }
+        public void setSecurity(Double security) { this.security = security; }
+        
+        public Double getPerformance() { return performance; }
+        public void setPerformance(Double performance) { this.performance = performance; }
+        
+        public Double getQuality() { return quality; }
+        public void setQuality(Double quality) { this.quality = quality; }
+        
+        public Double getOverall() { return overall; }
+        public void setOverall(Double overall) { this.overall = overall; }
+    }
+
+    @DynamoDbBean
+    public static class TokenUsage {
+        private Integer screeningTokens;
+        private Integer detectionTokens;
+        private Integer suggestionTokens;
+        private Integer totalTokens;
+        
+        // Getters and Setters
+        public Integer getScreeningTokens() { return screeningTokens; }
+        public void setScreeningTokens(Integer screeningTokens) { this.screeningTokens = screeningTokens; }
+        
+        public Integer getDetectionTokens() { return detectionTokens; }
+        public void setDetectionTokens(Integer detectionTokens) { this.detectionTokens = detectionTokens; }
+        
+        public Integer getSuggestionTokens() { return suggestionTokens; }
+        public void setSuggestionTokens(Integer suggestionTokens) { this.suggestionTokens = suggestionTokens; }
+        
+        public Integer getTotalTokens() { return totalTokens; }
+        public void setTotalTokens(Integer totalTokens) { this.totalTokens = totalTokens; }
+    }
+
+    @DynamoDbBean
+    public static class Costs {
+        private Double screeningCost;
+        private Double detectionCost;
+        private Double suggestionCost;
+        private Double totalCost;
+        
+        // Getters and Setters
+        public Double getScreeningCost() { return screeningCost; }
+        public void setScreeningCost(Double screeningCost) { this.screeningCost = screeningCost; }
+        
+        public Double getDetectionCost() { return detectionCost; }
+        public void setDetectionCost(Double detectionCost) { this.detectionCost = detectionCost; }
+        
+        public Double getSuggestionCost() { return suggestionCost; }
+        public void setSuggestionCost(Double suggestionCost) { this.suggestionCost = suggestionCost; }
+        
+        public Double getTotalCost() { return totalCost; }
+        public void setTotalCost(Double totalCost) { this.totalCost = totalCost; }
+    }
+
+    // Builder pattern
+    public static AnalysisResultBuilder builder() {
+        return new AnalysisResultBuilder();
+    }
+
+    public static class AnalysisResultBuilder {
+        private AnalysisResult result = new AnalysisResult();
+        
+        public AnalysisResultBuilder analysisId(String analysisId) {
+            result.setAnalysisId(analysisId);
+            return this;
+        }
+        
+        public AnalysisResultBuilder sessionId(String sessionId) {
+            result.setSessionId(sessionId);
+            return this;
+        }
+        
+        public AnalysisResultBuilder scanNumber(Integer scanNumber) {
+            result.setScanNumber(scanNumber);
+            return this;
+        }
+        
+        public AnalysisResultBuilder status(String status) {
+            result.setStatus(status);
+            return this;
+        }
+        
+        public AnalysisResultBuilder repository(String repository) {
+            result.setRepository(repository);
+            return this;
+        }
+        
+        public AnalysisResultBuilder branch(String branch) {
+            result.setBranch(branch);
+            return this;
+        }
+        
+        public AnalysisResultBuilder startedAt(Long startedAt) {
+            result.setStartedAt(startedAt);
+            return this;
+        }
+        
+        public AnalysisResultBuilder completedAt(Long completedAt) {
+            result.setCompletedAt(completedAt);
+            return this;
+        }
+        
+        public AnalysisResultBuilder filesSubmitted(Integer filesSubmitted) {
+            result.setFilesSubmitted(filesSubmitted);
+            return this;
+        }
+        
+        public AnalysisResultBuilder filesAnalyzed(Integer filesAnalyzed) {
+            result.setFilesAnalyzed(filesAnalyzed);
+            return this;
+        }
+        
+        public AnalysisResultBuilder filesSkipped(Integer filesSkipped) {
+            result.setFilesSkipped(filesSkipped);
+            return this;
+        }
+        
+        public AnalysisResultBuilder processingTimeMs(Long processingTimeMs) {
+            result.setProcessingTimeMs(processingTimeMs);
+            return this;
+        }
+        
+        public AnalysisResult build() {
+            return result;
+        }
+    }
+    
     // Getters and Setters
     @DynamoDbPartitionKey
     public String getAnalysisId() {

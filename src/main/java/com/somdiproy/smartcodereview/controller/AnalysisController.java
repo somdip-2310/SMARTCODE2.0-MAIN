@@ -2,6 +2,7 @@ package com.somdiproy.smartcodereview.controller;
 
 import com.somdiproy.smartcodereview.dto.AnalysisRequest;
 import com.somdiproy.smartcodereview.dto.AnalysisStatusResponse;
+import com.somdiproy.smartcodereview.dto.ReportResponse;
 import com.somdiproy.smartcodereview.exception.ScanLimitExceededException;
 import com.somdiproy.smartcodereview.exception.SessionNotFoundException;
 import com.somdiproy.smartcodereview.model.Analysis;
@@ -10,6 +11,7 @@ import com.somdiproy.smartcodereview.model.Repository;
 import com.somdiproy.smartcodereview.model.Session;
 import com.somdiproy.smartcodereview.service.AnalysisOrchestrator;
 import com.somdiproy.smartcodereview.service.GitHubService;
+import com.somdiproy.smartcodereview.service.ReportService;
 import com.somdiproy.smartcodereview.service.SecureTokenService;
 import com.somdiproy.smartcodereview.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,16 +36,19 @@ public class AnalysisController {
     private final GitHubService gitHubService;
     private final SecureTokenService secureTokenService;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SessionService.class);
+    private final ReportService reportService;
     
     @Autowired
     public AnalysisController(AnalysisOrchestrator analysisOrchestrator,
                              SessionService sessionService,
                              GitHubService gitHubService,
-                             SecureTokenService secureTokenService) {
+                             SecureTokenService secureTokenService,
+                             ReportService reportService) {
         this.analysisOrchestrator = analysisOrchestrator;
         this.sessionService = sessionService;
         this.gitHubService = gitHubService;
         this.secureTokenService = secureTokenService;
+        this.reportService = reportService;
     }
     
     /**
@@ -246,19 +251,23 @@ public class AnalysisController {
             // Verify session
             Session session = sessionService.getSession(sessionId);
             
-            // Get analysis results
+            // Get analysis to verify ownership
             Analysis analysis = analysisOrchestrator.getAnalysis(analysisId);
-            
+
             // Verify this analysis belongs to the session
             if (!analysis.getSessionId().equals(sessionId)) {
                 throw new SecurityException("Analysis does not belong to this session");
             }
-            
+
+            // Get comprehensive report using ReportService
+            ReportResponse report = reportService.getReport(analysisId);
+
+            // Add all required attributes for the report template
             model.addAttribute("analysisId", analysisId);
             model.addAttribute("sessionId", sessionId);
-            model.addAttribute("analysis", analysis);
+            model.addAttribute("report", report);  // Changed from 'analysis' to 'report'
             model.addAttribute("remainingScans", session.getRemainingScans());
-            
+
             return "report";
             
         } catch (Exception e) {

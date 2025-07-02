@@ -20,8 +20,17 @@ public class Analysis {
     private Integer issuesFound;
     private List<String> stages = new ArrayList<>();
     private String error;
+    private Integer scanNumber;
     
-    public enum AnalysisStatus {
+    public Integer getScanNumber() {
+		return scanNumber;
+	}
+
+	public void setScanNumber(Integer scanNumber) {
+		this.scanNumber = scanNumber;
+	}
+
+	public enum AnalysisStatus {
         PENDING,
         IN_PROGRESS,
         COMPLETED,

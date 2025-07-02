@@ -415,8 +415,8 @@ public class LambdaInvokerService {
 	    return batches;
 	}
 	
-	public void invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
-			List<Map<String, Object>> issues, int scanNumber) {
+	public String invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
+	        List<Map<String, Object>> issues, int scanNumber) {
 		try {
 			// Remove artificial delay
 			Map<String, Object> payload = new HashMap<>();
@@ -446,9 +446,11 @@ public class LambdaInvokerService {
 			}
 
 			log.debug("Suggestions Lambda response received, size: {} bytes", responseJson.length());
+			return responseJson;
 
-		} catch (Exception e) {
-			log.error("Failed to invoke suggestions Lambda", e);
-		}
+			} catch (Exception e) {
+			    log.error("Failed to invoke suggestions Lambda", e);
+			    return null;
+			}
 	}
 }
