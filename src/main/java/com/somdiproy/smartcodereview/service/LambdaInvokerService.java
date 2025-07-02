@@ -153,7 +153,7 @@ public class LambdaInvokerService {
 	                    
 	                    // Add small delay between batches to avoid rate limiting
 	                    if (i < batches.size() - 1) {
-	                        Thread.sleep(500); // 500ms delay between batches
+	                        Thread.sleep(5000); // 5000ms delay between batches
 	                    }
 	                    
 	                } catch (Exception batchError) {
@@ -179,6 +179,7 @@ public class LambdaInvokerService {
 	public List<Map<String, Object>> invokeDetection(String sessionId, String analysisId, String repository, String branch,
 			List<Map<String, Object>> screenedFiles, int scanNumber) {
 		try {
+			Thread.sleep(5000);
 			Map<String, Object> payload = new HashMap<>();
 			payload.put("sessionId", sessionId);
 			payload.put("analysisId", analysisId);
@@ -227,6 +228,7 @@ public class LambdaInvokerService {
 	public void invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
 			List<Map<String, Object>> issues, int scanNumber) {
 		try {
+			Thread.sleep(5000);
 			Map<String, Object> payload = new HashMap<>();
 			payload.put("sessionId", sessionId);
 			payload.put("analysisId", analysisId);
