@@ -342,11 +342,11 @@ public class DataAggregationService {
         }
         
         // Calculate scores (simple formula - can be improved)
-        scores.setSecurity(Math.max(0, 100 - (securityIssues * 10) - (criticalCount * 20)));
-        scores.setPerformance(Math.max(0, 100 - (performanceIssues * 8)));
-        scores.setQuality(Math.max(0, 100 - (qualityIssues * 5) - (highCount * 10)));
-        scores.setOverall((scores.getSecurity() + scores.getPerformance() + scores.getQuality()) / 3);
-        
+     // Calculate scores (simple formula - can be improved)
+        scores.setSecurity(Double.valueOf(Math.max(0, 100 - (securityIssues * 10) - (criticalCount * 20))));
+        scores.setPerformance(Double.valueOf(Math.max(0, 100 - (performanceIssues * 8))));
+        scores.setQuality(Double.valueOf(Math.max(0, 100 - (qualityIssues * 5) - (highCount * 10))));
+        scores.setOverall(Double.valueOf((scores.getSecurity() + scores.getPerformance() + scores.getQuality()) / 3));
         return scores;
     }
     
