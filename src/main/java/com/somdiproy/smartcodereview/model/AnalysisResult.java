@@ -256,6 +256,11 @@ public class AnalysisResult {
             return this;
         }
         
+        public AnalysisResultBuilder processingTimeMs(Long processingTimeMs) {
+            analysisResult.setProcessingTimeMs(processingTimeMs);
+            return this;
+        }
+        
         public AnalysisResult build() {
             return analysisResult;
         }

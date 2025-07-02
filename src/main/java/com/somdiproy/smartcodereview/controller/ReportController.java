@@ -25,6 +25,7 @@ public class ReportController {
         this.sessionService = sessionService;
     }
     
+    /*
     @GetMapping("/{analysisId}")
     public String showReport(@PathVariable String analysisId,
                             @RequestParam String sessionId,
@@ -40,6 +41,7 @@ public class ReportController {
         
         return "report";
     }
+    */
     
     @GetMapping("/api/download/{analysisId}")
     @ResponseBody

@@ -64,8 +64,8 @@ public class AuthController {
         }
         
         try {
-        	secureTokenService.storeSessionToken(request.getEmail(), request.getGithubToken());
-            Session session = sessionService.createSession(request.getEmail(), httpRequest);
+        	Session session = sessionService.createSession(request.getEmail(), httpRequest);
+        	secureTokenService.storeSessionToken(session.getSessionId(), request.getGithubToken());
             
             // Redirect to OTP verification page
             return "redirect:/auth/verify?sessionId=" + session.getSessionId();
