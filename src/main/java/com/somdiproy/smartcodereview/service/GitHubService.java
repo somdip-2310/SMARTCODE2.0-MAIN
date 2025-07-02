@@ -610,4 +610,50 @@ public class GitHubService {
             }
         }
     }
+    /**
+     * Test GitHub connection with provided token
+     * @param accessToken GitHub personal access token
+     * @return true if connection is successful, false otherwise
+     */
+    public boolean testGitHubConnection(String accessToken) {
+        try {
+            // First check token format
+            if (!isValidGitHubTokenFormat(accessToken)) {
+                log.error("Invalid GitHub token format. Token should start with 'ghp_'");
+                return false;
+            }
+            
+            GitHub github = createGitHubClient(accessToken);
+            
+            // Test connection by fetching user info
+            GHMyself myself = github.getMyself();
+            String login = myself.getLogin();
+            
+            log.info("✅ GitHub connection successful. Authenticated as: {}", login);
+            return true;
+            
+        } catch (GHException e) {
+            if (e.getMessage().contains("401")) {
+                log.error("❌ GitHub authentication failed: Invalid token");
+            } else if (e.getMessage().contains("403")) {
+                log.error("❌ GitHub authentication failed: Token lacks required permissions");
+            } else {
+                log.error("❌ GitHub API error: {}", e.getMessage());
+            }
+            return false;
+        } catch (IOException e) {
+            log.error("❌ Network error while testing GitHub connection: {}", e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("❌ Unexpected error during GitHub connection test: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Validate GitHub token format
+     */
+    private boolean isValidGitHubTokenFormat(String token) {
+        return token != null && token.startsWith("ghp_") && token.length() > 10;
+    }
 }

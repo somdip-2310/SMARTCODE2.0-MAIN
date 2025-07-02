@@ -6,14 +6,16 @@ import com.somdiproy.smartcodereview.exception.InvalidOtpException;
 import com.somdiproy.smartcodereview.exception.SessionNotFoundException;
 import com.somdiproy.smartcodereview.model.Session;
 import com.somdiproy.smartcodereview.service.SessionService;
+import com.somdiproy.smartcodereview.service.GitHubService;
+import com.somdiproy.smartcodereview.service.SecureTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.IOException;
 
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHMyself;
@@ -27,8 +29,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.somdiproy.smartcodereview.service.SecureTokenService;
-import java.io.IOException;
 
 /**
  * Controller for authentication and session management
@@ -38,10 +38,9 @@ import java.io.IOException;
 @RequestMapping("/auth")
 public class AuthController {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
-    
     private final SessionService sessionService;
     private final SecureTokenService secureTokenService;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GitHubService.class);
     
     @Autowired
     public AuthController(SessionService sessionService, SecureTokenService secureTokenService) {
@@ -60,23 +59,71 @@ public class AuthController {
         
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Please provide a valid email address");
+            redirectAttributes.addFlashAttribute("email", request.getEmail());
             return "redirect:/";
         }
         
         try {
-        	Session session = sessionService.createSession(request.getEmail(), httpRequest);
-        	secureTokenService.storeSessionToken(session.getSessionId(), request.getGithubToken());
+            // First validate GitHub token format
+            String githubToken = request.getGithubToken();
+            if (githubToken == null || !githubToken.startsWith("ghp_") || githubToken.length() < 10) {
+                log.error("❌ Invalid GitHub token format");
+                redirectAttributes.addFlashAttribute("error", "Invalid GitHub token format. Token should start with 'ghp_'");
+                redirectAttributes.addFlashAttribute("email", request.getEmail());
+                return "redirect:/";
+            }
+            
+            // Test GitHub connection before creating session
+            log.info("🔍 Testing GitHub connection with provided token");
+            
+            try {
+                GitHub github = new GitHubBuilder().withOAuthToken(githubToken).build();
+                GHMyself myself = github.getMyself();
+                String login = myself.getLogin(); // This will throw exception if token is invalid
+                
+                log.info("✅ GitHub connection successful. Authenticated as: {}", login);
+                
+                // Check rate limit
+                GHRateLimit rateLimit = github.getRateLimit();
+                if (rateLimit.getRemaining() < 100) {
+                    log.warn("⚠️ Low GitHub API rate limit: {} remaining", rateLimit.getRemaining());
+                }
+                
+            } catch (HttpException e) {
+                if (e.getResponseCode() == 401) {
+                    log.error("❌ GitHub authentication failed: Invalid token");
+                    redirectAttributes.addFlashAttribute("error", "Invalid GitHub token. Please check your token and try again.");
+                } else {
+                    log.error("❌ GitHub API error: {}", e.getMessage());
+                    redirectAttributes.addFlashAttribute("error", "GitHub API error: " + e.getMessage());
+                }
+                redirectAttributes.addFlashAttribute("email", request.getEmail());
+                return "redirect:/";
+            } catch (IOException e) {
+                log.error("❌ Network error while testing GitHub connection: {}", e.getMessage());
+                redirectAttributes.addFlashAttribute("error", "Network error while validating GitHub token. Please try again.");
+                redirectAttributes.addFlashAttribute("email", request.getEmail());
+                return "redirect:/";
+            }
+            
+            // Create session only after successful GitHub validation
+            Session session = sessionService.createSession(request.getEmail(), httpRequest);
+            secureTokenService.storeSessionToken(session.getSessionId(), request.getGithubToken());
             
             // Redirect to OTP verification page
             return "redirect:/auth/verify?sessionId=" + session.getSessionId();
             
         } catch (Exception e) {
             log.error("Failed to create session", e);
-            redirectAttributes.addFlashAttribute("error", "Failed to create session. Please try again.");
+            redirectAttributes.addFlashAttribute("error", "Failed to create session: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("email", request.getEmail());
             return "redirect:/";
         }
     }
     
+    /**
+     * Validate GitHub token via AJAX
+     */
     @PostMapping("/validate-token")
     @ResponseBody
     public Map<String, Object> validateToken(@RequestBody Map<String, String> request) {
@@ -153,7 +200,7 @@ public class AuthController {
             
             if (session.isVerified()) {
                 // Already verified, redirect to repository selection
-                return "redirect:/repository/select?sessionId=" + sessionId;
+                return "redirect:/repository?sessionId=" + sessionId;
             }
             
             model.addAttribute("sessionId", sessionId);
