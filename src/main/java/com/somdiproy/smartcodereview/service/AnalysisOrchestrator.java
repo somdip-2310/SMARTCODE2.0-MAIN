@@ -232,21 +232,22 @@ public class AnalysisOrchestrator {
         }
         
         // Then check database
-        return analysisRepository.findById(analysisId)
-                .map(result -> Analysis.builder()
-                        .analysisId(result.getAnalysisId())
-                        .sessionId(result.getSessionId())
-                        .repository(result.getRepository())
-                        .branch(result.getBranch())
-                        .status(Analysis.AnalysisStatus.COMPLETED)
-                        .progress(100)
-                        .startedAt(result.getStartedAt())
-                        .completedAt(result.getCompletedAt())
-                        .totalFiles(result.getFilesSubmitted())
-                        .issuesFound(result.getSummary() != null ? result.getSummary().getTotalIssues() : 0)
-                        .scanNumber(result.getScanNumber())
-                        .build())
+        AnalysisResult result = analysisRepository.findById(analysisId)
                 .orElseThrow(() -> new RuntimeException("Analysis not found: " + analysisId));
+
+        return Analysis.builder()
+                .analysisId(result.getAnalysisId())
+                .sessionId(result.getSessionId())
+                .repository(result.getRepository())
+                .branch(result.getBranch())
+                .status(Analysis.AnalysisStatus.COMPLETED)
+                .progress(100)
+                .startedAt(result.getStartedAt())
+                .completedAt(result.getCompletedAt())
+                .totalFiles(result.getFilesSubmitted())
+                .issuesFound(result.getSummary() != null ? result.getSummary().getTotalIssues() : 0)
+                .scanNumber(result.getScanNumber())
+                .build();
     }
     
     /**

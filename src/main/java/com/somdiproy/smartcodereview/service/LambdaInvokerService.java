@@ -417,40 +417,40 @@ public class LambdaInvokerService {
 	
 	public String invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
 	        List<Map<String, Object>> issues, int scanNumber) {
-		try {
-			// Remove artificial delay
-			Map<String, Object> payload = new HashMap<>();
-			payload.put("sessionId", sessionId);
-			payload.put("analysisId", analysisId);
-			payload.put("repository", repository);
-			payload.put("branch", branch);
-			payload.put("issues", issues);
-			payload.put("stage", "suggestions");
-			payload.put("scanNumber", scanNumber);
-			payload.put("timestamp", System.currentTimeMillis());
-			String payloadJson = objectMapper.writeValueAsString(payload);
+	    try {
+	        // Remove artificial delay
+	        Map<String, Object> payload = new HashMap<>();
+	        payload.put("sessionId", sessionId);
+	        payload.put("analysisId", analysisId);
+	        payload.put("repository", repository);
+	        payload.put("branch", branch);
+	        payload.put("issues", issues);
+	        payload.put("stage", "suggestions");
+	        payload.put("scanNumber", scanNumber);
+	        payload.put("timestamp", System.currentTimeMillis());
+	        String payloadJson = objectMapper.writeValueAsString(payload);
 
-			InvokeRequest request = InvokeRequest.builder()
-					.functionName(suggestionsFunctionArn)
-					.invocationType(InvocationType.REQUEST_RESPONSE)
-					.payload(SdkBytes.fromUtf8String(payloadJson))
-					.build();
+	        InvokeRequest request = InvokeRequest.builder()
+	                .functionName(suggestionsFunctionArn)
+	                .invocationType(InvocationType.REQUEST_RESPONSE)
+	                .payload(SdkBytes.fromUtf8String(payloadJson))
+	                .build();
 
-			InvokeResponse response = lambdaClient.invoke(request);
-			String responseJson = response.payload().asUtf8String();
+	        InvokeResponse response = lambdaClient.invoke(request);
+	        String responseJson = response.payload().asUtf8String();
 
-			// Check for Lambda function errors
-			if (response.functionError() != null) {
-			    log.error("❌ Suggestions Lambda function error: {}", response.functionError());
-			    return;
-			}
+	        // Check for Lambda function errors
+	        if (response.functionError() != null) {
+	            log.error("❌ Suggestions Lambda function error: {}", response.functionError());
+	            return null;  // Changed from 'return;' to 'return null;'
+	        }
 
-			log.debug("Suggestions Lambda response received, size: {} bytes", responseJson.length());
-			return responseJson;
+	        log.debug("Suggestions Lambda response received, size: {} bytes", responseJson.length());
+	        return responseJson;
 
-			} catch (Exception e) {
-			    log.error("Failed to invoke suggestions Lambda", e);
-			    return null;
-			}
+	    } catch (Exception e) {
+	        log.error("Failed to invoke suggestions Lambda", e);
+	        return null;
+	    }
 	}
 }

@@ -25,6 +25,8 @@ public class DataAggregationService {
     private final AnalysisRepository analysisRepository;
     private final IssueDetailsRepository issueDetailsRepository;
     private final ObjectMapper objectMapper;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
+
     
     // Temporary storage for Lambda results during processing
     private final Map<String, LambdaResults> lambdaResultsCache = new ConcurrentHashMap<>();
@@ -214,49 +216,55 @@ public class DataAggregationService {
         // Immediate Fix
         Map<String, Object> immediateFix = (Map<String, Object>) suggestionData.get("immediateFix");
         if (immediateFix != null) {
-            suggestion.setImmediateFix(Suggestion.ImmediateFix.builder()
-                .title(getStringValue(immediateFix, "title"))
-                .searchCode(getStringValue(immediateFix, "searchCode"))
-                .replaceCode(getStringValue(immediateFix, "replaceCode"))
-                .explanation(getStringValue(immediateFix, "explanation"))
-                .build());
+            Suggestion.ImmediateFix fix = new Suggestion.ImmediateFix();
+            fix.setTitle(getStringValue(immediateFix, "title"));
+            fix.setSearchCode(getStringValue(immediateFix, "searchCode"));
+            fix.setReplaceCode(getStringValue(immediateFix, "replaceCode"));
+            fix.setExplanation(getStringValue(immediateFix, "explanation"));
+            suggestion.setImmediateFix(fix);
         }
         
         // Best Practice
         Map<String, Object> bestPractice = (Map<String, Object>) suggestionData.get("bestPractice");
         if (bestPractice != null) {
-            suggestion.setBestPractice(Suggestion.BestPractice.builder()
-                .title(getStringValue(bestPractice, "title"))
-                .code(getStringValue(bestPractice, "code"))
-                .benefits((List<String>) bestPractice.get("benefits"))
-                .build());
+            Suggestion.BestPractice practice = new Suggestion.BestPractice();
+            practice.setTitle(getStringValue(bestPractice, "title"));
+            practice.setCode(getStringValue(bestPractice, "code"));
+            practice.setBenefits((List<String>) bestPractice.get("benefits"));
+            suggestion.setBestPractice(practice);
         }
         
         // Testing
         Map<String, Object> testing = (Map<String, Object>) suggestionData.get("testing");
         if (testing != null) {
-            suggestion.setTesting(Suggestion.Testing.builder()
-                .testCase(getStringValue(testing, "testCase"))
-                .validationSteps((List<String>) testing.get("validationSteps"))
-                .build());
+            Suggestion.Testing test = new Suggestion.Testing();
+            test.setTestCase(getStringValue(testing, "testCase"));
+            test.setValidationSteps((List<String>) testing.get("validationSteps"));
+            suggestion.setTesting(test);
         }
         
         // Prevention
         Map<String, Object> prevention = (Map<String, Object>) suggestionData.get("prevention");
         if (prevention != null) {
+            Suggestion.Prevention prev = new Suggestion.Prevention();
+            
+            // Handle tools list
             List<Map<String, Object>> tools = (List<Map<String, Object>>) prevention.get("tools");
-            List<Suggestion.Tool> toolList = tools != null ? tools.stream()
-                .map(t -> Suggestion.Tool.builder()
-                    .name(getStringValue(t, "name"))
-                    .description(getStringValue(t, "description"))
-                    .build())
-                .collect(Collectors.toList()) : null;
-                
-            suggestion.setPrevention(Suggestion.Prevention.builder()
-                .guidelines((List<String>) prevention.get("guidelines"))
-                .tools(toolList)
-                .codeReviewChecklist((List<String>) prevention.get("codeReviewChecklist"))
-                .build());
+            List<Suggestion.Tool> toolList = null;
+            if (tools != null) {
+                toolList = new ArrayList<>();
+                for (Map<String, Object> t : tools) {
+                    Suggestion.Tool tool = new Suggestion.Tool();
+                    tool.setName(getStringValue(t, "name"));
+                    tool.setDescription(getStringValue(t, "description"));
+                    toolList.add(tool);
+                }
+            }
+            
+            prev.setGuidelines((List<String>) prevention.get("guidelines"));
+            prev.setTools(toolList);
+            prev.setCodeReviewChecklist((List<String>) prevention.get("codeReviewChecklist"));
+            suggestion.setPrevention(prev);
         }
         
         return suggestion;

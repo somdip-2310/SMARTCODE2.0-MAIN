@@ -22,13 +22,7 @@ public class Analysis {
     private String error;
     private Integer scanNumber;
     
-    public Integer getScanNumber() {
-		return scanNumber;
-	}
-
-	public void setScanNumber(Integer scanNumber) {
-		this.scanNumber = scanNumber;
-	}
+    
 
 	public enum AnalysisStatus {
         PENDING,
@@ -148,6 +142,14 @@ public class Analysis {
         this.error = error;
     }
     
+    public Integer getScanNumber() {
+        return scanNumber;
+    }
+
+    public void setScanNumber(Integer scanNumber) {
+        this.scanNumber = scanNumber;
+    }
+    
     // Builder pattern
     public static AnalysisBuilder builder() {
         return new AnalysisBuilder();
@@ -218,6 +220,11 @@ public class Analysis {
         
         public AnalysisBuilder error(String error) {
             analysis.setError(error);
+            return this;
+        }
+        
+        public AnalysisBuilder scanNumber(Integer scanNumber) {
+            analysis.setScanNumber(scanNumber);
             return this;
         }
         
