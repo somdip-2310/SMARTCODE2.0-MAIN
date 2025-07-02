@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
@@ -15,6 +16,8 @@ import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
+
+import java.time.Duration;
 
 /**
  * AWS SDK Configuration for Smart Code Review Platform
@@ -82,11 +85,21 @@ public class AWSConfig {
     /**
      * Lambda client configuration
      */
+    /**
+     * Lambda client configuration
+     */
+    /**
+     * Lambda client configuration
+     */
     @Bean
     public LambdaClient lambdaClient(AwsCredentialsProvider credentialsProvider) {
         return LambdaClient.builder()
                 .region(Region.of(awsRegion))
                 .credentialsProvider(credentialsProvider)
+                .overrideConfiguration(ClientOverrideConfiguration.builder()
+                    .apiCallTimeout(Duration.ofMinutes(10))
+                    .apiCallAttemptTimeout(Duration.ofMinutes(4))
+                    .build())
                 .build();
     }
 
