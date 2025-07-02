@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -123,9 +124,9 @@ public class AnalysisOrchestrator {
             
             // Stage 2: Screening with Nova Micro
             log.info("🔍 Stage 2: Screening files with Nova Micro");
-            List<String> validFiles = lambdaInvokerService.invokeScreening(
-                    sessionId, 
-                    analysisId, 
+            List<Map<String, Object>> validFiles = lambdaInvokerService.invokeScreening(
+                    sessionId,
+                    analysisId,
                     repoUrl, 
                     branch, 
                     files,
@@ -136,14 +137,28 @@ public class AnalysisOrchestrator {
             
             // Stage 3: Detection with Nova Lite
             log.info("🎯 Stage 3: Detecting issues with Nova Lite");
-            List<String> issues = lambdaInvokerService.invokeDetection(validFiles);
+            List<Map<String, Object>> issues = lambdaInvokerService.invokeDetection(
+                    sessionId,
+                    analysisId,
+                    repoUrl,
+                    branch,
+                    validFiles,
+                    session.getScanCount()
+            );
             analysis.setIssuesFound(issues.size());
             analysis.setProgress(66);
             log.info("✓ Detection complete: {} issues found", issues.size());
             
             // Stage 4: Suggestions with Nova Premier
             log.info("💡 Stage 4: Generating suggestions with Nova Premier");
-            lambdaInvokerService.invokeSuggestions(issues);
+            lambdaInvokerService.invokeSuggestions(
+                    sessionId,
+                    analysisId,
+                    repoUrl,
+                    branch,
+                    issues,
+                    session.getScanCount()
+            );
             analysis.setProgress(100);
             log.info("✓ Suggestions generated successfully");
             

@@ -41,8 +41,8 @@ public class LambdaInvokerService {
 		this.lambdaClient = lambdaClient;
 	}
 
-	public List<String> invokeScreening(String sessionId, String analysisId, String repository, String branch,
-			List<GitHubFile> files, int scanNumber) {
+	public List<Map<String, Object>> invokeScreening(String sessionId, String analysisId, String repository,
+			String branch, List<GitHubFile> files, int scanNumber) {
 		try {
 			// Convert GitHubFile to the structure expected by Lambda
 			List<Map<String, Object>> fileInputs = files.stream().map(file -> {
@@ -88,20 +88,27 @@ public class LambdaInvokerService {
 				return new ArrayList<>();
 			}
 
-			// Extract screened file paths
+			// Return the complete screened files data
 			List<Map<String, Object>> screenedFiles = (List<Map<String, Object>>) responseMap.get("files");
-			return screenedFiles.stream().map(f -> (String) f.get("path")).collect(Collectors.toList());
-
+			return screenedFiles;
 		} catch (Exception e) {
 			log.error("Failed to invoke screening Lambda", e);
 			return new ArrayList<>();
 		}
 	}
 
-	public List<String> invokeDetection(List<String> files) {
+	public List<Map<String, Object>> invokeDetection(String sessionId, String analysisId, String repository, String branch,
+			List<Map<String, Object>> screenedFiles, int scanNumber) {
 		try {
-			Map<String, Object> payload = Map.of("files", files, "action", "detect");
-
+			Map<String, Object> payload = new HashMap<>();
+			payload.put("sessionId", sessionId);
+			payload.put("analysisId", analysisId);
+			payload.put("repository", repository);
+			payload.put("branch", branch);
+			payload.put("files", screenedFiles);
+			payload.put("stage", "detection");
+			payload.put("scanNumber", scanNumber);
+			payload.put("timestamp", System.currentTimeMillis());
 			String payloadJson = objectMapper.writeValueAsString(payload);
 
 			InvokeRequest request = InvokeRequest.builder().functionName(detectionFunctionArn)
@@ -112,8 +119,18 @@ public class LambdaInvokerService {
 
 			log.info("Detection Lambda response: {}", responseJson);
 
-			// TODO: Parse response properly
-			return new ArrayList<>();
+			// Parse detection response
+			Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
+			String status = (String) responseMap.get("status");
+
+			if ("error".equals(status)) {
+				log.error("❌ Detection Lambda returned error: {}", responseMap.get("errors"));
+				return new ArrayList<>();
+			}
+
+			// Return the detected issues
+			List<Map<String, Object>> issues = (List<Map<String, Object>>) responseMap.get("issues");
+			return issues != null ? issues : new ArrayList<>();
 
 		} catch (Exception e) {
 			log.error("Failed to invoke detection Lambda", e);
@@ -121,10 +138,18 @@ public class LambdaInvokerService {
 		}
 	}
 
-	public void invokeSuggestions(List<String> issues) {
+	public void invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
+			List<Map<String, Object>> issues, int scanNumber) {
 		try {
-			Map<String, Object> payload = Map.of("issues", issues, "action", "suggest");
-
+			Map<String, Object> payload = new HashMap<>();
+			payload.put("sessionId", sessionId);
+			payload.put("analysisId", analysisId);
+			payload.put("repository", repository);
+			payload.put("branch", branch);
+			payload.put("issues", issues);
+			payload.put("stage", "suggestions");
+			payload.put("scanNumber", scanNumber);
+			payload.put("timestamp", System.currentTimeMillis());
 			String payloadJson = objectMapper.writeValueAsString(payload);
 
 			InvokeRequest request = InvokeRequest.builder().functionName(suggestionsFunctionArn)

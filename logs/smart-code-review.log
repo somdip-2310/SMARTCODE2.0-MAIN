@@ -6054,3 +6054,11 @@ org.springframework.expression.spel.SpelEvaluationException: EL1007E: Property o
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
 	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
 
+2025-07-02T11:57:35.088+05:30  INFO 76680 --- [smart-code-review] [RMI TCP Connection(36)-127.0.0.1] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2025-07-02T11:57:35.431+05:30  INFO 76680 --- [smart-code-review] [RMI TCP Connection(36)-127.0.0.1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-02T11:57:35.482+05:30  INFO 76680 --- [smart-code-review] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-02T11:57:35.963+05:30  INFO 76680 --- [smart-code-review] [RMI TCP Connection(36)-127.0.0.1] c.s.s.service.SessionService             : Shutting down SecureTokenService, clearing 1 tokens
+2025-07-02T11:57:40.976+05:30  INFO 76680 --- [smart-code-review] [RMI TCP Connection(36)-127.0.0.1] c.s.s.service.SessionService             : Cleaned up all temporary tokens on shutdown
+2025-07-02T11:57:41.113+05:30  INFO 76680 --- [smart-code-review] [RMI TCP Connection(36)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-02T11:57:41.276+05:30  INFO 76680 --- [smart-code-review] [RMI TCP Connection(36)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-07-02T11:57:41.373+05:30  INFO 76680 --- [smart-code-review] [RMI TCP Connection(36)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
