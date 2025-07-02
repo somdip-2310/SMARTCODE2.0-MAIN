@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.somdiproy.smartcodereview.service.GitHubService.GitHubFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import java.util.concurrent.TimeUnit;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,9 +33,8 @@ public class LambdaInvokerService {
 	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
 
 	private final LambdaClient lambdaClient;
-	private static final int DETECTION_BATCH_SIZE = 5; // Reduced from 10
-	private static final int MAX_PAYLOAD_SIZE = 50000; // 50KB max
-	private static final Duration LAMBDA_TIMEOUT = Duration.ofMinutes(6);
+	private static final int DETECTION_BATCH_SIZE = 2; // Maximum 2 files per batch
+	private static final int MAX_PAYLOAD_SIZE = 25000; // 25KB max for even faster processingprivate static final Duration LAMBDA_TIMEOUT = Duration.ofMinutes(15);
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Value("${aws.lambda.functions.screening}")
@@ -197,57 +197,83 @@ public class LambdaInvokerService {
 	        }
 	        
 	        // Single invocation for small payloads
-			Map<String, Object> payload = new HashMap<>();
-			payload.put("sessionId", sessionId);
-			payload.put("analysisId", analysisId);
-			payload.put("repository", repository);
-			payload.put("branch", branch);
-			payload.put("files", screenedFiles);
-			payload.put("stage", "detection");
-			payload.put("scanNumber", scanNumber);
-			payload.put("timestamp", System.currentTimeMillis());
-			String payloadJson = objectMapper.writeValueAsString(payload);
+	        Map<String, Object> payload = new HashMap<>();
+	        payload.put("sessionId", sessionId);
+	        payload.put("analysisId", analysisId);
+	        payload.put("repository", repository);
+	        payload.put("branch", branch);
+	        payload.put("files", screenedFiles);
+	        payload.put("stage", "detection");
+	        payload.put("scanNumber", scanNumber);
+	        payload.put("timestamp", System.currentTimeMillis());
+	        String payloadJson = objectMapper.writeValueAsString(payload);
 
-			InvokeRequest request = InvokeRequest.builder()
-					.functionName(detectionFunctionArn)
-					.invocationType(InvocationType.REQUEST_RESPONSE)
-					.payload(SdkBytes.fromUtf8String(payloadJson))
-					.build();
+	        InvokeRequest request = InvokeRequest.builder()
+	                .functionName(detectionFunctionArn)
+	                .invocationType(InvocationType.REQUEST_RESPONSE)
+	                .payload(SdkBytes.fromUtf8String(payloadJson))  // Fixed: was batchPayloadJson
+	                .build();
 
-			InvokeResponse response = lambdaClient.invoke(request);
-			String responseJson = response.payload().asUtf8String();
+	        // Add retry logic
+	        InvokeResponse response = null;
+	        int maxRetries = 3;
+	        int retryCount = 0;
+	        
+	        while (retryCount < maxRetries) {
+	            try {
+	                response = lambdaClient.invoke(request);
+	                break; // Success, exit retry loop
+	            } catch (SdkClientException e) {
+	                retryCount++;
+	                if (retryCount >= maxRetries) {
+	                    throw e; // Max retries reached, throw exception
+	                }
+	                log.warn("⚠️ Lambda invocation failed, retrying ({}/{}): {}", 
+	                        retryCount, maxRetries, e.getMessage());
+	                
+	                // Wait before retry with exponential backoff
+	                try {
+	                    TimeUnit.SECONDS.sleep(retryCount * 2);
+	                } catch (InterruptedException ie) {
+	                    Thread.currentThread().interrupt();
+	                    throw new RuntimeException("Retry interrupted", ie);
+	                }
+	            }
+	        }
 
-			// Check for Lambda function errors
-			if (response.functionError() != null) {
-			    log.error("❌ Lambda function error: {}", response.functionError());
-			    return new ArrayList<>();
-			}
+	        String responseJson = response.payload().asUtf8String();
 
-			// Check response status code
-			if (response.statusCode() != 200) {
-			    log.error("❌ Lambda invocation failed with status code: {}", response.statusCode());
-			    return new ArrayList<>();
-			}
+	        // Check for Lambda function errors
+	        if (response.functionError() != null) {
+	            log.error("❌ Lambda function error: {}", response.functionError());
+	            return new ArrayList<>();
+	        }
 
-			log.debug("Detection Lambda response received, size: {} bytes", responseJson.length());
+	        // Check response status code
+	        if (response.statusCode() != 200) {
+	            log.error("❌ Lambda invocation failed with status code: {}", response.statusCode());
+	            return new ArrayList<>();
+	        }
 
-			// Parse detection response
-			Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
-			String status = (String) responseMap.get("status");
+	        log.debug("Detection Lambda response received, size: {} bytes", responseJson.length());
 
-			if ("error".equals(status)) {
-				log.error("❌ Detection Lambda returned error: {}", responseMap.get("errors"));
-				return new ArrayList<>();
-			}
+	        // Parse detection response
+	        Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
+	        String status = (String) responseMap.get("status");
 
-			// Return the detected issues
-			List<Map<String, Object>> issues = (List<Map<String, Object>>) responseMap.get("issues");
-			return issues != null ? issues : new ArrayList<>();
+	        if ("error".equals(status)) {
+	            log.error("❌ Detection Lambda returned error: {}", responseMap.get("errors"));
+	            return new ArrayList<>();
+	        }
 
-		} catch (Exception e) {
-			log.error("Failed to invoke detection Lambda", e);
-			return new ArrayList<>();
-		}
+	        // Return the detected issues
+	        List<Map<String, Object>> issues = (List<Map<String, Object>>) responseMap.get("issues");
+	        return issues != null ? issues : new ArrayList<>();
+
+	    } catch (Exception e) {
+	        log.error("Failed to invoke detection Lambda", e);
+	        return new ArrayList<>();
+	    }
 	}
 	
 	private List<Map<String, Object>> invokeDetectionInBatches(String sessionId, String analysisId, 

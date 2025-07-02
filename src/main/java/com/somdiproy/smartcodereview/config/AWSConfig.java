@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.core.retry.RetryPolicy;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
@@ -92,8 +93,11 @@ public class AWSConfig {
                 .region(Region.of(awsRegion))
                 .credentialsProvider(credentialsProvider)
                 .overrideConfiguration(ClientOverrideConfiguration.builder()
-                    .apiCallTimeout(Duration.ofMinutes(20))
-                    .apiCallAttemptTimeout(Duration.ofMinutes(20))
+                    .apiCallTimeout(Duration.ofMinutes(30))
+                    .apiCallAttemptTimeout(Duration.ofMinutes(30))
+                    .retryPolicy(RetryPolicy.builder()
+                        .numRetries(3)
+                        .build())
                     .build())
                 .build();
     }
