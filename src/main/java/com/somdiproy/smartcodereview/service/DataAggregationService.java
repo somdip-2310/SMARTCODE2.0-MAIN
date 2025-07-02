@@ -204,6 +204,10 @@ public class DataAggregationService {
         issue.setCwe(getStringValue(issueData, "cwe"));
         issue.setCvssScore(getDoubleValue(issueData, "cvssScore"));
         
+        // Extract CVE information if available
+        issue.setCveId(getStringValue(issueData, "cveId"));
+        issue.setCveScore(getDoubleValue(issueData, "cveScore"));
+        
         return issue;
     }
     
@@ -315,10 +319,10 @@ public class DataAggregationService {
         AnalysisResult.Scores scores = new AnalysisResult.Scores();
         
         if (issues == null || issues.isEmpty()) {
-            scores.setSecurity(100.0);
-            scores.setPerformance(100.0);
-            scores.setQuality(100.0);
-            scores.setOverall(100.0);
+            scores.setSecurity(10.0);
+            scores.setPerformance(10.0);
+            scores.setQuality(10.0);
+            scores.setOverall(10.0);
             return scores;
         }
         
@@ -343,10 +347,18 @@ public class DataAggregationService {
         
         // Calculate scores (simple formula - can be improved)
      // Calculate scores (simple formula - can be improved)
-        scores.setSecurity(Double.valueOf(Math.max(0, 100 - (securityIssues * 10) - (criticalCount * 20))));
-        scores.setPerformance(Double.valueOf(Math.max(0, 100 - (performanceIssues * 8))));
-        scores.setQuality(Double.valueOf(Math.max(0, 100 - (qualityIssues * 5) - (highCount * 10))));
-        scores.setOverall(Double.valueOf((scores.getSecurity() + scores.getPerformance() + scores.getQuality()) / 3));
+     // Calculate scores (10 = perfect, 0 = worst)
+        double securityScore = 10.0 - (securityIssues * 0.5) - (criticalCount * 1.0);
+        double performanceScore = 10.0 - (performanceIssues * 0.3);
+        double qualityScore = 10.0 - (qualityIssues * 0.2) - (highCount * 0.5);
+        
+        scores.setSecurity(Math.max(0.0, Math.min(10.0, securityScore)));
+        scores.setPerformance(Math.max(0.0, Math.min(10.0, performanceScore)));
+        scores.setQuality(Math.max(0.0, Math.min(10.0, qualityScore)));
+        
+        // Overall score is weighted average
+        double overallScore = (scores.getSecurity() * 0.5 + scores.getPerformance() * 0.3 + scores.getQuality() * 0.2);
+        scores.setOverall(Math.max(0.0, Math.min(10.0, overallScore)));
         return scores;
     }
     

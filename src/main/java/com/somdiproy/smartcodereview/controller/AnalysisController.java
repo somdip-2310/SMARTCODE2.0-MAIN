@@ -7,6 +7,7 @@ import com.somdiproy.smartcodereview.exception.ScanLimitExceededException;
 import com.somdiproy.smartcodereview.exception.SessionNotFoundException;
 import com.somdiproy.smartcodereview.model.Analysis;
 import com.somdiproy.smartcodereview.model.Branch;
+import com.somdiproy.smartcodereview.model.Issue;
 import com.somdiproy.smartcodereview.model.Repository;
 import com.somdiproy.smartcodereview.model.Session;
 import com.somdiproy.smartcodereview.service.AnalysisOrchestrator;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller for repository analysis operations
@@ -258,14 +260,26 @@ public class AnalysisController {
                 throw new SecurityException("Analysis does not belong to this session");
             }
 
-            // Get comprehensive report using ReportService
+         // Get comprehensive report using ReportService
             ReportResponse report = reportService.getReport(analysisId);
+
+            // Segregate issues by type
+            List<Issue> securityIssues = report.getIssues().stream()
+                .filter(i -> "SECURITY".equalsIgnoreCase(i.getCategory()) && 
+                            i.getCveId() != null && !i.getCveId().isEmpty())
+                .collect(Collectors.toList());
+            
+            List<Issue> otherIssues = report.getIssues().stream()
+                .filter(i -> !securityIssues.contains(i))
+                .collect(Collectors.toList());
 
             // Add all required attributes for the report template
             model.addAttribute("analysisId", analysisId);
             model.addAttribute("sessionId", sessionId);
             model.addAttribute("report", report);  // Changed from 'analysis' to 'report'
             model.addAttribute("remainingScans", session.getRemainingScans());
+            model.addAttribute("securityIssues", securityIssues);
+            model.addAttribute("otherIssues", otherIssues);
 
             return "report";
             

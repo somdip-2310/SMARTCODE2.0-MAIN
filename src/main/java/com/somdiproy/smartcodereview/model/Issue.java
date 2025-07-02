@@ -22,6 +22,8 @@ public class Issue {
     private String language;
     private String cwe;
     private Double cvssScore;
+    private String cveId;
+    private Double cveScore;
     private Suggestion suggestion;
     
     // Constructors
@@ -139,8 +141,26 @@ public class Issue {
         return cvssScore;
     }
     
+   
+    
     public void setCvssScore(Double cvssScore) {
-        this.cvssScore = cvssScore;
+		this.cvssScore = cvssScore;
+	}
+
+	public String getCveId() {
+        return cveId;
+    }
+    
+    public void setCveId(String cveId) {
+        this.cveId = cveId;
+    }
+    
+    public Double getCveScore() {
+        return cveScore;
+    }
+    
+    public void setCveScore(Double cveScore) {
+        this.cveScore = cveScore;
     }
     
     public Suggestion getSuggestion() {
