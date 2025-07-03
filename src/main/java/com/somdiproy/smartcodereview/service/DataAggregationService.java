@@ -461,4 +461,150 @@ public class DataAggregationService {
             this.suggestionResponse = suggestionResponse;
         }
     }
+    /**
+     * Get analysis progress from DynamoDB
+     */
+    public Map<String, Object> getAnalysisProgress(String analysisId) {
+        try {
+            log.debug("🔍 Checking analysis progress for: {}", analysisId);
+            
+            // Query the analysis repository for the current analysis
+            AnalysisResult analysisResult = analysisRepository.findById(analysisId);
+            
+            if (analysisResult != null) {
+                Map<String, Object> progress = new HashMap<>();
+                progress.put("analysisId", analysisId);
+                progress.put("status", analysisResult.getStatus());
+                progress.put("progress", calculateProgressPercentage(analysisResult));
+                progress.put("completedAt", analysisResult.getCompletedAt());
+                progress.put("startedAt", analysisResult.getStartedAt());
+                
+                // Add detailed status information
+                if ("completed".equals(analysisResult.getStatus())) {
+                    progress.put("suggestions_complete", true);
+                    progress.put("totalIssues", analysisResult.getSummary() != null ? 
+                                analysisResult.getSummary().getTotalIssues() : 0);
+                }
+                
+                log.debug("✅ Found analysis progress: {} - {}", analysisId, analysisResult.getStatus());
+                return progress;
+            }
+            
+            // If not found in main results, check if it's still in progress
+            // This part depends on how you track in-progress analyses
+            Map<String, Object> inProgressStatus = checkInProgressAnalysis(analysisId);
+            if (inProgressStatus != null) {
+                log.debug("📊 Analysis {} is still in progress", analysisId);
+                return inProgressStatus;
+            }
+            
+            log.debug("❌ No analysis progress found for: {}", analysisId);
+            return null;
+            
+        } catch (Exception e) {
+            log.error("❌ Failed to get analysis progress for {}: {}", analysisId, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Check if analysis is still in progress (you may need to adjust this based on your tracking)
+     */
+    private Map<String, Object> checkInProgressAnalysis(String analysisId) {
+        try {
+            // Check if we have Lambda results in cache (indicates processing)
+            LambdaResults lambdaResults = lambdaResultsCache.get(analysisId);
+            if (lambdaResults != null) {
+                Map<String, Object> progress = new HashMap<>();
+                progress.put("analysisId", analysisId);
+                progress.put("status", "in_progress");
+                progress.put("progress", 50); // Estimate based on what's completed
+                
+                // Check what stages are complete
+                if (lambdaResults.getScreenedFiles() != null) {
+                    progress.put("screening_complete", true);
+                    progress.put("progress", 70);
+                }
+                if (lambdaResults.getDetectedIssues() != null) {
+                    progress.put("detection_complete", true);
+                    progress.put("progress", 85);
+                }
+                if (lambdaResults.getSuggestionResponse() != null) {
+                    progress.put("suggestions_complete", true);
+                    progress.put("progress", 100);
+                    progress.put("status", "suggestions_complete");
+                }
+                
+                return progress;
+            }
+            
+            return null;
+            
+        } catch (Exception e) {
+            log.error("❌ Error checking in-progress analysis {}: {}", analysisId, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Calculate progress percentage based on analysis result
+     */
+    private int calculateProgressPercentage(AnalysisResult analysisResult) {
+        if (analysisResult == null) return 0;
+        
+        String status = analysisResult.getStatus();
+        if (status == null) return 0;
+        
+        switch (status.toLowerCase()) {
+            case "started":
+            case "screening":
+                return 25;
+            case "detection":
+                return 50;
+            case "suggestions":
+                return 75;
+            case "completed":
+            case "suggestions_complete":
+                return 100;
+            case "failed":
+            case "error":
+                return -1; // Indicates failure
+            default:
+                return 10; // Default for unknown status
+        }
+    }
+
+    /**
+     * Update analysis progress (helper method for Lambda functions to update status)
+     */
+    public void updateAnalysisProgress(String analysisId, String status, Object data) {
+        try {
+            log.info("📊 Updating analysis progress: {} -> {}", analysisId, status);
+            
+            // For in-progress updates, we can store in cache or a separate tracking mechanism
+            // This depends on your specific needs
+            
+            if ("suggestions_complete".equals(status)) {
+                // Mark as complete in cache if it exists
+                LambdaResults results = lambdaResultsCache.get(analysisId);
+                if (results != null) {
+                    // Add completion marker
+                    Map<String, Object> completionData = new HashMap<>();
+                    completionData.put("completed", true);
+                    completionData.put("timestamp", System.currentTimeMillis());
+                    completionData.put("data", data);
+                    
+                    // Store completion data
+                    if (results.getSuggestionResponse() == null) {
+                        results.setSuggestionResponse(completionData);
+                    }
+                }
+            }
+            
+            log.debug("✅ Analysis progress updated: {} -> {}", analysisId, status);
+            
+        } catch (Exception e) {
+            log.error("❌ Failed to update analysis progress for {}: {}", analysisId, e.getMessage());
+        }
+    }
 }

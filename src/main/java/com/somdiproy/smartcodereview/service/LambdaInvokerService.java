@@ -25,810 +25,934 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import org.springframework.scheduling.annotation.Async;
 
 @Slf4j
 @Service
 public class LambdaInvokerService {
 
-    private final LambdaClient lambdaClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
+	private final LambdaClient lambdaClient;
+	private final ObjectMapper objectMapper = new ObjectMapper();
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
 
-    // Configuration constants
-    private static final int DETECTION_BATCH_SIZE = 1; // Reduced to 1 for rate limiting
-    private static final int SUGGESTIONS_BATCH_SIZE = 1; // Process one issue at a time
-    private static final int MAX_PAYLOAD_SIZE = 25000; // 25KB max
-    private static final Duration LAMBDA_TIMEOUT = Duration.ofMinutes(60); // 1 hour for rate limiting scenarios
-    
-    // Rate limiting configuration
-    private static final long LAMBDA_RATE_LIMIT_DELAY = 10000; // 10 seconds between calls
-    private static final long SUGGESTIONS_RATE_LIMIT_DELAY = 15000; // 15 seconds for suggestions
-    private static final int MAX_LAMBDA_RETRIES = 5;
-    private static final long MAX_RETRY_DELAY_MS = 300000; // 5 minutes max delay
-    private static final long BASE_RETRY_DELAY_MS = 5000; // 5 seconds base delay
-    
-    // Circuit breaker configuration
-    private static final int CIRCUIT_BREAKER_FAILURE_THRESHOLD = 3;
-    private static final long CIRCUIT_BREAKER_TIMEOUT_MS = 300000; // 5 minutes
-    
-    // Rate limiting state management
-    private final ConcurrentHashMap<String, Long> lastInvocationTimes = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, AtomicInteger> failureCounters = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Long> circuitBreakerOpenTimes = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Long> analysisLocks = new ConcurrentHashMap<>();
-    private static final long LOCK_TIMEOUT_MS = 3600000; // 1 hour
-    
-    // Monitoring
-    private final AtomicLong totalInvocations = new AtomicLong(0);
-    private final AtomicLong successfulInvocations = new AtomicLong(0);
-    private final AtomicLong failedInvocations = new AtomicLong(0);
-    private final AtomicLong rateLimitedInvocations = new AtomicLong(0);
+	// Configuration constants
+	private static final int DETECTION_BATCH_SIZE = 1; // Reduced to 1 for rate limiting
+	private static final int SUGGESTIONS_BATCH_SIZE = 1; // Process one issue at a time
+	private static final int MAX_PAYLOAD_SIZE = 25000; // 25KB max
+	private static final Duration LAMBDA_TIMEOUT = Duration.ofMinutes(30); // 1 hour for rate limiting scenarios
 
-    @Value("${aws.lambda.functions.screening}")
-    private String screeningFunctionArn;
+	// Rate limiting configuration
+	private static final long LAMBDA_RATE_LIMIT_DELAY = 5000; // 10 seconds between calls
+	private static final long SUGGESTIONS_RATE_LIMIT_DELAY = 8000; // 15 seconds for suggestions
+	private static final int MAX_LAMBDA_RETRIES = 3;
+	private static final long MAX_RETRY_DELAY_MS = 60000; // 5 minutes max delay
+	private static final long BASE_RETRY_DELAY_MS = 5000; // 5 seconds base delay
 
-    @Value("${aws.lambda.functions.detection}")
-    private String detectionFunctionArn;
+	// Circuit breaker configuration
+	private static final int CIRCUIT_BREAKER_FAILURE_THRESHOLD = 2;
+	private static final long CIRCUIT_BREAKER_TIMEOUT_MS = 120000; // 5 minutes
 
-    @Value("${aws.lambda.functions.suggestions}")
-    private String suggestionsFunctionArn;
+	// Rate limiting state management
+	private final ConcurrentHashMap<String, Long> lastInvocationTimes = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, AtomicInteger> failureCounters = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, Long> circuitBreakerOpenTimes = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, Long> analysisLocks = new ConcurrentHashMap<>();
+	private static final long LOCK_TIMEOUT_MS = 3600000; // 1 hour
 
-    // Optional rate limiting configuration from properties
-    @Value("${aws.lambda.rate-limit.min-interval-between-calls:10000}")
-    private long configuredRateLimit;
+	// Monitoring
+	private final AtomicLong totalInvocations = new AtomicLong(0);
+	private final AtomicLong successfulInvocations = new AtomicLong(0);
+	private final AtomicLong failedInvocations = new AtomicLong(0);
+	private final AtomicLong rateLimitedInvocations = new AtomicLong(0);
 
-    @Value("${aws.lambda.rate-limit.max-concurrent-executions:1}")
-    private int maxConcurrentExecutions;
+	@Value("${aws.lambda.functions.screening}")
+	private String screeningFunctionArn;
 
-    @Autowired
-    public LambdaInvokerService(LambdaClient lambdaClient) {
-        this.lambdaClient = lambdaClient;
-        log.info("🚀 LambdaInvokerService initialized with aggressive rate limiting configuration");
-        log.info("📊 Rate limits: Lambda calls={}ms, Suggestions={}ms, Max retries={}", 
-                 LAMBDA_RATE_LIMIT_DELAY, SUGGESTIONS_RATE_LIMIT_DELAY, MAX_LAMBDA_RETRIES);
-    }
+	@Value("${aws.lambda.functions.detection}")
+	private String detectionFunctionArn;
 
-    /**
-     * Enhanced screening invocation with basic rate limiting
-     */
-    public List<Map<String, Object>> invokeScreening(String sessionId, String analysisId, String repository,
-            String branch, List<GitHubFile> files, int scanNumber) {
-        
-        String lockKey = "screening_" + analysisId;
-        if (!acquireAnalysisLock(lockKey)) {
-            log.warn("⚠️ Another screening process is already running for analysis {}", analysisId);
-            return new ArrayList<>();
-        }
+	@Value("${aws.lambda.functions.suggestions}")
+	private String suggestionsFunctionArn;
 
-        try {
-            enforceRateLimit("screening");
-            
-            List<Map<String, Object>> fileInputs = files.stream().map(file -> {
-                Map<String, Object> fileMap = new HashMap<>();
-                fileMap.put("path", file.getPath());
-                fileMap.put("name", file.getName());
-                fileMap.put("content", file.getContent());
-                fileMap.put("size", file.getSize());
-                fileMap.put("sha", file.getSha());
-                fileMap.put("language", file.getLanguage());
-                fileMap.put("mimeType", file.getMimeType());
-                fileMap.put("encoding", "UTF-8");
-                return fileMap;
-            }).collect(Collectors.toList());
+	// Optional rate limiting configuration from properties
+	@Value("${aws.lambda.rate-limit.min-interval-between-calls:10000}")
+	private long configuredRateLimit;
 
-            String testPayloadJson = objectMapper.writeValueAsString(Map.of("files", fileInputs));
-            boolean needsBatching = testPayloadJson.length() > 200000; // 200KB threshold
-            
-            if (!needsBatching) {
-                return invokeSingleScreening(sessionId, analysisId, repository, branch, fileInputs, scanNumber);
-            } else {
-                return invokeBatchedScreening(sessionId, analysisId, repository, branch, fileInputs, scanNumber);
-            }
-            
-        } catch (Exception e) {
-            log.error("❌ Failed to invoke screening Lambda for analysis {}", analysisId, e);
-            recordFailure("screening");
-            return new ArrayList<>();
-        } finally {
-            releaseAnalysisLock(lockKey);
-        }
-    }
+	@Value("${aws.lambda.rate-limit.max-concurrent-executions:1}")
+	private int maxConcurrentExecutions;
 
-    /**
-     * Enhanced detection invocation with aggressive rate limiting
-     */
-    public List<Map<String, Object>> invokeDetection(String sessionId, String analysisId, String repository, 
-            String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
-        
-        String lockKey = "detection_" + analysisId;
-        if (!acquireAnalysisLock(lockKey)) {
-            log.warn("⚠️ Another detection process is already running for analysis {}", analysisId);
-            return new ArrayList<>();
-        }
+	@Autowired
+	private DataAggregationService dataAggregationService;
 
-        try {
-            if (isCircuitBreakerOpen("detection")) {
-                log.warn("🔴 Circuit breaker is OPEN for detection. Skipping invocation.");
-                return new ArrayList<>();
-            }
+	@Autowired
+	public LambdaInvokerService(LambdaClient lambdaClient) {
+		this.lambdaClient = lambdaClient;
+		log.info("🚀 LambdaInvokerService initialized with aggressive rate limiting configuration");
+		log.info("📊 Rate limits: Lambda calls={}ms, Suggestions={}ms, Max retries={}", LAMBDA_RATE_LIMIT_DELAY,
+				SUGGESTIONS_RATE_LIMIT_DELAY, MAX_LAMBDA_RETRIES);
+	}
 
-            enforceRateLimit("detection");
+	/**
+	 * Enhanced screening invocation with basic rate limiting
+	 */
+	public List<Map<String, Object>> invokeScreening(String sessionId, String analysisId, String repository,
+			String branch, List<GitHubFile> files, int scanNumber) {
 
-            String testPayload = objectMapper.writeValueAsString(screenedFiles);
-            if (testPayload.length() > MAX_PAYLOAD_SIZE || screenedFiles.size() > DETECTION_BATCH_SIZE) {
-                log.info("📦 Large payload detected ({} files, {} bytes). Using batch processing...", 
-                        screenedFiles.size(), testPayload.length());
-                return invokeDetectionInBatches(sessionId, analysisId, repository, branch, screenedFiles, scanNumber);
-            }
-            
-            return invokeSingleDetection(sessionId, analysisId, repository, branch, screenedFiles, scanNumber);
-            
-        } catch (Exception e) {
-            log.error("❌ Failed to invoke detection Lambda for analysis {}", analysisId, e);
-            recordFailure("detection");
-            return new ArrayList<>();
-        } finally {
-            releaseAnalysisLock(lockKey);
-        }
-    }
+		String lockKey = "screening_" + analysisId;
+		if (!acquireAnalysisLock(lockKey)) {
+			log.warn("⚠️ Another screening process is already running for analysis {}", analysisId);
+			return new ArrayList<>();
+		}
 
-    /**
-     * Ultra-conservative suggestions invocation with maximum rate limiting
-     */
-    public String invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
-            List<Map<String, Object>> issues, int scanNumber) {
-        
-        String lockKey = "suggestions_" + analysisId;
-        if (!acquireAnalysisLock(lockKey)) {
-            log.warn("⚠️ Another suggestions process is already running for analysis {}", analysisId);
-            return null;
-        }
+		try {
+			enforceRateLimit("screening");
 
-        try {
-            if (isCircuitBreakerOpen("suggestions")) {
-                log.warn("🔴 Circuit breaker is OPEN for suggestions. Skipping invocation.");
-                return null;
-            }
+			List<Map<String, Object>> fileInputs = files.stream().map(file -> {
+				Map<String, Object> fileMap = new HashMap<>();
+				fileMap.put("path", file.getPath());
+				fileMap.put("name", file.getName());
+				fileMap.put("content", file.getContent());
+				fileMap.put("size", file.getSize());
+				fileMap.put("sha", file.getSha());
+				fileMap.put("language", file.getLanguage());
+				fileMap.put("mimeType", file.getMimeType());
+				fileMap.put("encoding", "UTF-8");
+				return fileMap;
+			}).collect(Collectors.toList());
 
-            // Apply hybrid strategy to issues before processing
-            List<Map<String, Object>> hybridProcessedIssues = applyHybridStrategy(issues);
-            
-            log.info("🎯 Hybrid Strategy: Processing {} issues out of {} total (optimized for cost)", 
-                     hybridProcessedIssues.size(), issues.size());
+			String testPayloadJson = objectMapper.writeValueAsString(Map.of("files", fileInputs));
+			boolean needsBatching = testPayloadJson.length() > 200000; // 200KB threshold
 
-            return invokeSuggestionsWithHybridStrategy(sessionId, analysisId, repository, branch, 
-                                                      hybridProcessedIssues, scanNumber);
-            
-        } catch (Exception e) {
-            log.error("❌ Failed to invoke suggestions Lambda for analysis {}", analysisId, e);
-            recordFailure("suggestions");
-            return null;
-        } finally {
-            releaseAnalysisLock(lockKey);
-        }
-    }
-    
-    /**
-     * Apply hybrid strategy for cost-effective suggestions
-     * Priority: Nova Lite (90%) → Templates (9%) → Nova Premier (1%)
-     */
-    private List<Map<String, Object>> applyHybridStrategy(List<Map<String, Object>> issues) {
-        List<Map<String, Object>> processedIssues = new ArrayList<>();
-        
-        for (Map<String, Object> issue : issues) {
-            String severity = (String) issue.getOrDefault("severity", "MEDIUM");
-            String category = (String) issue.getOrDefault("category", "quality");
-            
-            // Apply hybrid priority logic
-         // Apply hybrid priority logic
-            String selectedModel = determineModelForIssue(severity, category, issue);
-            issue.put("selectedModel", selectedModel);
-            issue.put("processingStrategy", "hybrid");
-            
-            // Only process if not skipped
-            if (!"SKIP".equals(selectedModel)) {
-                processedIssues.add(issue);
-            }
-        }
-        
-        log.info("🔄 Hybrid Strategy Applied: {} issues selected for processing from {} total", 
-                 processedIssues.size(), issues.size());
-        
-        return processedIssues;
-    }
+			if (!needsBatching) {
+				return invokeSingleScreening(sessionId, analysisId, repository, branch, fileInputs, scanNumber);
+			} else {
+				return invokeBatchedScreening(sessionId, analysisId, repository, branch, fileInputs, scanNumber);
+			}
 
-   
-    /**
-     * Determine model based on issue severity and category
-     * Implements the 90/9/1 strategy using deterministic selection
-     */
-    private String determineModelForIssue(String severity, String category, Map<String, Object> issue) {
-        // Create deterministic hash from issue characteristics
-        String issueKey = String.format("%s_%s_%s_%s", 
-            issue.getOrDefault("id", "unknown"),
-            issue.getOrDefault("type", "unknown"),
-            issue.getOrDefault("file", "unknown"),
-            issue.getOrDefault("line", "0")
-        );
-        
-        int hash = Math.abs(issueKey.hashCode()) % 100;
-        
-        // 1% Nova Premier for CRITICAL security issues only
-        if ("CRITICAL".equalsIgnoreCase(severity) && "security".equalsIgnoreCase(category)) {
-            return hash < 1 ? "nova-premier" : "nova-lite";
-        }
-        
-        // 90% Nova Lite for most issues
-        if (hash < 90) {
-            return "nova-lite";
-        }
-        
-        // 9% Enhanced Templates for fallback (90-98)
-        if (hash < 99) {
-            return "template";
-        }
-        
-        // Remaining 1% - use Nova Lite instead of skipping
-        return "nova-lite";
-    }
+		} catch (Exception e) {
+			log.error("❌ Failed to invoke screening Lambda for analysis {}", analysisId, e);
+			recordFailure("screening");
+			return new ArrayList<>();
+		} finally {
+			releaseAnalysisLock(lockKey);
+		}
+	}
 
-    /**
-     * Enhanced suggestions invocation with hybrid strategy support
-     */
-    public String invokeSuggestionsWithHybridStrategy(String sessionId, String analysisId, String repository, 
-            String branch, List<Map<String, Object>> issues, int scanNumber) throws Exception {
-        
-        log.info("🚀 Invoking suggestions Lambda with hybrid strategy for {} issues", issues.size());
-        
-        // Pre-delay to ensure we don't hit rate limits
-        enforceRateLimit("suggestions", SUGGESTIONS_RATE_LIMIT_DELAY);
-        
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("sessionId", sessionId);
-        payload.put("analysisId", analysisId);
-        payload.put("repository", repository);
-        payload.put("branch", branch);
-        payload.put("issues", issues);
-        payload.put("scanNumber", scanNumber);
-        
-        // Enable hybrid strategy in Lambda
-        payload.put("strategy", "hybrid");
-        payload.put("modelId", determineOverallModelStrategy(issues));
-        payload.put("processingMode", "hybrid");
-        
-        // Add issue severity for routing decisions
-        if (!issues.isEmpty()) {
-            String maxSeverity = issues.stream()
-                .map(issue -> (String) issue.getOrDefault("severity", "MEDIUM"))
-                .max(this::compareSeverity)
-                .orElse("MEDIUM");
-            payload.put("issueSeverity", maxSeverity);
-        }
-        
-        // Rate limiting configuration
-        payload.put("rateLimitMode", true);
-        payload.put("maxConcurrentRequests", 1);
-        payload.put("batchSize", 1);
-        payload.put("delayBetweenRequests", 15000); // 15 seconds between Nova API calls
-        payload.put("maxRetries", 10);
-        payload.put("exponentialBackoffMaxDelay", 120000);
-        payload.put("timestamp", System.currentTimeMillis());
-        
-        String payloadJson = objectMapper.writeValueAsString(payload);
-        
-        log.info("📤 Invoking suggestions Lambda with hybrid strategy, payload size: {} bytes", 
-                 payloadJson.length());
-        
-        InvokeRequest request = InvokeRequest.builder()
-                .functionName(suggestionsFunctionArn)
-                .invocationType(InvocationType.REQUEST_RESPONSE)
-                .payload(SdkBytes.fromUtf8String(payloadJson))
-                .build();
-        
-        return invokeWithRetryAndCircuitBreaker(request, "suggestions");
-    }
+	/**
+	 * Enhanced detection invocation with aggressive rate limiting
+	 */
+	public List<Map<String, Object>> invokeDetection(String sessionId, String analysisId, String repository,
+			String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
 
-    private String determineOverallModelStrategy(List<Map<String, Object>> issues) {
-        boolean hasCriticalSecurity = issues.stream()
-            .anyMatch(issue -> "CRITICAL".equalsIgnoreCase((String) issue.get("severity")) &&
-                              "security".equalsIgnoreCase((String) issue.get("category")));
-        
-        // Use first issue's characteristics for consistency
-        if (!issues.isEmpty()) {
-            Map<String, Object> firstIssue = issues.get(0);
-            String issueKey = String.format("%s_%d", 
-                firstIssue.getOrDefault("analysisId", "unknown"),
-                issues.size()
-            );
-            int hash = Math.abs(issueKey.hashCode()) % 100;
-            
-            if (hasCriticalSecurity && hash < 1) {
-                return "nova-premier";
-            }
-            
-            return hash < 90 ? "nova-lite" : "template";
-        }
-        
-        return "nova-lite";
-    }
+		String lockKey = "detection_" + analysisId;
+		if (!acquireAnalysisLock(lockKey)) {
+			log.warn("⚠️ Another detection process is already running for analysis {}", analysisId);
+			return new ArrayList<>();
+		}
 
-    /**
-     * Compare severity levels for priority ordering
-     */
-    private int compareSeverity(String s1, String s2) {
-        Map<String, Integer> severityOrder = Map.of(
-            "LOW", 1,
-            "MEDIUM", 2, 
-            "HIGH", 3,
-            "CRITICAL", 4
-        );
-        
-        return Integer.compare(
-            severityOrder.getOrDefault(s1, 2),
-            severityOrder.getOrDefault(s2, 2)
-        );
-    }
-    
-    /**
-     * Enhanced suggestions invocation with aggressive rate limiting
-     */
-    public String invokeSuggestionsWithRateLimit(String sessionId, String analysisId, String repository, 
-            String branch, List<Map<String, Object>> issues, int scanNumber) throws Exception {
-        
-        log.info("🐌 Invoking suggestions with ultra-aggressive rate limiting for {} issues", issues.size());
-        
-        // Pre-delay to ensure we don't hit rate limits
-        enforceRateLimit("suggestions", SUGGESTIONS_RATE_LIMIT_DELAY);
-        
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("sessionId", sessionId);
-        payload.put("analysisId", analysisId);
-        payload.put("repository", repository);
-        payload.put("branch", branch);
-        payload.put("issues", issues);
-        payload.put("scanNumber", scanNumber);
-        payload.put("rateLimitMode", true);
-        payload.put("maxConcurrentRequests", 1);
-        payload.put("batchSize", 1);
-        payload.put("delayBetweenRequests", 15000); // 15 seconds between Nova API calls
-        payload.put("maxRetries", 10);
-        payload.put("exponentialBackoffMaxDelay", 120000);
-        payload.put("timestamp", System.currentTimeMillis());
-        
-        String payloadJson = objectMapper.writeValueAsString(payload);
-        
-        log.info("📤 Invoking suggestions Lambda with ultra-conservative configuration, payload size: {} bytes", 
-                 payloadJson.length());
-        
-        InvokeRequest request = InvokeRequest.builder()
-                .functionName(suggestionsFunctionArn)
-                .invocationType(InvocationType.REQUEST_RESPONSE)
-                .payload(SdkBytes.fromUtf8String(payloadJson))
-                .build();
-        
-        return invokeWithRetryAndCircuitBreaker(request, "suggestions");
-    }
+		try {
+			if (isCircuitBreakerOpen("detection")) {
+				log.warn("🔴 Circuit breaker is OPEN for detection. Skipping invocation.");
+				return new ArrayList<>();
+			}
 
-    /**
-     * Private helper methods
-     */
-    private List<Map<String, Object>> invokeSingleScreening(String sessionId, String analysisId, String repository,
-            String branch, List<Map<String, Object>> fileInputs, int scanNumber) throws Exception {
-        
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("sessionId", sessionId);
-        payload.put("analysisId", analysisId);
-        payload.put("repository", repository);
-        payload.put("branch", branch);
-        payload.put("files", fileInputs);
-        payload.put("stage", "screening");
-        payload.put("scanNumber", scanNumber);
-        payload.put("timestamp", System.currentTimeMillis());
+			enforceRateLimit("detection");
 
-        String payloadJson = objectMapper.writeValueAsString(payload);
-        log.info("📤 Invoking screening Lambda with payload size: {} bytes", payloadJson.length());
+			String testPayload = objectMapper.writeValueAsString(screenedFiles);
+			if (testPayload.length() > MAX_PAYLOAD_SIZE || screenedFiles.size() > DETECTION_BATCH_SIZE) {
+				log.info("📦 Large payload detected ({} files, {} bytes). Using batch processing...",
+						screenedFiles.size(), testPayload.length());
+				return invokeDetectionInBatches(sessionId, analysisId, repository, branch, screenedFiles, scanNumber);
+			}
 
-        InvokeRequest request = InvokeRequest.builder()
-                .functionName(screeningFunctionArn)
-                .invocationType(InvocationType.REQUEST_RESPONSE)
-                .payload(SdkBytes.fromUtf8String(payloadJson))
-                .build();
+			return invokeSingleDetection(sessionId, analysisId, repository, branch, screenedFiles, scanNumber);
 
-        String responseJson = invokeWithRetryAndCircuitBreaker(request, "screening");
-        if (responseJson == null) return new ArrayList<>();
+		} catch (Exception e) {
+			log.error("❌ Failed to invoke detection Lambda for analysis {}", analysisId, e);
+			recordFailure("detection");
+			return new ArrayList<>();
+		} finally {
+			releaseAnalysisLock(lockKey);
+		}
+	}
 
-        Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
-        String status = (String) responseMap.get("status");
+	/**
+	 * Ultra-conservative suggestions invocation with maximum rate limiting
+	 */
+	public String invokeSuggestions(String sessionId, String analysisId, String repository, String branch,
+			List<Map<String, Object>> issues, int scanNumber) {
 
-        if ("error".equals(status)) {
-            log.error("❌ Lambda returned error: {}", responseMap.get("errors"));
-            return new ArrayList<>();
-        }
+		String lockKey = "suggestions_" + analysisId;
+		if (!acquireAnalysisLock(lockKey)) {
+			log.warn("⚠️ Another suggestions process is already running for analysis {}", analysisId);
+			return null;
+		}
 
-        List<Map<String, Object>> screenedFiles = (List<Map<String, Object>>) responseMap.get("files");
-        return screenedFiles != null ? screenedFiles : new ArrayList<>();
-    }
+		try {
+			if (isCircuitBreakerOpen("suggestions")) {
+				log.warn("🔴 Circuit breaker is OPEN for suggestions. Skipping invocation.");
+				return null;
+			}
 
-    private List<Map<String, Object>> invokeBatchedScreening(String sessionId, String analysisId, String repository,
-            String branch, List<Map<String, Object>> fileInputs, int scanNumber) throws Exception {
-        
-        log.info("📦 Large payload detected ({} files). Using batch processing...", fileInputs.size());
-        
-        List<List<Map<String, Object>>> batches = createBatches(fileInputs, 10);
-        List<Map<String, Object>> allScreenedFiles = new ArrayList<>();
-        
-        for (int i = 0; i < batches.size(); i++) {
-            try {
-                // Rate limiting between batches
-                if (i > 0) {
-                    enforceRateLimit("screening_batch");
-                }
-                
-                Map<String, Object> batchPayload = createBatchPayload(sessionId, analysisId, repository, branch,
-                        batches.get(i), "screening", scanNumber, i + 1, batches.size());
-                
-                String payloadJson = objectMapper.writeValueAsString(batchPayload);
-                log.info("📤 Invoking screening Lambda batch {}/{} with {} files, payload size: {} bytes", 
-                        i + 1, batches.size(), batches.get(i).size(), payloadJson.length());
+			// Apply hybrid strategy to issues before processing
+			List<Map<String, Object>> hybridProcessedIssues = applyHybridStrategy(issues);
 
-                InvokeRequest request = InvokeRequest.builder()
-                        .functionName(screeningFunctionArn)
-                        .invocationType(InvocationType.REQUEST_RESPONSE)
-                        .payload(SdkBytes.fromUtf8String(payloadJson))
-                        .build();
+			log.info("🎯 Hybrid Strategy: Processing {} issues out of {} total (optimized for cost)",
+					hybridProcessedIssues.size(), issues.size());
 
-                String responseJson = invokeWithRetryAndCircuitBreaker(request, "screening_batch");
-                if (responseJson != null) {
-                    Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
-                    String status = (String) responseMap.get("status");
-                    
-                    if ("success".equals(status) || status == null) {
-                        List<Map<String, Object>> batchFiles = (List<Map<String, Object>>) responseMap.get("files");
-                        if (batchFiles != null) {
-                            allScreenedFiles.addAll(batchFiles);
-                            log.info("✅ Batch {}/{} processed successfully: {} files screened", 
-                                    i + 1, batches.size(), batchFiles.size());
-                        }
-                    }
-                }
-                
-            } catch (Exception batchError) {
-                log.error("❌ Failed to process batch {}/{}: {}", 
-                        i + 1, batches.size(), batchError.getMessage());
-            }
-        }
-        
-        log.info("📊 Batch processing complete: {} files screened out of {} total files", 
-                allScreenedFiles.size(), fileInputs.size());
-        return allScreenedFiles;
-    }
+			// Use async invocation with timeout protection
+			return invokeSuggestionsWithTimeout(sessionId, analysisId, repository, branch, hybridProcessedIssues,
+					scanNumber);
 
-    private List<Map<String, Object>> invokeSingleDetection(String sessionId, String analysisId, String repository,
-            String branch, List<Map<String, Object>> screenedFiles, int scanNumber) throws Exception {
-        
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("sessionId", sessionId);
-        payload.put("analysisId", analysisId);
-        payload.put("repository", repository);
-        payload.put("branch", branch);
-        payload.put("files", screenedFiles);
-        payload.put("stage", "detection");
-        payload.put("scanNumber", scanNumber);
-        payload.put("timestamp", System.currentTimeMillis());
-        
-        String payloadJson = objectMapper.writeValueAsString(payload);
+		} catch (Exception e) {
+			log.error("❌ Failed to invoke suggestions Lambda for analysis {}", analysisId, e);
+			recordFailure("suggestions");
+			return null;
+		} finally {
+			releaseAnalysisLock(lockKey);
+		}
+	}
+	/**
+	 * Asynchronous suggestions invocation with timeout protection
+	 */
+	public String invokeSuggestionsWithTimeout(String sessionId, String analysisId, String repository, 
+	        String branch, List<Map<String, Object>> issues, int scanNumber) {
+	    
+	    try {
+	        log.info("🚀 Starting async suggestions generation for analysis: {}", analysisId);
+	        
+	        // Start Lambda function asynchronously
+	        CompletableFuture<String> asyncResult = invokeSuggestionsAsync(
+	            sessionId, analysisId, repository, branch, issues, scanNumber);
+	        
+	        // Wait for completion with timeout (20 minutes)
+	        String result = asyncResult.get(20, TimeUnit.MINUTES);
+	        
+	        if ("COMPLETED".equals(result)) {
+	            log.info("✅ Suggestions completed successfully for analysis: {}", analysisId);
+	            return "SUCCESS";
+	        } else {
+	            log.warn("⚠️ Suggestions completed with status: {} for analysis: {}", result, analysisId);
+	            return result;
+	        }
+	        
+	    } catch (Exception e) {
+	        log.error("❌ Suggestions invocation failed for analysis {}: {}", analysisId, e.getMessage());
+	        recordFailure("suggestions");
+	        return null;
+	    }
+	}
+	
+	/**
+	 * Apply hybrid strategy for cost-effective suggestions Priority: Nova Lite
+	 * (90%) → Templates (9%) → Nova Premier (1%)
+	 */
+	private List<Map<String, Object>> applyHybridStrategy(List<Map<String, Object>> issues) {
+		List<Map<String, Object>> processedIssues = new ArrayList<>();
 
-        InvokeRequest request = InvokeRequest.builder()
-                .functionName(detectionFunctionArn)
-                .invocationType(InvocationType.REQUEST_RESPONSE)
-                .payload(SdkBytes.fromUtf8String(payloadJson))
-                .build();
+		for (Map<String, Object> issue : issues) {
+			String severity = (String) issue.getOrDefault("severity", "MEDIUM");
+			String category = (String) issue.getOrDefault("category", "quality");
 
-        String responseJson = invokeWithRetryAndCircuitBreaker(request, "detection");
-        if (responseJson == null) return new ArrayList<>();
+			// Apply hybrid priority logic
+			// Apply hybrid priority logic
+			String selectedModel = determineModelForIssue(severity, category, issue);
+			issue.put("selectedModel", selectedModel);
+			issue.put("processingStrategy", "hybrid");
 
-        Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
-        String status = (String) responseMap.get("status");
+			// Only process if not skipped
+			if (!"SKIP".equals(selectedModel)) {
+				processedIssues.add(issue);
+			}
+		}
 
-        if ("error".equals(status)) {
-            log.error("❌ Detection Lambda returned error: {}", responseMap.get("errors"));
-            return new ArrayList<>();
-        }
+		log.info("🔄 Hybrid Strategy Applied: {} issues selected for processing from {} total", processedIssues.size(),
+				issues.size());
 
-        List<Map<String, Object>> issues = (List<Map<String, Object>>) responseMap.get("issues");
-        return issues != null ? issues : new ArrayList<>();
-    }
+		return processedIssues;
+	}
+	
+	/**
+	 * Asynchronous Lambda invocation with polling
+	 */
+	@Async
+	public CompletableFuture<String> invokeSuggestionsAsync(String sessionId, String analysisId, 
+	        String repository, String branch, List<Map<String, Object>> issues, int scanNumber) {
+	    
+	    return CompletableFuture.supplyAsync(() -> {
+	        try {
+	            // Start Lambda function asynchronously
+	            String invokeResult = invokeLambdaAsync(
+	                suggestionsFunctionArn, 
+	                buildSuggestionsPayload(sessionId, analysisId, repository, branch, issues, scanNumber)
+	            );
+	            
+	            if (invokeResult != null) {
+	                // Poll for completion
+	                return pollForSuggestionsCompletion(analysisId, 1200000L); // 20 minutes max
+	            }
+	            
+	            return "FAILED";
+	            
+	        } catch (Exception e) {
+	            log.error("❌ Async suggestions generation failed for analysis {}: {}", analysisId, e.getMessage());
+	            return "FAILED";
+	        }
+	    });
+	}
 
-    private List<Map<String, Object>> invokeDetectionInBatches(String sessionId, String analysisId,
-            String repository, String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
-        
-        List<Map<String, Object>> allIssues = new ArrayList<>();
-        List<List<Map<String, Object>>> batches = createBatches(screenedFiles, DETECTION_BATCH_SIZE);
-        
-        log.info("📦 Processing {} files in {} batches for detection", screenedFiles.size(), batches.size());
-        
-        int successfulBatches = 0;
-        int failedBatches = 0;
-        
-        for (int i = 0; i < batches.size(); i++) {
-            long batchStartTime = System.currentTimeMillis();
-            
-            try {
-                // Aggressive rate limiting between batches
-                if (i > 0) {
-                    enforceRateLimit("detection_batch", LAMBDA_RATE_LIMIT_DELAY);
-                }
-                
-                Map<String, Object> batchPayload = createBatchPayload(sessionId, analysisId, repository, branch,
-                        batches.get(i), "detection", scanNumber, i + 1, batches.size());
-                
-                String batchPayloadJson = objectMapper.writeValueAsString(batchPayload);
-                log.info("🔍 Invoking detection batch {}/{}, payload size: {} bytes", 
-                        i + 1, batches.size(), batchPayloadJson.length());
-                
-                InvokeRequest request = InvokeRequest.builder()
-                        .functionName(detectionFunctionArn)
-                        .invocationType(InvocationType.REQUEST_RESPONSE)
-                        .payload(SdkBytes.fromUtf8String(batchPayloadJson))
-                        .build();
-                
-                String responseJson = invokeWithRetryAndCircuitBreaker(request, "detection_batch");
-                if (responseJson != null) {
-                    Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
-                    String status = (String) responseMap.get("status");
-                    
-                    if ("success".equals(status) || status == null) {
-                        List<Map<String, Object>> batchIssues = (List<Map<String, Object>>) responseMap.get("issues");
-                        if (batchIssues != null) {
-                            allIssues.addAll(batchIssues);
-                            long batchDuration = System.currentTimeMillis() - batchStartTime;
-                            log.info("✅ Batch {}/{} completed in {} seconds: {} issues found", 
-                                    i + 1, batches.size(), batchDuration / 1000, batchIssues.size());
-                            successfulBatches++;
-                        }
-                    } else {
-                        log.warn("⚠️ Batch {}/{} returned error: {}", 
-                                i + 1, batches.size(), responseMap.get("errors"));
-                        failedBatches++;
-                    }
-                } else {
-                    failedBatches++;
-                }
-                
-            } catch (Exception e) {
-                long batchDuration = System.currentTimeMillis() - batchStartTime;
-                log.error("❌ Failed to process detection batch {}/{} after {} seconds: {}", 
-                        i + 1, batches.size(), batchDuration / 1000, e.getMessage());
-                failedBatches++;
-            }
-        }
-        
-        log.info("📊 Detection batch processing complete: {} successful, {} failed, {} total issues found", 
-                successfulBatches, failedBatches, allIssues.size());
-        
-        return allIssues;
-    }
+	/**
+	 * Invoke Lambda function asynchronously
+	 */
+	private String invokeLambdaAsync(String functionArn, String payload) {
+	    try {
+	        InvokeRequest request = InvokeRequest.builder()
+	            .functionName(functionArn)
+	            .invocationType(InvocationType.EVENT) // Async invocation
+	            .payload(SdkBytes.fromUtf8String(payload))
+	            .build();
+	        
+	        InvokeResponse response = lambdaClient.invoke(request);
+	        
+	        if (response.statusCode() == 202) { // Async success
+	            log.info("✅ Lambda function started asynchronously");
+	            return "ASYNC_STARTED";
+	        } else {
+	            log.error("❌ Lambda async invocation failed with status: {}", response.statusCode());
+	            return null;
+	        }
+	        
+	    } catch (Exception e) {
+	        log.error("❌ Failed to invoke Lambda async: {}", e.getMessage());
+	        return null;
+	    }
+	}
 
-    /**
-     * Core invocation method with enhanced retry logic and circuit breaker
-     */
-    private String invokeWithRetryAndCircuitBreaker(InvokeRequest request, String operation) {
-        totalInvocations.incrementAndGet();
-        
-        if (isCircuitBreakerOpen(operation)) {
-            log.warn("🔴 Circuit breaker is OPEN for operation: {}. Skipping invocation.", operation);
-            return null;
-        }
+	/**
+	 * Poll DynamoDB for suggestions completion
+	 */
+	private String pollForSuggestionsCompletion(String analysisId, long maxWaitTimeMs) {
+	    long startTime = System.currentTimeMillis();
+	    long pollingInterval = 30000; // 30 seconds
+	    
+	    while (System.currentTimeMillis() - startTime < maxWaitTimeMs) {
+	        try {
+	            // Check analysis progress in DynamoDB
+	            Map<String, Object> analysisStatus = dataAggregationService.getAnalysisProgress(analysisId);
+	            
+	            if (analysisStatus != null) {
+	                String status = (String) analysisStatus.get("status");
+	                
+	                if ("suggestions_complete".equals(status)) {
+	                    log.info("✅ Suggestions completed for analysis: {}", analysisId);
+	                    return "COMPLETED";
+	                } else if ("failed".equals(status)) {
+	                    log.error("❌ Suggestions failed for analysis: {}", analysisId);
+	                    return "FAILED";
+	                }
+	            }
+	            
+	            // Wait before next poll
+	            Thread.sleep(pollingInterval);
+	            
+	        } catch (InterruptedException e) {
+	            Thread.currentThread().interrupt();
+	            log.error("❌ Polling interrupted for analysis: {}", analysisId);
+	            return "INTERRUPTED";
+	        } catch (Exception e) {
+	            log.error("❌ Error polling for analysis {}: {}", analysisId, e.getMessage());
+	            // Continue polling despite errors
+	        }
+	    }
+	    
+	    log.warn("⏰ Polling timeout for analysis: {}", analysisId);
+	    return "TIMEOUT";
+	}
 
-        Exception lastException = null;
-        
-        for (int attempt = 1; attempt <= MAX_LAMBDA_RETRIES; attempt++) {
-            try {
-                log.debug("🔄 Invoking Lambda for operation: {} (attempt {}/{})", operation, attempt, MAX_LAMBDA_RETRIES);
-                
-                long startTime = System.currentTimeMillis();
-                InvokeResponse response = lambdaClient.invoke(request);
-                long duration = System.currentTimeMillis() - startTime;
-                
-                if (response.functionError() != null) {
-                    log.error("❌ Lambda function error for operation {}: {}", operation, response.functionError());
-                    recordFailure(operation);
-                    return null;
-                }
-                
-                if (response.statusCode() != 200) {
-                    log.error("❌ Lambda invocation failed for operation {} with status code: {}", 
-                             operation, response.statusCode());
-                    recordFailure(operation);
-                    return null;
-                }
-                
-                // Success
-                recordSuccess(operation);
-                log.debug("✅ Lambda invocation successful for operation {} in {}ms", operation, duration);
-                return response.payload().asUtf8String();
-                
-            } catch (SdkClientException e) {
-                lastException = e;
-                log.warn("⚠️ Lambda invocation failed for operation {} (attempt {}/{}): {}", 
-                        operation, attempt, MAX_LAMBDA_RETRIES, e.getMessage());
-                
-                if (attempt < MAX_LAMBDA_RETRIES) {
-                    long delay = calculateExponentialBackoffDelay(attempt);
-                    log.info("🕐 Waiting {}ms before retry attempt {}", delay, attempt + 1);
-                    
-                    try {
-                        Thread.sleep(delay);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        log.error("❌ Retry interrupted for operation: {}", operation);
-                        break;
-                    }
-                } else {
-                    recordFailure(operation);
-                    openCircuitBreaker(operation);
-                }
-            }
-        }
-        
-        failedInvocations.incrementAndGet();
-        log.error("❌ All {} retry attempts failed for operation: {}", MAX_LAMBDA_RETRIES, operation);
-        return null;
-    }
+	/**
+	 * Build suggestions payload with enhanced configuration
+	 */
+	private String buildSuggestionsPayload(String sessionId, String analysisId, String repository, 
+	        String branch, List<Map<String, Object>> issues, int scanNumber) throws Exception {
+	    
+	    Map<String, Object> payload = new HashMap<>();
+	    payload.put("sessionId", sessionId);
+	    payload.put("analysisId", analysisId);
+	    payload.put("repository", repository);
+	    payload.put("branch", branch);
+	    payload.put("issues", issues);
+	    payload.put("scanNumber", scanNumber);
+	    
+	    // Enhanced configuration for rate limiting
+	    payload.put("strategy", "hybrid");
+	    payload.put("processingMode", "async");
+	    payload.put("rateLimitMode", true);
+	    payload.put("maxConcurrentRequests", 1);
+	    payload.put("batchSize", 1);
+	    payload.put("delayBetweenRequests", 8000); // 8 seconds
+	    payload.put("maxRetries", 3);
+	    payload.put("timeoutBuffer", 60000); // 1 minute buffer
+	    payload.put("timestamp", System.currentTimeMillis());
+	    
+	    return objectMapper.writeValueAsString(payload);
+	}
+	
+	/**
+	 * Determine model based on issue severity and category Implements the 90/9/1
+	 * strategy using deterministic selection
+	 */
+	private String determineModelForIssue(String severity, String category, Map<String, Object> issue) {
+		// Create deterministic hash from issue characteristics
+		String issueKey = String.format("%s_%s_%s_%s", issue.getOrDefault("id", "unknown"),
+				issue.getOrDefault("type", "unknown"), issue.getOrDefault("file", "unknown"),
+				issue.getOrDefault("line", "0"));
 
-    /**
-     * Utility methods
-     */
-    
-    /**
-     * Get hybrid strategy metrics
-     */
-    public Map<String, Object> getHybridMetrics() {
-        Map<String, Object> metrics = getHealthMetrics();
-        
-        // Add hybrid-specific metrics
-        metrics.put("hybridStrategyEnabled", true);
-        metrics.put("costOptimizationActive", true);
-        metrics.put("modelDistribution", Map.of(
-            "novaLite", "90%",
-            "templates", "9%", 
-            "novaPremier", "1%"
-        ));
-        
-        return metrics;
-    }
-    
-    private void enforceRateLimit(String operation) {
-        enforceRateLimit(operation, LAMBDA_RATE_LIMIT_DELAY);
-    }
-    
-    private void enforceRateLimit(String operation, long delayMs) {
-        Long lastCall = lastInvocationTimes.get(operation);
-        if (lastCall != null) {
-            long timeSinceLastCall = System.currentTimeMillis() - lastCall;
-            if (timeSinceLastCall < delayMs) {
-                long waitTime = delayMs - timeSinceLastCall;
-                log.info("🐌 Rate limiting: waiting {}ms for operation {}", waitTime, operation);
-                rateLimitedInvocations.incrementAndGet();
-                try {
-                    Thread.sleep(waitTime);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
-        lastInvocationTimes.put(operation, System.currentTimeMillis());
-    }
+		int hash = Math.abs(issueKey.hashCode()) % 100;
 
-    private boolean acquireAnalysisLock(String lockKey) {
-        long currentTime = System.currentTimeMillis();
-        Long existingLock = analysisLocks.get(lockKey);
-        
-        if (existingLock != null && (currentTime - existingLock) < LOCK_TIMEOUT_MS) {
-            return false;
-        }
-        
-        analysisLocks.put(lockKey, currentTime);
-        return true;
-    }
+		// 1% Nova Premier for CRITICAL security issues only
+		if ("CRITICAL".equalsIgnoreCase(severity) && "security".equalsIgnoreCase(category)) {
+			return hash < 1 ? "nova-premier" : "nova-lite";
+		}
 
-    private void releaseAnalysisLock(String lockKey) {
-        analysisLocks.remove(lockKey);
-    }
+		// 90% Nova Lite for most issues
+		if (hash < 90) {
+			return "nova-lite";
+		}
 
-    private boolean isCircuitBreakerOpen(String operation) {
-        Long openTime = circuitBreakerOpenTimes.get(operation);
-        if (openTime == null) return false;
-        
-        if (System.currentTimeMillis() - openTime > CIRCUIT_BREAKER_TIMEOUT_MS) {
-            circuitBreakerOpenTimes.remove(operation);
-            failureCounters.remove(operation);
-            log.info("🟢 Circuit breaker CLOSED for operation: {}", operation);
-            return false;
-        }
-        return true;
-    }
+		// 9% Enhanced Templates for fallback (90-98)
+		if (hash < 99) {
+			return "template";
+		}
 
-    private void openCircuitBreaker(String operation) {
-        circuitBreakerOpenTimes.put(operation, System.currentTimeMillis());
-        log.warn("🔴 Circuit breaker OPENED for operation: {}", operation);
-    }
+		// Remaining 1% - use Nova Lite instead of skipping
+		return "nova-lite";
+	}
 
-    private void recordSuccess(String operation) {
-        failureCounters.remove(operation);
-        successfulInvocations.incrementAndGet();
-    }
+	/**
+	 * Enhanced suggestions invocation with hybrid strategy support
+	 */
+	public String invokeSuggestionsWithHybridStrategy(String sessionId, String analysisId, String repository,
+			String branch, List<Map<String, Object>> issues, int scanNumber) throws Exception {
 
-    private void recordFailure(String operation) {
-        int failures = failureCounters.computeIfAbsent(operation, k -> new AtomicInteger(0)).incrementAndGet();
-        if (failures >= CIRCUIT_BREAKER_FAILURE_THRESHOLD) {
-            openCircuitBreaker(operation);
-        }
-        failedInvocations.incrementAndGet();
-    }
+		log.info("🚀 Invoking suggestions Lambda with hybrid strategy for {} issues", issues.size());
 
-    private long calculateExponentialBackoffDelay(int attempt) {
-        long exponentialDelay = (long) Math.pow(2, attempt - 1) * BASE_RETRY_DELAY_MS;
-        long delay = Math.min(exponentialDelay, MAX_RETRY_DELAY_MS);
-        
-        // Add jitter (0-25% of delay) to prevent thundering herd
-        long jitter = (long) (delay * 0.25 * Math.random());
-        return delay + jitter;
-    }
+		// Pre-delay to ensure we don't hit rate limits
+		enforceRateLimit("suggestions", SUGGESTIONS_RATE_LIMIT_DELAY);
 
-    private List<List<Map<String, Object>>> createBatches(List<Map<String, Object>> items, int batchSize) {
-        List<List<Map<String, Object>>> batches = new ArrayList<>();
-        for (int i = 0; i < items.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, items.size());
-            batches.add(items.subList(i, end));
-        }
-        return batches;
-    }
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("sessionId", sessionId);
+		payload.put("analysisId", analysisId);
+		payload.put("repository", repository);
+		payload.put("branch", branch);
+		payload.put("issues", issues);
+		payload.put("scanNumber", scanNumber);
 
-    private Map<String, Object> createBatchPayload(String sessionId, String analysisId, String repository,
-            String branch, List<Map<String, Object>> items, String stage, int scanNumber, 
-            int batchNumber, int totalBatches) {
-        
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("sessionId", sessionId);
-        payload.put("analysisId", analysisId);
-        payload.put("repository", repository);
-        payload.put("branch", branch);
-        payload.put(stage.equals("screening") ? "files" : "files", items);
-        payload.put("stage", stage);
-        payload.put("scanNumber", scanNumber);
-        payload.put("batchInfo", Map.of(
-                "batchNumber", batchNumber,
-                "totalBatches", totalBatches,
-                "batchSize", items.size()
-        ));
-        payload.put("timestamp", System.currentTimeMillis());
-        return payload;
-    }
+		// Enable hybrid strategy in Lambda
+		payload.put("strategy", "hybrid");
+		payload.put("modelId", determineOverallModelStrategy(issues));
+		payload.put("processingMode", "hybrid");
 
-    /**
-     * Monitoring and health check methods
-     */
-    public Map<String, Object> getHealthMetrics() {
-        Map<String, Object> metrics = new HashMap<>();
-        metrics.put("totalInvocations", totalInvocations.get());
-        metrics.put("successfulInvocations", successfulInvocations.get());
-        metrics.put("failedInvocations", failedInvocations.get());
-        metrics.put("rateLimitedInvocations", rateLimitedInvocations.get());
-        metrics.put("successRate", 
-                totalInvocations.get() > 0 ? 
-                (double) successfulInvocations.get() / totalInvocations.get() * 100 : 0.0);
-        metrics.put("activeCircuitBreakers", circuitBreakerOpenTimes.size());
-        metrics.put("activeLocks", analysisLocks.size());
-        return metrics;
-    }
+		// Add issue severity for routing decisions
+		if (!issues.isEmpty()) {
+			String maxSeverity = issues.stream().map(issue -> (String) issue.getOrDefault("severity", "MEDIUM"))
+					.max(this::compareSeverity).orElse("MEDIUM");
+			payload.put("issueSeverity", maxSeverity);
+		}
 
-    public void logHealthMetrics() {
-        Map<String, Object> metrics = getHealthMetrics();
-        log.info("📊 Lambda Service Health: Total={}, Success={}, Failed={}, RateLimited={}, SuccessRate={}%, CircuitBreakers={}, Locks={}", 
-                metrics.get("totalInvocations"), metrics.get("successfulInvocations"), 
-                metrics.get("failedInvocations"), metrics.get("rateLimitedInvocations"),
-                String.format("%.1f", metrics.get("successRate")), 
-                metrics.get("activeCircuitBreakers"), metrics.get("activeLocks"));
-    }
+		// Rate limiting configuration
+		payload.put("rateLimitMode", true);
+		payload.put("maxConcurrentRequests", 1);
+		payload.put("batchSize", 1);
+		payload.put("delayBetweenRequests", 8000); // 8 seconds between Nova API calls
+		payload.put("maxRetries", 10);
+		payload.put("exponentialBackoffMaxDelay", 120000);
+		payload.put("timestamp", System.currentTimeMillis());
+
+		String payloadJson = objectMapper.writeValueAsString(payload);
+
+		log.info("📤 Invoking suggestions Lambda with hybrid strategy, payload size: {} bytes", payloadJson.length());
+
+		InvokeRequest request = InvokeRequest.builder().functionName(suggestionsFunctionArn)
+				.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson)).build();
+
+		return invokeWithRetryAndCircuitBreaker(request, "suggestions");
+	}
+
+	private String determineOverallModelStrategy(List<Map<String, Object>> issues) {
+		boolean hasCriticalSecurity = issues.stream()
+				.anyMatch(issue -> "CRITICAL".equalsIgnoreCase((String) issue.get("severity"))
+						&& "security".equalsIgnoreCase((String) issue.get("category")));
+
+		// Use first issue's characteristics for consistency
+		if (!issues.isEmpty()) {
+			Map<String, Object> firstIssue = issues.get(0);
+			String issueKey = String.format("%s_%d", firstIssue.getOrDefault("analysisId", "unknown"), issues.size());
+			int hash = Math.abs(issueKey.hashCode()) % 100;
+
+			if (hasCriticalSecurity && hash < 1) {
+				return "nova-premier";
+			}
+
+			return hash < 90 ? "nova-lite" : "template";
+		}
+
+		return "nova-lite";
+	}
+
+	/**
+	 * Compare severity levels for priority ordering
+	 */
+	private int compareSeverity(String s1, String s2) {
+		Map<String, Integer> severityOrder = Map.of("LOW", 1, "MEDIUM", 2, "HIGH", 3, "CRITICAL", 4);
+
+		return Integer.compare(severityOrder.getOrDefault(s1, 2), severityOrder.getOrDefault(s2, 2));
+	}
+
+	/**
+	 * Enhanced suggestions invocation with aggressive rate limiting
+	 */
+	public String invokeSuggestionsWithRateLimit(String sessionId, String analysisId, String repository, String branch,
+			List<Map<String, Object>> issues, int scanNumber) throws Exception {
+
+		log.info("🐌 Invoking suggestions with ultra-aggressive rate limiting for {} issues", issues.size());
+
+		// Pre-delay to ensure we don't hit rate limits
+		enforceRateLimit("suggestions", SUGGESTIONS_RATE_LIMIT_DELAY);
+
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("sessionId", sessionId);
+		payload.put("analysisId", analysisId);
+		payload.put("repository", repository);
+		payload.put("branch", branch);
+		payload.put("issues", issues);
+		payload.put("scanNumber", scanNumber);
+		payload.put("rateLimitMode", true);
+		payload.put("maxConcurrentRequests", 1);
+		payload.put("batchSize", 1);
+		payload.put("delayBetweenRequests", 15000); // 15 seconds between Nova API calls
+		payload.put("maxRetries", 3);
+		payload.put("exponentialBackoffMaxDelay", 120000);
+		payload.put("timestamp", System.currentTimeMillis());
+
+		String payloadJson = objectMapper.writeValueAsString(payload);
+
+		log.info("📤 Invoking suggestions Lambda with ultra-conservative configuration, payload size: {} bytes",
+				payloadJson.length());
+
+		InvokeRequest request = InvokeRequest.builder().functionName(suggestionsFunctionArn)
+				.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson)).build();
+
+		return invokeWithRetryAndCircuitBreaker(request, "suggestions");
+	}
+
+	/**
+	 * Private helper methods
+	 */
+	private List<Map<String, Object>> invokeSingleScreening(String sessionId, String analysisId, String repository,
+			String branch, List<Map<String, Object>> fileInputs, int scanNumber) throws Exception {
+
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("sessionId", sessionId);
+		payload.put("analysisId", analysisId);
+		payload.put("repository", repository);
+		payload.put("branch", branch);
+		payload.put("files", fileInputs);
+		payload.put("stage", "screening");
+		payload.put("scanNumber", scanNumber);
+		payload.put("timestamp", System.currentTimeMillis());
+
+		String payloadJson = objectMapper.writeValueAsString(payload);
+		log.info("📤 Invoking screening Lambda with payload size: {} bytes", payloadJson.length());
+
+		InvokeRequest request = InvokeRequest.builder().functionName(screeningFunctionArn)
+				.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson)).build();
+
+		String responseJson = invokeWithRetryAndCircuitBreaker(request, "screening");
+		if (responseJson == null)
+			return new ArrayList<>();
+
+		Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
+		String status = (String) responseMap.get("status");
+
+		if ("error".equals(status)) {
+			log.error("❌ Lambda returned error: {}", responseMap.get("errors"));
+			return new ArrayList<>();
+		}
+
+		List<Map<String, Object>> screenedFiles = (List<Map<String, Object>>) responseMap.get("files");
+		return screenedFiles != null ? screenedFiles : new ArrayList<>();
+	}
+
+	private List<Map<String, Object>> invokeBatchedScreening(String sessionId, String analysisId, String repository,
+			String branch, List<Map<String, Object>> fileInputs, int scanNumber) throws Exception {
+
+		log.info("📦 Large payload detected ({} files). Using batch processing...", fileInputs.size());
+
+		List<List<Map<String, Object>>> batches = createBatches(fileInputs, 10);
+		List<Map<String, Object>> allScreenedFiles = new ArrayList<>();
+
+		for (int i = 0; i < batches.size(); i++) {
+			try {
+				// Rate limiting between batches
+				if (i > 0) {
+					enforceRateLimit("screening_batch");
+				}
+
+				Map<String, Object> batchPayload = createBatchPayload(sessionId, analysisId, repository, branch,
+						batches.get(i), "screening", scanNumber, i + 1, batches.size());
+
+				String payloadJson = objectMapper.writeValueAsString(batchPayload);
+				log.info("📤 Invoking screening Lambda batch {}/{} with {} files, payload size: {} bytes", i + 1,
+						batches.size(), batches.get(i).size(), payloadJson.length());
+
+				InvokeRequest request = InvokeRequest.builder().functionName(screeningFunctionArn)
+						.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson))
+						.build();
+
+				String responseJson = invokeWithRetryAndCircuitBreaker(request, "screening_batch");
+				if (responseJson != null) {
+					Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
+					String status = (String) responseMap.get("status");
+
+					if ("success".equals(status) || status == null) {
+						List<Map<String, Object>> batchFiles = (List<Map<String, Object>>) responseMap.get("files");
+						if (batchFiles != null) {
+							allScreenedFiles.addAll(batchFiles);
+							log.info("✅ Batch {}/{} processed successfully: {} files screened", i + 1, batches.size(),
+									batchFiles.size());
+						}
+					}
+				}
+
+			} catch (Exception batchError) {
+				log.error("❌ Failed to process batch {}/{}: {}", i + 1, batches.size(), batchError.getMessage());
+			}
+		}
+
+		log.info("📊 Batch processing complete: {} files screened out of {} total files", allScreenedFiles.size(),
+				fileInputs.size());
+		return allScreenedFiles;
+	}
+
+	private List<Map<String, Object>> invokeSingleDetection(String sessionId, String analysisId, String repository,
+			String branch, List<Map<String, Object>> screenedFiles, int scanNumber) throws Exception {
+
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("sessionId", sessionId);
+		payload.put("analysisId", analysisId);
+		payload.put("repository", repository);
+		payload.put("branch", branch);
+		payload.put("files", screenedFiles);
+		payload.put("stage", "detection");
+		payload.put("scanNumber", scanNumber);
+		payload.put("timestamp", System.currentTimeMillis());
+
+		String payloadJson = objectMapper.writeValueAsString(payload);
+
+		InvokeRequest request = InvokeRequest.builder().functionName(detectionFunctionArn)
+				.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson)).build();
+
+		String responseJson = invokeWithRetryAndCircuitBreaker(request, "detection");
+		if (responseJson == null)
+			return new ArrayList<>();
+
+		Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
+		String status = (String) responseMap.get("status");
+
+		if ("error".equals(status)) {
+			log.error("❌ Detection Lambda returned error: {}", responseMap.get("errors"));
+			return new ArrayList<>();
+		}
+
+		List<Map<String, Object>> issues = (List<Map<String, Object>>) responseMap.get("issues");
+		return issues != null ? issues : new ArrayList<>();
+	}
+
+	private List<Map<String, Object>> invokeDetectionInBatches(String sessionId, String analysisId, String repository,
+			String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
+
+		List<Map<String, Object>> allIssues = new ArrayList<>();
+		List<List<Map<String, Object>>> batches = createBatches(screenedFiles, DETECTION_BATCH_SIZE);
+
+		log.info("📦 Processing {} files in {} batches for detection", screenedFiles.size(), batches.size());
+
+		int successfulBatches = 0;
+		int failedBatches = 0;
+
+		for (int i = 0; i < batches.size(); i++) {
+			long batchStartTime = System.currentTimeMillis();
+
+			try {
+				// Aggressive rate limiting between batches
+				if (i > 0) {
+					enforceRateLimit("detection_batch", LAMBDA_RATE_LIMIT_DELAY);
+				}
+
+				Map<String, Object> batchPayload = createBatchPayload(sessionId, analysisId, repository, branch,
+						batches.get(i), "detection", scanNumber, i + 1, batches.size());
+
+				String batchPayloadJson = objectMapper.writeValueAsString(batchPayload);
+				log.info("🔍 Invoking detection batch {}/{}, payload size: {} bytes", i + 1, batches.size(),
+						batchPayloadJson.length());
+
+				InvokeRequest request = InvokeRequest.builder().functionName(detectionFunctionArn)
+						.invocationType(InvocationType.REQUEST_RESPONSE)
+						.payload(SdkBytes.fromUtf8String(batchPayloadJson)).build();
+
+				String responseJson = invokeWithRetryAndCircuitBreaker(request, "detection_batch");
+				if (responseJson != null) {
+					Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
+					String status = (String) responseMap.get("status");
+
+					if ("success".equals(status) || status == null) {
+						List<Map<String, Object>> batchIssues = (List<Map<String, Object>>) responseMap.get("issues");
+						if (batchIssues != null) {
+							allIssues.addAll(batchIssues);
+							long batchDuration = System.currentTimeMillis() - batchStartTime;
+							log.info("✅ Batch {}/{} completed in {} seconds: {} issues found", i + 1, batches.size(),
+									batchDuration / 1000, batchIssues.size());
+							successfulBatches++;
+						}
+					} else {
+						log.warn("⚠️ Batch {}/{} returned error: {}", i + 1, batches.size(), responseMap.get("errors"));
+						failedBatches++;
+					}
+				} else {
+					failedBatches++;
+				}
+
+			} catch (Exception e) {
+				long batchDuration = System.currentTimeMillis() - batchStartTime;
+				log.error("❌ Failed to process detection batch {}/{} after {} seconds: {}", i + 1, batches.size(),
+						batchDuration / 1000, e.getMessage());
+				failedBatches++;
+			}
+		}
+
+		log.info("📊 Detection batch processing complete: {} successful, {} failed, {} total issues found",
+				successfulBatches, failedBatches, allIssues.size());
+
+		return allIssues;
+	}
+
+	/**
+	 * Core invocation method with enhanced retry logic and circuit breaker
+	 */
+	private String invokeWithRetryAndCircuitBreaker(InvokeRequest request, String operation) {
+		totalInvocations.incrementAndGet();
+
+		if (isCircuitBreakerOpen(operation)) {
+			log.warn("🔴 Circuit breaker is OPEN for operation: {}. Skipping invocation.", operation);
+			return null;
+		}
+
+		Exception lastException = null;
+
+		for (int attempt = 1; attempt <= MAX_LAMBDA_RETRIES; attempt++) {
+			try {
+				log.debug("🔄 Invoking Lambda for operation: {} (attempt {}/{})", operation, attempt,
+						MAX_LAMBDA_RETRIES);
+
+				long startTime = System.currentTimeMillis();
+				InvokeResponse response = lambdaClient.invoke(request);
+				long duration = System.currentTimeMillis() - startTime;
+
+				if (response.functionError() != null) {
+					log.error("❌ Lambda function error for operation {}: {}", operation, response.functionError());
+					recordFailure(operation);
+					return null;
+				}
+
+				if (response.statusCode() != 200) {
+					log.error("❌ Lambda invocation failed for operation {} with status code: {}", operation,
+							response.statusCode());
+					recordFailure(operation);
+					return null;
+				}
+
+				// Success
+				recordSuccess(operation);
+				log.debug("✅ Lambda invocation successful for operation {} in {}ms", operation, duration);
+				return response.payload().asUtf8String();
+
+			} catch (SdkClientException e) {
+				lastException = e;
+				log.warn("⚠️ Lambda invocation failed for operation {} (attempt {}/{}): {}", operation, attempt,
+						MAX_LAMBDA_RETRIES, e.getMessage());
+
+				if (attempt < MAX_LAMBDA_RETRIES) {
+					long delay = calculateExponentialBackoffDelay(attempt);
+					log.info("🕐 Waiting {}ms before retry attempt {}", delay, attempt + 1);
+
+					try {
+						Thread.sleep(delay);
+					} catch (InterruptedException ie) {
+						Thread.currentThread().interrupt();
+						log.error("❌ Retry interrupted for operation: {}", operation);
+						break;
+					}
+				} else {
+					recordFailure(operation);
+					openCircuitBreaker(operation);
+				}
+			}
+		}
+
+		failedInvocations.incrementAndGet();
+		log.error("❌ All {} retry attempts failed for operation: {}", MAX_LAMBDA_RETRIES, operation);
+		return null;
+	}
+
+	/**
+	 * Utility methods
+	 */
+
+	/**
+	 * Get hybrid strategy metrics
+	 */
+	public Map<String, Object> getHybridMetrics() {
+		Map<String, Object> metrics = getHealthMetrics();
+
+		// Add hybrid-specific metrics
+		metrics.put("hybridStrategyEnabled", true);
+		metrics.put("costOptimizationActive", true);
+		metrics.put("modelDistribution", Map.of("novaLite", "90%", "templates", "9%", "novaPremier", "1%"));
+
+		return metrics;
+	}
+
+	private void enforceRateLimit(String operation) {
+		enforceRateLimit(operation, LAMBDA_RATE_LIMIT_DELAY);
+	}
+
+	private void enforceRateLimit(String operation, long delayMs) {
+		Long lastCall = lastInvocationTimes.get(operation);
+		if (lastCall != null) {
+			long timeSinceLastCall = System.currentTimeMillis() - lastCall;
+			if (timeSinceLastCall < delayMs) {
+				long waitTime = delayMs - timeSinceLastCall;
+				log.info("🐌 Rate limiting: waiting {}ms for operation {}", waitTime, operation);
+				rateLimitedInvocations.incrementAndGet();
+				try {
+					Thread.sleep(waitTime);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		}
+		lastInvocationTimes.put(operation, System.currentTimeMillis());
+	}
+
+	private boolean acquireAnalysisLock(String lockKey) {
+		long currentTime = System.currentTimeMillis();
+		Long existingLock = analysisLocks.get(lockKey);
+
+		if (existingLock != null && (currentTime - existingLock) < LOCK_TIMEOUT_MS) {
+			return false;
+		}
+
+		analysisLocks.put(lockKey, currentTime);
+		return true;
+	}
+
+	private void releaseAnalysisLock(String lockKey) {
+		analysisLocks.remove(lockKey);
+	}
+
+	private boolean isCircuitBreakerOpen(String operation) {
+		Long openTime = circuitBreakerOpenTimes.get(operation);
+		if (openTime == null)
+			return false;
+
+		if (System.currentTimeMillis() - openTime > CIRCUIT_BREAKER_TIMEOUT_MS) {
+			circuitBreakerOpenTimes.remove(operation);
+			failureCounters.remove(operation);
+			log.info("🟢 Circuit breaker CLOSED for operation: {}", operation);
+			return false;
+		}
+		return true;
+	}
+
+	private void openCircuitBreaker(String operation) {
+		circuitBreakerOpenTimes.put(operation, System.currentTimeMillis());
+		log.warn("🔴 Circuit breaker OPENED for operation: {}", operation);
+	}
+
+	private void recordSuccess(String operation) {
+		failureCounters.remove(operation);
+		successfulInvocations.incrementAndGet();
+	}
+
+	private void recordFailure(String operation) {
+		int failures = failureCounters.computeIfAbsent(operation, k -> new AtomicInteger(0)).incrementAndGet();
+		if (failures >= CIRCUIT_BREAKER_FAILURE_THRESHOLD) {
+			openCircuitBreaker(operation);
+		}
+		failedInvocations.incrementAndGet();
+	}
+
+	private long calculateExponentialBackoffDelay(int attempt) {
+		long exponentialDelay = (long) Math.pow(2, attempt - 1) * BASE_RETRY_DELAY_MS;
+		long delay = Math.min(exponentialDelay, MAX_RETRY_DELAY_MS);
+
+		// Add jitter (0-25% of delay) to prevent thundering herd
+		long jitter = (long) (delay * 0.25 * Math.random());
+		return delay + jitter;
+	}
+
+	private List<List<Map<String, Object>>> createBatches(List<Map<String, Object>> items, int batchSize) {
+		List<List<Map<String, Object>>> batches = new ArrayList<>();
+		for (int i = 0; i < items.size(); i += batchSize) {
+			int end = Math.min(i + batchSize, items.size());
+			batches.add(items.subList(i, end));
+		}
+		return batches;
+	}
+
+	private Map<String, Object> createBatchPayload(String sessionId, String analysisId, String repository,
+			String branch, List<Map<String, Object>> items, String stage, int scanNumber, int batchNumber,
+			int totalBatches) {
+
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("sessionId", sessionId);
+		payload.put("analysisId", analysisId);
+		payload.put("repository", repository);
+		payload.put("branch", branch);
+		payload.put(stage.equals("screening") ? "files" : "files", items);
+		payload.put("stage", stage);
+		payload.put("scanNumber", scanNumber);
+		payload.put("batchInfo",
+				Map.of("batchNumber", batchNumber, "totalBatches", totalBatches, "batchSize", items.size()));
+		payload.put("timestamp", System.currentTimeMillis());
+		return payload;
+	}
+
+	/**
+	 * Monitoring and health check methods
+	 */
+	public Map<String, Object> getHealthMetrics() {
+		Map<String, Object> metrics = new HashMap<>();
+		metrics.put("totalInvocations", totalInvocations.get());
+		metrics.put("successfulInvocations", successfulInvocations.get());
+		metrics.put("failedInvocations", failedInvocations.get());
+		metrics.put("rateLimitedInvocations", rateLimitedInvocations.get());
+		metrics.put("successRate",
+				totalInvocations.get() > 0 ? (double) successfulInvocations.get() / totalInvocations.get() * 100 : 0.0);
+		metrics.put("activeCircuitBreakers", circuitBreakerOpenTimes.size());
+		metrics.put("activeLocks", analysisLocks.size());
+		return metrics;
+	}
+
+	public void logHealthMetrics() {
+		Map<String, Object> metrics = getHealthMetrics();
+		log.info(
+				"📊 Lambda Service Health: Total={}, Success={}, Failed={}, RateLimited={}, SuccessRate={}%, CircuitBreakers={}, Locks={}",
+				metrics.get("totalInvocations"), metrics.get("successfulInvocations"), metrics.get("failedInvocations"),
+				metrics.get("rateLimitedInvocations"), String.format("%.1f", metrics.get("successRate")),
+				metrics.get("activeCircuitBreakers"), metrics.get("activeLocks"));
+	}
 }
