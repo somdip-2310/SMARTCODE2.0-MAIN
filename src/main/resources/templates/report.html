@@ -298,7 +298,7 @@
 											<span th:unless="${issue.cveScore != null}">-</span>
 										</td>
 										<td th:text="${issue.title}"></td>
-										<td><code th:text="${#strings.substringAfterLast(issue.file, '/')}"></code></td>
+										<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
 										<td th:text="${issue.line}"></td>
 										<td>
 											<button class="btn btn-sm btn-primary" type="button"
@@ -394,7 +394,7 @@
 												th:text="${issue.severity}"></span>
 										</td>
 										<td th:text="${issue.title}"></td>
-										<td><code th:text="${#strings.substringAfterLast(issue.file, '/')}"></code></td>
+										<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
 										<td th:text="${issue.line}"></td>
 										<td>
 											<button class="btn btn-sm btn-primary" type="button"
