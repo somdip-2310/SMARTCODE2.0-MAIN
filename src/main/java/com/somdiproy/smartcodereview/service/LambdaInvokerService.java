@@ -212,7 +212,7 @@ public class LambdaInvokerService {
     /**
      * Enhanced suggestions invocation with aggressive rate limiting
      */
-    private String invokeSuggestionsWithRateLimit(String sessionId, String analysisId, String repository, 
+    public String invokeSuggestionsWithRateLimit(String sessionId, String analysisId, String repository, 
             String branch, List<Map<String, Object>> issues, int scanNumber) throws Exception {
         
         log.info("🐌 Invoking suggestions with ultra-aggressive rate limiting for {} issues", issues.size());

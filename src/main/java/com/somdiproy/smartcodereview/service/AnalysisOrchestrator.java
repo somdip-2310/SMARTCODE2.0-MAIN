@@ -1,3 +1,4 @@
+// src/main/java/com/somdiproy/smartcodereview/service/AnalysisOrchestrator.java
 package com.somdiproy.smartcodereview.service;
 
 import com.somdiproy.smartcodereview.dto.AnalysisStatusResponse;
@@ -34,7 +35,7 @@ public class AnalysisOrchestrator {
     private final DataAggregationService dataAggregationService;
     private final GitHubService gitHubService;
     private final LambdaInvokerService lambdaInvokerService;
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AnalysisOrchestrator.class);
 
     // In-memory storage for analysis progress (replace with Redis in production)
     private final ConcurrentHashMap<String, Analysis> analysisProgress = new ConcurrentHashMap<>();
@@ -89,8 +90,10 @@ public class AnalysisOrchestrator {
     @Async
     protected void processAnalysisAsync(String analysisId, String sessionId, String repoUrl, 
                                        String branch, String githubToken, int scanNumber) {
+        Analysis analysis = analysisProgress.get(analysisId);
+        String suggestionResponse = null; // Declare at method level for proper scope
+        
         try {
-            Analysis analysis = analysisProgress.get(analysisId);
             analysis.setStatus(Analysis.AnalysisStatus.IN_PROGRESS);
             
             log.info("🚀 Starting analysis {} for repository {} branch {}", analysisId, repoUrl, branch);
@@ -137,7 +140,6 @@ public class AnalysisOrchestrator {
             
             // Filter issues for suggestions - only high-severity security issues
             List<Map<String, Object>> securityIssuesForSuggestions = filterSecurityIssuesForSuggestions(issues, log);
-
             
             // Stage 4: Suggestions with Nova Premier (security issues only) - Rate Limited Approach
             log.info("🔒 Stage 4: Generating suggestions for {} high-severity security issues (from {} total issues)", 
@@ -147,40 +149,46 @@ public class AnalysisOrchestrator {
             String lockKey = "suggestions_" + analysisId;
             if (!acquireAnalysisLock(lockKey)) {
                 log.warn("⚠️ Another Lambda instance is already processing suggestions for analysis {}", analysisId);
-                return;
+                // Continue with analysis completion even if suggestions are skipped
+            } else {
+                try {
+                    // Ultra-conservative rate limiting: Process fewer issues to reduce API calls
+                    List<Map<String, Object>> reducedIssues = securityIssuesForSuggestions.stream()
+                            .limit(5)  // Limit to top 5 issues to reduce API pressure
+                            .collect(Collectors.toList());
+                    
+                    log.info("🎯 Processing top {} critical security issues to minimize rate limiting", reducedIssues.size());
+                    
+                    // Use public method instead of private one
+                    suggestionResponse = lambdaInvokerService.invokeSuggestions(
+                            sessionId,
+                            analysisId,
+                            repoUrl,
+                            branch,
+                            reducedIssues,  // Reduced issue set
+                            scanNumber
+                    );
+                    
+                    log.info("✓ Suggestions generated successfully");
+                    
+                } catch (Exception suggestionsError) {
+                    log.error("❌ Error generating suggestions for analysis {}: {}", analysisId, suggestionsError.getMessage());
+                    // Continue with analysis completion even if suggestions fail
+                } finally {
+                    releaseAnalysisLock(lockKey);
+                }
             }
-
-            try {
-                // Ultra-conservative rate limiting: Process fewer issues to reduce API calls
-                List<Map<String, Object>> reducedIssues = securityIssuesForSuggestions.stream()
-                        .limit(5)  // Limit to top 5 issues to reduce API pressure
-                        .collect(Collectors.toList());
-                
-                log.info("🎯 Processing top {} critical security issues to minimize rate limiting", reducedIssues.size());
-                
-                String suggestionResponse = lambdaInvokerService.invokeSuggestionsWithRateLimit(
-                        sessionId,
-                        analysisId,
-                        repoUrl,
-                        branch,
-                        reducedIssues,  // Reduced issue set
-                        scanNumber
-                );
-            } finally {
-                releaseAnalysisLock(lockKey);
-            }
-
-            // Store ALL issues for display (including performance)
-            dataAggregationService.storeDetectionResults(analysisId, issues);  // ALL issues for display
             
+            // Store suggestion results if available
             if (suggestionResponse != null) {
                 dataAggregationService.storeSuggestionResults(analysisId, suggestionResponse);
+                log.info("✓ Suggestions stored successfully");
+            } else {
+                log.warn("⚠️ No suggestions generated for analysis {}", analysisId);
             }
             
+            // Complete analysis
             analysis.setProgress(100);
-            log.info("✓ Suggestions generated successfully");
-            
-            // Mark as completed
             analysis.setStatus(Analysis.AnalysisStatus.COMPLETED);
             analysis.setCompletedAt(System.currentTimeMillis() / 1000);
             
@@ -192,10 +200,19 @@ public class AnalysisOrchestrator {
             
         } catch (Exception e) {
             log.error("❌ Analysis failed for {}: {}", analysisId, e.getMessage(), e);
-            Analysis analysis = analysisProgress.get(analysisId);
             if (analysis != null) {
                 analysis.setStatus(Analysis.AnalysisStatus.FAILED);
                 analysis.setError(e.getMessage());
+                analysis.setCompletedAt(System.currentTimeMillis() / 1000);
+            }
+            
+            // Store partial results even on failure
+            try {
+                if (analysis != null) {
+                    dataAggregationService.aggregateAndSaveResults(analysis);
+                }
+            } catch (Exception saveError) {
+                log.error("❌ Failed to save partial results for analysis {}: {}", analysisId, saveError.getMessage());
             }
         }
     }
@@ -364,6 +381,7 @@ public class AnalysisOrchestrator {
         return 30; // 30 seconds
     }
     
+    // Analysis lock management for preventing concurrent suggestions processing
     private final ConcurrentHashMap<String, Long> analysisLocks = new ConcurrentHashMap<>();
     private static final long LOCK_TIMEOUT_MS = 1800000; // 30 minutes
 
