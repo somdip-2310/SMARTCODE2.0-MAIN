@@ -61,6 +61,10 @@ public class DataAggregationService {
      */
     public void storeSuggestionResults(String analysisId, String suggestionResponseJson) {
         try {
+            // Log raw response for debugging
+            log.debug("Raw suggestion response for analysis {}: {}", analysisId, 
+                     suggestionResponseJson != null ? suggestionResponseJson.substring(0, Math.min(200, suggestionResponseJson.length())) : "null");
+            
             // Validate and clean response before parsing
             String cleanedResponse = validateAndCleanResponse(suggestionResponseJson);
             
@@ -70,13 +74,20 @@ public class DataAggregationService {
                 return;
             }
             
+            // Additional validation - ensure it's valid JSON
+            if (!isValidJson(cleanedResponse)) {
+                log.warn("Response is not valid JSON for analysis {}, creating synthetic response", analysisId);
+                createSyntheticJsonResponse(analysisId, suggestionResponseJson);
+                return;
+            }
+            
             Map<String, Object> response = objectMapper.readValue(cleanedResponse, Map.class);
             getLambdaResults(analysisId).setSuggestionResponse(response);
             log.info("Stored suggestion results for analysis {}", analysisId);
         } catch (Exception e) {
             log.error("Failed to parse suggestion response for analysis {}: {}", analysisId, e.getMessage());
             log.debug("Raw response content: {}", suggestionResponseJson);
-            createFallbackSuggestionResponse(analysisId);
+            createSyntheticJsonResponse(analysisId, suggestionResponseJson);
         }
     }
 
@@ -94,8 +105,10 @@ public class DataAggregationService {
         if (trimmedResponse.startsWith("SUCCESS") || 
             trimmedResponse.startsWith("FAILURE") || 
             trimmedResponse.startsWith("ERROR") ||
-            trimmedResponse.startsWith("COMPLETED")) {
-            log.warn("Received plain text response instead of JSON: {}", trimmedResponse.substring(0, Math.min(50, trimmedResponse.length())));
+            trimmedResponse.startsWith("COMPLETED") ||
+            trimmedResponse.startsWith("PARTIAL") ||
+            trimmedResponse.startsWith("TIMEOUT")) {
+            log.warn("Received plain text response instead of JSON: {}", trimmedResponse.substring(0, Math.min(100, trimmedResponse.length())));
             return null;
         }
         
@@ -116,7 +129,69 @@ public class DataAggregationService {
         
         return trimmedResponse;
     }
-
+    
+    /**
+     * Validate if a string is valid JSON
+     */
+    private boolean isValidJson(String jsonString) {
+        try {
+            objectMapper.readTree(jsonString);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Create synthetic JSON response from plain text Lambda response
+     */
+    private void createSyntheticJsonResponse(String analysisId, String originalResponse) {
+        try {
+            Map<String, Object> syntheticResponse = new HashMap<>();
+            
+            // Determine status from plain text response
+            String status = "partial_success";
+            String message = "Suggestions completed with text response";
+            
+            if (originalResponse != null) {
+                String response = originalResponse.trim().toUpperCase();
+                if (response.startsWith("SUCCESS")) {
+                    status = "success";
+                    message = "Suggestions completed successfully";
+                } else if (response.startsWith("FAILURE") || response.startsWith("ERROR")) {
+                    status = "error";
+                    message = "Suggestions generation encountered errors";
+                } else if (response.startsWith("COMPLETED")) {
+                    status = "success";
+                    message = "Suggestions generation completed";
+                }
+            }
+            
+            syntheticResponse.put("status", status);
+            syntheticResponse.put("analysisId", analysisId);
+            syntheticResponse.put("suggestions", new ArrayList<>());
+            syntheticResponse.put("summary", Map.of(
+                "totalSuggestions", 0,
+                "tokensUsed", 0,
+                "totalCost", 0.0,
+                "message", message,
+                "originalResponse", originalResponse != null ? originalResponse.substring(0, Math.min(100, originalResponse.length())) : "null"
+            ));
+            syntheticResponse.put("metadata", Map.of(
+                "responseType", "synthetic",
+                "timestamp", System.currentTimeMillis(),
+                "convertedFromPlainText", true
+            ));
+            
+            getLambdaResults(analysisId).setSuggestionResponse(syntheticResponse);
+            log.info("Created synthetic JSON response for analysis {} from plain text response", analysisId);
+            
+        } catch (Exception e) {
+            log.error("Failed to create synthetic response for analysis {}: {}", analysisId, e.getMessage());
+            createFallbackSuggestionResponse(analysisId);
+        }
+    }
+    
     /**
      * Create fallback suggestion response when parsing fails
      */

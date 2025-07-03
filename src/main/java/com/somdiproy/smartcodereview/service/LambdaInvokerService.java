@@ -231,13 +231,19 @@ public class LambdaInvokerService {
 	        
 	        // Wait for completion with timeout (20 minutes)
 	        String result = asyncResult.get(20, TimeUnit.MINUTES);
-	        
-	        if ("COMPLETED".equals(result)) {
+
+	        // Process the result to ensure consistent format
+	        String processedResult = processAsyncLambdaResponse(result != null ? result : "TIMEOUT", "suggestions");
+
+	        if ("COMPLETED".equals(processedResult)) {
 	            log.info("✅ Suggestions completed successfully for analysis: {}", analysisId);
-	            return "SUCCESS";
+	            return createSyntheticJsonResponseForLambda("suggestions", "SUCCESS");
+	        } else if ("FAILED".equals(processedResult)) {
+	            log.error("❌ Suggestions failed for analysis: {}", analysisId);
+	            return createSyntheticJsonResponseForLambda("suggestions", "FAILURE");
 	        } else {
-	            log.warn("⚠️ Suggestions completed with status: {} for analysis: {}", result, analysisId);
-	            return result;
+	            log.warn("⚠️ Suggestions completed with status: {} for analysis: {}", processedResult, analysisId);
+	            return createSyntheticJsonResponseForLambda("suggestions", processedResult);
 	        }
 	        
 	    } catch (Exception e) {
@@ -331,7 +337,47 @@ public class LambdaInvokerService {
 	        return null;
 	    }
 	}
-
+	/**
+	 * Validate and process async Lambda response
+	 */
+	private String processAsyncLambdaResponse(String rawResponse, String operation) {
+	    if (rawResponse == null || rawResponse.trim().isEmpty()) {
+	        log.warn("Empty async response from Lambda for operation: {}", operation);
+	        return "FAILED";
+	    }
+	    
+	    String trimmedResponse = rawResponse.trim();
+	    
+	    // Handle plain text responses
+	    if (trimmedResponse.startsWith("SUCCESS") || trimmedResponse.startsWith("COMPLETED")) {
+	        log.info("Async Lambda {} completed with text response: {}", operation, 
+	                trimmedResponse.substring(0, Math.min(50, trimmedResponse.length())));
+	        return "COMPLETED";
+	    } else if (trimmedResponse.startsWith("FAILURE") || trimmedResponse.startsWith("ERROR")) {
+	        log.error("Async Lambda {} failed with text response: {}", operation, 
+	                 trimmedResponse.substring(0, Math.min(50, trimmedResponse.length())));
+	        return "FAILED";
+	    }
+	    
+	    // Try to parse as JSON for structured response
+	    try {
+	        objectMapper.readTree(trimmedResponse);
+	        // If valid JSON, extract status
+	        Map<String, Object> responseMap = objectMapper.readValue(trimmedResponse, Map.class);
+	        String status = (String) responseMap.get("status");
+	        
+	        if ("success".equals(status) || "completed".equals(status)) {
+	            return "COMPLETED";
+	        } else if ("error".equals(status) || "failed".equals(status)) {
+	            return "FAILED";
+	        } else {
+	            return "IN_PROGRESS";
+	        }
+	    } catch (Exception e) {
+	        log.warn("Could not parse async response as JSON for {}: {}", operation, e.getMessage());
+	        return "FAILED";
+	    }
+	}
 	/**
 	 * Poll DynamoDB for suggestions completion
 	 */
@@ -537,6 +583,84 @@ public class LambdaInvokerService {
 	    }
 	}
 	/**
+	 * Process and validate Lambda response before returning
+	 */
+	private String processLambdaResponse(String rawResponse, String operation) {
+	    if (rawResponse == null || rawResponse.trim().isEmpty()) {
+	        log.warn("Received null or empty response from Lambda for operation: {}", operation);
+	        return createSyntheticJsonResponseForLambda(operation, "EMPTY_RESPONSE");
+	    }
+	    
+	    String trimmedResponse = rawResponse.trim();
+	    
+	    // Check if response is plain text instead of JSON
+	    if (trimmedResponse.startsWith("SUCCESS") || 
+	        trimmedResponse.startsWith("FAILURE") || 
+	        trimmedResponse.startsWith("ERROR") ||
+	        trimmedResponse.startsWith("COMPLETED")) {
+	        
+	    	log.warn("Lambda returned plain text response for {}: {}", operation, 
+	    	        trimmedResponse.substring(0, Math.min(100, trimmedResponse.length())));
+	    	log.debug("Full plain text response for {}: {}", operation, trimmedResponse);
+	        
+	        return createSyntheticJsonResponseForLambda(operation, trimmedResponse);
+	    }
+	    
+	    // Validate JSON format
+	    try {
+	        objectMapper.readTree(trimmedResponse);
+	        return trimmedResponse; // Valid JSON
+	    } catch (Exception e) {
+	        log.error("Lambda response is not valid JSON for {}: {}", operation, e.getMessage());
+	        return createSyntheticJsonResponseForLambda(operation, trimmedResponse);
+	    }
+	}
+
+	/**
+	 * Create synthetic JSON response when Lambda returns plain text
+	 */
+	private String createSyntheticJsonResponseForLambda(String operation, String plainTextResponse) {
+	    try {
+	        Map<String, Object> syntheticResponse = new HashMap<>();
+	        
+	        if (plainTextResponse.startsWith("SUCCESS")) {
+	            syntheticResponse.put("status", "success");
+	            syntheticResponse.put("message", plainTextResponse);
+	        } else if (plainTextResponse.startsWith("FAILURE")) {
+	            syntheticResponse.put("status", "error");
+	            syntheticResponse.put("message", plainTextResponse);
+	        } else if (plainTextResponse.startsWith("COMPLETED")) {
+	            syntheticResponse.put("status", "success");
+	            syntheticResponse.put("message", plainTextResponse);
+	        } else {
+	            syntheticResponse.put("status", "error");
+	            syntheticResponse.put("message", plainTextResponse);
+	        }
+	        
+	        syntheticResponse.put("operation", operation);
+	        syntheticResponse.put("timestamp", System.currentTimeMillis());
+	        syntheticResponse.put("synthetic", true);
+	        
+	        if ("suggestions".equals(operation)) {
+	            syntheticResponse.put("suggestions", new ArrayList<>());
+	            syntheticResponse.put("summary", Map.of(
+	                "totalSuggestions", 0,
+	                "tokensUsed", 0,
+	                "totalCost", 0.0
+	            ));
+	        }
+	        
+	        String jsonResponse = objectMapper.writeValueAsString(syntheticResponse);
+	        log.info("Created synthetic JSON response for {} operation", operation);
+	        return jsonResponse;
+	        
+	    } catch (Exception e) {
+	        log.error("Failed to create synthetic JSON response: {}", e.getMessage());
+	        return null;
+	    }
+	}
+	
+	/**
 	 * Enhanced suggestions invocation with hybrid strategy support
 	 */
 	public String invokeSuggestionsWithHybridStrategy(String sessionId, String analysisId, String repository,
@@ -583,7 +707,8 @@ public class LambdaInvokerService {
 		InvokeRequest request = InvokeRequest.builder().functionName(suggestionsFunctionArn)
 				.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson)).build();
 
-		return invokeWithRetryAndCircuitBreaker(request, "suggestions");
+		String rawResponse = invokeWithRetryAndCircuitBreaker(request, "suggestions");
+		return processLambdaResponse(rawResponse, "suggestions");
 	}
 
 	private String determineOverallModelStrategy(List<Map<String, Object>> issues) {
@@ -675,7 +800,8 @@ public class LambdaInvokerService {
 		InvokeRequest request = InvokeRequest.builder().functionName(screeningFunctionArn)
 				.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson)).build();
 
-		String responseJson = invokeWithRetryAndCircuitBreaker(request, "screening");
+		String rawResponse = invokeWithRetryAndCircuitBreaker(request, "screening");
+		String responseJson = processLambdaResponse(rawResponse, "screening");
 		if (responseJson == null)
 			return new ArrayList<>();
 
@@ -717,7 +843,8 @@ public class LambdaInvokerService {
 						.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson))
 						.build();
 
-				String responseJson = invokeWithRetryAndCircuitBreaker(request, "screening_batch");
+				String rawResponse = invokeWithRetryAndCircuitBreaker(request, "screening_batch");
+				String responseJson = processLambdaResponse(rawResponse, "screening_batch");
 				if (responseJson != null) {
 					Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
 					String status = (String) responseMap.get("status");
@@ -760,7 +887,8 @@ public class LambdaInvokerService {
 		InvokeRequest request = InvokeRequest.builder().functionName(detectionFunctionArn)
 				.invocationType(InvocationType.REQUEST_RESPONSE).payload(SdkBytes.fromUtf8String(payloadJson)).build();
 
-		String responseJson = invokeWithRetryAndCircuitBreaker(request, "detection");
+		String rawResponse = invokeWithRetryAndCircuitBreaker(request, "detection");
+		String responseJson = processLambdaResponse(rawResponse, "detection");
 		if (responseJson == null)
 			return new ArrayList<>();
 
@@ -807,7 +935,8 @@ public class LambdaInvokerService {
 						.invocationType(InvocationType.REQUEST_RESPONSE)
 						.payload(SdkBytes.fromUtf8String(batchPayloadJson)).build();
 
-				String responseJson = invokeWithRetryAndCircuitBreaker(request, "detection_batch");
+				String rawResponse = invokeWithRetryAndCircuitBreaker(request, "detection_batch");
+				String responseJson = processLambdaResponse(rawResponse, "detection_batch");
 				if (responseJson != null) {
 					Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
 					String status = (String) responseMap.get("status");
@@ -881,7 +1010,10 @@ public class LambdaInvokerService {
 				// Success
 				recordSuccess(operation);
 				log.debug("✅ Lambda invocation successful for operation {} in {}ms", operation, duration);
-				return response.payload().asUtf8String();
+				String rawResponse = response.payload().asUtf8String();
+				log.debug("Raw Lambda response for {}: {}", operation, 
+				         rawResponse != null ? rawResponse.substring(0, Math.min(200, rawResponse.length())) : "null");
+				return rawResponse;
 
 			} catch (SdkClientException e) {
 				lastException = e;
