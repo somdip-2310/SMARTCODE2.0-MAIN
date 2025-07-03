@@ -263,10 +263,10 @@ public class AnalysisController {
          // Get comprehensive report using ReportService
             ReportResponse report = reportService.getReport(analysisId);
 
-         // Separate security issues with actionable fixes
+         // Filter security issues for main security table (CVE issues with high severity)
             List<Issue> securityIssues = report.getIssues().stream()
                 .filter(issue -> "security".equalsIgnoreCase(issue.getCategory()))
-                .filter(issue -> hasActionableFix(issue)) // Only issues with real fixes
+                .filter(this::isMainSecurityIssue) // Issues that belong in main security table
                 .sorted((issue1, issue2) -> {
                     int severityCompare = Integer.compare(
                         getSeverityPriority(issue2.getSeverity()), 
@@ -278,11 +278,11 @@ public class AnalysisController {
                 })
                 .collect(Collectors.toList());
 
-            // Additional security issues without automated fixes
+            // Additional security issues for manual review (lower severity or no CVE data)
             List<Issue> additionalSecurityIssues = report.getIssues().stream()
                 .filter(issue -> "security".equalsIgnoreCase(issue.getCategory()))
-                .filter(issue -> !hasActionableFix(issue)) // Issues without automated fixes
-                .filter(issue -> issue.getCveId() != null || issue.getTitle() != null) // But with meaningful data
+                .filter(issue -> !isMainSecurityIssue(issue)) // Issues not in main security table
+                .filter(issue -> issue.getTitle() != null || issue.getType() != null) // But with meaningful data
                 .sorted((issue1, issue2) -> {
                     int severityCompare = Integer.compare(
                         getSeverityPriority(issue2.getSeverity()), 
@@ -377,6 +377,7 @@ public class AnalysisController {
     }
 
     // Helper method to check if issue has actionable fix
+ // Helper method to check if issue has actionable fix
     private boolean hasActionableFix(Issue issue) {
         if (issue.getSuggestion() == null || 
             issue.getSuggestion().getImmediateFix() == null) {
@@ -399,5 +400,26 @@ public class AnalysisController {
         }
         
         return true;
+    }
+
+    // Helper method to check if security issue should be in main security table
+    private boolean isMainSecurityIssue(Issue issue) {
+        if (!"security".equalsIgnoreCase(issue.getCategory())) {
+            return false;
+        }
+        
+        // Issues with CVE ID and score should be in main security table
+        if (issue.getCveId() != null && issue.getCveScore() != null && issue.getCveScore() > 0) {
+            return true;
+        }
+        
+        // Critical and High severity security issues should be in main table
+        if ("CRITICAL".equalsIgnoreCase(issue.getSeverity()) || 
+            "HIGH".equalsIgnoreCase(issue.getSeverity())) {
+            return true;
+        }
+        
+        // Issues with actionable fixes should be in main table
+        return hasActionableFix(issue);
     }
 }

@@ -417,19 +417,72 @@
 		                                <th>File</th>
 		                                <th>Line</th>
 		                                <th>Priority</th>
+		                                <th>Action</th>
 		                            </tr>
 		                        </thead>
 		                        <tbody>
 		                            <th:block th:each="issue : ${additionalSecurityIssues}">
 		                                <tr>
 		                                    <td><span class="badge bg-warning text-dark" th:text="${issue.type}">Type</span></td>
-		                                    <td th:text="${issue.title ?: issue.description}">Description</td>
-		                                    <td><code th:text="${issue.file}">file.java</code></td>
-		                                    <td th:text="${issue.line}">1</td>
+		                                    <td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
+		                                        (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
+		                                    <td><code th:text="${issue.file != null ? (issue.file.contains('/') ? 
+		                                        issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
+		                                    <td th:text="${issue.line}"></td>
 		                                    <td>
-		                                        <span class="badge" 
-		                                              th:classappend="${issue.severity == 'HIGH'} ? 'bg-warning' : 'bg-info'"
-		                                              th:text="${issue.severity}">Medium</span>
+		                                        <span class="badge bg-danger" th:if="${issue.severity == 'CRITICAL'}">CRITICAL</span>
+		                                        <span class="badge bg-warning" th:if="${issue.severity == 'HIGH'}">HIGH</span>
+		                                        <span class="badge bg-info" th:if="${issue.severity == 'MEDIUM'}">MEDIUM</span>
+		                                        <span class="badge bg-success" th:if="${issue.severity == 'LOW'}">LOW</span>
+		                                    </td>
+		                                    <td>
+		                                        <button class="btn btn-sm btn-outline-warning" type="button"
+		                                            data-bs-toggle="collapse"
+		                                            th:attr="data-bs-target='#additional-security-detail-' + ${issue.issueId}"
+		                                            aria-expanded="false">
+		                                            View Fix
+		                                        </button>
+		                                    </td>
+		                                </tr>
+		                                <!-- Inline collapsible row for fix details -->
+		                                <tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
+		                                    class="collapse" th:id="'additional-security-detail-' + ${issue.issueId}">
+		                                    <td colspan="6" class="p-0 inline-fix">
+		                                        <div class="card border-0 rounded-0">
+		                                            <div class="card-body bg-light">
+		                                                <h6 class="mb-3"><i class="bi bi-lightbulb text-warning"></i> Manual Review Required</h6>
+		                                                <p class="mb-3" th:text="${issue.suggestion.immediateFix.explanation}">Fix explanation</p>
+		                                                
+		                                                <div class="row">
+		                                                    <div class="col-md-6">
+		                                                        <h6 class="text-danger">Code to Review:</h6>
+		                                                        <div class="position-relative">
+		                                                            <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+		                                                                th:data-element-id="${issue.issueId} + '-additional-search'"
+		                                                                onclick="copyToClipboardById(this, this.dataset.elementId)">
+		                                                                <i class="bi bi-clipboard"></i>
+		                                                            </button>
+		                                                            <pre class="bg-white border rounded p-3" 
+		                                                                th:id="${issue.issueId} + '-additional-search'"
+		                                                                th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+		                                                        </div>
+		                                                    </div>
+		                                                    <div class="col-md-6">
+		                                                        <h6 class="text-success">Recommended Solution:</h6>
+		                                                        <div class="position-relative">
+		                                                            <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+		                                                                th:data-element-id="${issue.issueId} + '-additional-replace'"
+		                                                                onclick="copyToClipboardById(this, this.dataset.elementId)">
+		                                                                <i class="bi bi-clipboard"></i>
+		                                                            </button>
+		                                                            <pre class="bg-white border rounded p-3" 
+		                                                                th:id="${issue.issueId} + '-additional-replace'"
+		                                                                th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+		                                                        </div>
+		                                                    </div>
+		                                                </div>
+		                                            </div>
+		                                        </div>
 		                                    </td>
 		                                </tr>
 		                            </th:block>
