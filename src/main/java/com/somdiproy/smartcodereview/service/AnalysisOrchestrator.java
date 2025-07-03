@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Service that orchestrates the three-tier analysis process
@@ -134,16 +135,24 @@ public class AnalysisOrchestrator {
             // Store detection results for aggregation
             dataAggregationService.storeDetectionResults(analysisId, issues);
             
-            // Stage 4: Suggestions with Nova Premier
-            log.info("💡 Stage 4: Generating suggestions with Nova Premier");
+            // Filter issues for suggestions - only high-severity security issues
+            List<Map<String, Object>> securityIssuesForSuggestions = filterSecurityIssuesForSuggestions(issues, logger);
+
+            // Stage 4: Suggestions with Nova Premier (security issues only)
+            log.info("🔒 Stage 4: Generating suggestions for {} high-severity security issues (from {} total issues)", 
+                     securityIssuesForSuggestions.size(), issues.size());
+                     
             String suggestionResponse = lambdaInvokerService.invokeSuggestions(
                     sessionId,
                     analysisId,
                     repoUrl,
                     branch,
-                    issues,
+                    securityIssuesForSuggestions,  // Only security issues
                     scanNumber
             );
+
+            // Store ALL issues for display (including performance)
+            dataAggregationService.storeDetectionResults(analysisId, issues);  // ALL issues for display
             
             if (suggestionResponse != null) {
                 dataAggregationService.storeSuggestionResults(analysisId, suggestionResponse);
@@ -170,6 +179,82 @@ public class AnalysisOrchestrator {
                 analysis.setError(e.getMessage());
             }
         }
+    }
+    
+    /**
+     * Filter issues to only include high-severity security issues for suggestions
+     * while keeping ALL issues for display in results
+     */
+    private List<Map<String, Object>> filterSecurityIssuesForSuggestions(List<Map<String, Object>> allIssues, 
+                                                                         org.slf4j.Logger logger) {
+        List<Map<String, Object>> securityIssues = allIssues.stream()
+            .filter(issue -> {
+                String category = (String) issue.getOrDefault("category", "");
+                return "security".equalsIgnoreCase(category);
+            })
+            .filter(issue -> {
+                String severity = (String) issue.getOrDefault("severity", "LOW");
+                return "CRITICAL".equalsIgnoreCase(severity) || "HIGH".equalsIgnoreCase(severity);
+            })
+            .filter(issue -> {
+                // Estimate CVE score
+                double cveScore = estimateCVEScore(issue);
+                return cveScore > 7.0;
+            })
+            .sorted((a, b) -> {
+                String severityA = (String) a.getOrDefault("severity", "LOW");
+                String severityB = (String) b.getOrDefault("severity", "LOW");
+                return getSeverityPriority(severityB) - getSeverityPriority(severityA);
+            })
+            .limit(15) // Max 15 security issues for suggestions
+            .collect(Collectors.toList());
+        
+        logger.info("📊 Filtered {} high-severity security issues for suggestions from {} total issues", 
+                   securityIssues.size(), allIssues.size());
+        
+        return securityIssues;
+    }
+
+    /**
+     * Estimate CVE score for filtering
+     */
+    private double estimateCVEScore(Map<String, Object> issue) {
+        String type = ((String) issue.getOrDefault("type", "")).toUpperCase();
+        String severity = ((String) issue.getOrDefault("severity", "")).toUpperCase();
+        
+        double baseScore = switch (severity) {
+            case "CRITICAL" -> 9.0;
+            case "HIGH" -> 7.5;
+            case "MEDIUM" -> 5.0;
+            case "LOW" -> 2.0;
+            default -> 4.0;
+        };
+        
+        double typeMultiplier = switch (type) {
+            case "SQL_INJECTION" -> 1.1;
+            case "XSS", "CROSS_SITE_SCRIPTING" -> 1.0;
+            case "INSECURE_DESERIALIZATION" -> 1.1;
+            case "AUTHENTICATION_BYPASS" -> 1.2;
+            case "AUTHORIZATION_BYPASS" -> 1.1;
+            case "REMOTE_CODE_EXECUTION", "RCE" -> 1.3;
+            case "COMMAND_INJECTION" -> 1.2;
+            default -> 0.9;
+        };
+        
+        return baseScore * typeMultiplier;
+    }
+
+    /**
+     * Get severity priority for sorting
+     */
+    private int getSeverityPriority(String severity) {
+        return switch (severity.toUpperCase()) {
+            case "CRITICAL" -> 4;
+            case "HIGH" -> 3;
+            case "MEDIUM" -> 2;
+            case "LOW" -> 1;
+            default -> 0;
+        };
     }
     
     /**
