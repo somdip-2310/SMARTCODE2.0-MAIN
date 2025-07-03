@@ -104,42 +104,232 @@ public class DataAggregationService {
     /**
      * Create AnalysisResult from Lambda results
      */
+    /**
+     * Create AnalysisResult from Lambda results with enhanced validation
+     */
     private AnalysisResult createAnalysisResult(Analysis analysis, LambdaResults results) {
         AnalysisResult result = new AnalysisResult();
+        
+        // Required fields with null checks and defaults
         result.setAnalysisId(analysis.getAnalysisId());
-        result.setSessionId(analysis.getSessionId());
-        result.setScanNumber(analysis.getScanNumber());
+        result.setSessionId(analysis.getSessionId() != null ? analysis.getSessionId() : "unknown-session");
+        result.setScanNumber(analysis.getScanNumber() != null ? analysis.getScanNumber() : 1);
         result.setStatus("completed");
-        result.setRepository(analysis.getRepository());
-        result.setBranch(analysis.getBranch());
-        result.setStartedAt(analysis.getStartedAt());
-        result.setCompletedAt(System.currentTimeMillis() / 1000);
-        result.setProcessingTimeMs((result.getCompletedAt() - result.getStartedAt()) * 1000);
         
-        // File counts
-        result.setFilesSubmitted(analysis.getTotalFiles());
-        result.setFilesAnalyzed(results.getScreenedFiles() != null ? results.getScreenedFiles().size() : 0);
-        result.setFilesSkipped(result.getFilesSubmitted() - result.getFilesAnalyzed());
+        // Repository and branch with validation
+        String repository = analysis.getRepository();
+        if (repository == null || repository.trim().isEmpty()) {
+            repository = "Unknown Repository";
+            log.warn("⚠️ Repository is null for analysis {}, using default", analysis.getAnalysisId());
+        }
+        result.setRepository(repository);
         
-        // Create summary from detected issues
-        AnalysisResult.Summary summary = createSummary(results.getDetectedIssues());
-        result.setSummary(summary);
+        String branch = analysis.getBranch();
+        if (branch == null || branch.trim().isEmpty()) {
+            branch = "main";
+            log.warn("⚠️ Branch is null for analysis {}, using default", analysis.getAnalysisId());
+        }
+        result.setBranch(branch);
         
-        // Calculate scores
-        AnalysisResult.Scores scores = calculateScores(results.getDetectedIssues());
-        result.setScores(scores);
+        // Timestamps with validation
+        Long startedAt = analysis.getStartedAt();
+        if (startedAt == null || startedAt <= 0) {
+            startedAt = System.currentTimeMillis() / 1000;
+            log.warn("⚠️ StartedAt is null/invalid for analysis {}, using current time", analysis.getAnalysisId());
+        }
+        result.setStartedAt(startedAt);
         
-        // Extract token usage and costs from suggestion response
-        if (results.getSuggestionResponse() != null) {
-            extractTokenUsageAndCosts(result, results.getSuggestionResponse());
+        long completedAt = System.currentTimeMillis() / 1000;
+        result.setCompletedAt(completedAt);
+        
+        // Calculate processing time with validation
+        long processingTimeMs = (completedAt - startedAt) * 1000;
+        if (processingTimeMs < 0) {
+            processingTimeMs = 0;
+            log.warn("⚠️ Negative processing time calculated for analysis {}, setting to 0", analysis.getAnalysisId());
+        }
+        result.setProcessingTimeMs(processingTimeMs);
+        
+        // File counts with validation
+        Integer totalFiles = analysis.getTotalFiles();
+        if (totalFiles == null || totalFiles < 0) {
+            totalFiles = 0;
+            log.warn("⚠️ TotalFiles is null/negative for analysis {}, setting to 0", analysis.getAnalysisId());
+        }
+        result.setFilesSubmitted(totalFiles);
+        
+        int filesAnalyzed = 0;
+        if (results.getScreenedFiles() != null) {
+            filesAnalyzed = results.getScreenedFiles().size();
+        }
+        result.setFilesAnalyzed(filesAnalyzed);
+        
+        int filesSkipped = Math.max(0, totalFiles - filesAnalyzed);
+        result.setFilesSkipped(filesSkipped);
+        
+        // Create summary with null check
+        try {
+            AnalysisResult.Summary summary = createSummary(results.getDetectedIssues());
+            if (summary == null) {
+                summary = createEmptySummary();
+                log.warn("⚠️ Summary creation failed for analysis {}, using empty summary", analysis.getAnalysisId());
+            }
+            result.setSummary(summary);
+        } catch (Exception e) {
+            log.error("❌ Failed to create summary for analysis {}: {}", analysis.getAnalysisId(), e.getMessage());
+            result.setSummary(createEmptySummary());
         }
         
-        // Set TTL (7 days)
-        long ttl = (System.currentTimeMillis() / 1000) + (7 * 24 * 60 * 60);
+        // Calculate scores with null check
+        try {
+            AnalysisResult.Scores scores = calculateScores(results.getDetectedIssues());
+            if (scores == null) {
+                scores = createDefaultScores();
+                log.warn("⚠️ Scores calculation failed for analysis {}, using defaults", analysis.getAnalysisId());
+            }
+            result.setScores(scores);
+        } catch (Exception e) {
+            log.error("❌ Failed to calculate scores for analysis {}: {}", analysis.getAnalysisId(), e.getMessage());
+            result.setScores(createDefaultScores());
+        }
+        
+        // Extract token usage and costs with error handling
+        try {
+            if (results.getSuggestionResponse() != null) {
+                extractTokenUsageAndCosts(result, results.getSuggestionResponse());
+            } else {
+                // Set default token usage if no suggestion response
+                result.setTokenUsage(createDefaultTokenUsage());
+                result.setCosts(createDefaultCosts());
+                log.debug("No suggestion response for analysis {}, using default token/cost data", analysis.getAnalysisId());
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to extract token usage/costs for analysis {}: {}", analysis.getAnalysisId(), e.getMessage());
+            result.setTokenUsage(createDefaultTokenUsage());
+            result.setCosts(createDefaultCosts());
+        }
+        
+        // Set TTL (7 days) with validation
+        long currentTime = System.currentTimeMillis() / 1000;
+        long ttl = currentTime + (7 * 24 * 60 * 60); // 7 days from now
+        
+        // Ensure TTL is in the future
+        if (ttl <= currentTime) {
+            ttl = currentTime + (24 * 60 * 60); // Fallback to 1 day
+            log.warn("⚠️ TTL calculation issue for analysis {}, using 1 day fallback", analysis.getAnalysisId());
+        }
+        
         result.setTtl(ttl);
         result.setExpiresAt(ttl);
         
+        // Final validation
+        if (!validateAnalysisResult(result)) {
+            log.error("❌ AnalysisResult validation failed for analysis {}", analysis.getAnalysisId());
+            throw new IllegalStateException("AnalysisResult validation failed for analysis: " + analysis.getAnalysisId());
+        }
+        
+        log.debug("✅ Created valid AnalysisResult for analysis {}", analysis.getAnalysisId());
         return result;
+    }
+
+    /**
+     * Create empty summary for fallback
+     */
+    private AnalysisResult.Summary createEmptySummary() {
+        AnalysisResult.Summary summary = new AnalysisResult.Summary();
+        summary.setTotalIssues(0);
+        summary.setBySeverity(new HashMap<>());
+        summary.setByCategory(new HashMap<>());
+        summary.setByType(new HashMap<>());
+        return summary;
+    }
+
+    /**
+     * Create default scores for fallback
+     */
+    private AnalysisResult.Scores createDefaultScores() {
+        AnalysisResult.Scores scores = new AnalysisResult.Scores();
+        scores.setSecurity(10.0);
+        scores.setPerformance(10.0);
+        scores.setQuality(10.0);
+        scores.setOverall(10.0);
+        return scores;
+    }
+
+    /**
+     * Create default token usage for fallback
+     */
+    private AnalysisResult.TokenUsage createDefaultTokenUsage() {
+        AnalysisResult.TokenUsage tokenUsage = new AnalysisResult.TokenUsage();
+        tokenUsage.setScreeningTokens(0);
+        tokenUsage.setDetectionTokens(0);
+        tokenUsage.setSuggestionTokens(0);
+        tokenUsage.setTotalTokens(0);
+        return tokenUsage;
+    }
+
+    /**
+     * Create default costs for fallback
+     */
+    private AnalysisResult.Costs createDefaultCosts() {
+        AnalysisResult.Costs costs = new AnalysisResult.Costs();
+        costs.setScreeningCost(0.0);
+        costs.setDetectionCost(0.0);
+        costs.setSuggestionCost(0.0);
+        costs.setTotalCost(0.0);
+        return costs;
+    }
+
+    /**
+     * Validate AnalysisResult before saving to DynamoDB
+     */
+    private boolean validateAnalysisResult(AnalysisResult result) {
+        if (result == null) {
+            log.error("AnalysisResult is null");
+            return false;
+        }
+        
+        if (result.getAnalysisId() == null || result.getAnalysisId().trim().isEmpty()) {
+            log.error("AnalysisId is null or empty");
+            return false;
+        }
+        
+        if (result.getSessionId() == null || result.getSessionId().trim().isEmpty()) {
+            log.error("SessionId is null or empty");
+            return false;
+        }
+        
+        if (result.getRepository() == null || result.getRepository().trim().isEmpty()) {
+            log.error("Repository is null or empty");
+            return false;
+        }
+        
+        if (result.getBranch() == null || result.getBranch().trim().isEmpty()) {
+            log.error("Branch is null or empty");
+            return false;
+        }
+        
+        if (result.getStatus() == null || result.getStatus().trim().isEmpty()) {
+            log.error("Status is null or empty");
+            return false;
+        }
+        
+        if (result.getStartedAt() == null || result.getStartedAt() <= 0) {
+            log.error("StartedAt is null or invalid: {}", result.getStartedAt());
+            return false;
+        }
+        
+        if (result.getCompletedAt() == null || result.getCompletedAt() <= 0) {
+            log.error("CompletedAt is null or invalid: {}", result.getCompletedAt());
+            return false;
+        }
+        
+        if (result.getTtl() == null || result.getTtl() <= 0) {
+            log.error("TTL is null or invalid: {}", result.getTtl());
+            return false;
+        }
+        
+        return true;
     }
     
     /**
@@ -151,11 +341,10 @@ public class DataAggregationService {
         // Map to store suggestions by issue ID
         Map<String, Map<String, Object>> suggestionsByIssueId = new HashMap<>();
         
-        // Extract suggestions from response
-     // Extract suggestions from response
+     
+        // Extract suggestions from response with enhanced parsing
         if (results.getSuggestionResponse() != null) {
-            List<Map<String, Object>> suggestions = 
-                (List<Map<String, Object>>) results.getSuggestionResponse().get("suggestions");
+            List<Map<String, Object>> suggestions = extractSuggestionsFromResponse(results.getSuggestionResponse());
             if (suggestions != null) {
                 for (Map<String, Object> suggestion : suggestions) {
                     String issueId = (String) suggestion.get("issueId");
@@ -178,10 +367,35 @@ public class DataAggregationService {
                 Issue issue = createIssue(analysisId, detectedIssue);
                 
                 // Add suggestion if available
-                Map<String, Object> suggestionData = suggestionsByIssueId.get(issue.getIssueId());
+             // Add suggestion if available - check multiple possible ID formats
+                String issueId = issue.getIssueId();
+                Map<String, Object> suggestionData = suggestionsByIssueId.get(issueId);
+                
+                // Try alternative ID matching if direct match fails
+                if (suggestionData == null) {
+                    String alternativeId = issue.getType() + "_" + issue.getFile() + "_" + issue.getLine();
+                    suggestionData = suggestionsByIssueId.get(alternativeId);
+                }
+                
+                // Try issue type matching for security issues
+                if (suggestionData == null && "security".equals(issue.getCategory())) {
+                    for (Map.Entry<String, Map<String, Object>> entry : suggestionsByIssueId.entrySet()) {
+                        Map<String, Object> data = entry.getValue();
+                        if (issue.getType().equals(data.get("issueType")) || 
+                            issue.getFile().equals(data.get("file"))) {
+                            suggestionData = data;
+                            break;
+                        }
+                    }
+                }
+                
                 if (suggestionData != null) {
                     Suggestion suggestion = createSuggestion(suggestionData);
                     issue.setSuggestion(suggestion);
+                    log.debug("✅ Linked suggestion to issue: {}", issueId);
+                } else {
+                    log.warn("⚠️ No suggestion found for issue: {} (type: {}, file: {})", 
+                        issueId, issue.getType(), issue.getFile());
                 }
                 
                 issues.add(issue);
@@ -190,7 +404,36 @@ public class DataAggregationService {
         
         return issues;
     }
-    
+    /**
+     * Extract suggestions from Lambda response with multiple format support
+     */
+    private List<Map<String, Object>> extractSuggestionsFromResponse(Map<String, Object> response) {
+        // Try multiple possible paths for suggestions
+        List<Map<String, Object>> suggestions = null;
+        
+        // Path 1: Direct suggestions array
+        if (response.get("suggestions") instanceof List) {
+            suggestions = (List<Map<String, Object>>) response.get("suggestions");
+        }
+        
+        // Path 2: Nested in summary
+        if (suggestions == null && response.get("summary") != null) {
+            Map<String, Object> summary = (Map<String, Object>) response.get("summary");
+            if (summary.get("suggestions") instanceof List) {
+                suggestions = (List<Map<String, Object>>) summary.get("suggestions");
+            }
+        }
+        
+        // Path 3: Nested in data
+        if (suggestions == null && response.get("data") != null) {
+            Map<String, Object> data = (Map<String, Object>) response.get("data");
+            if (data.get("suggestions") instanceof List) {
+                suggestions = (List<Map<String, Object>>) data.get("suggestions");
+            }
+        }
+        
+        return suggestions != null ? suggestions : new ArrayList<>();
+    }
     /**
      * Fallback method to fetch suggestions directly from DynamoDB
      */
@@ -251,19 +494,19 @@ public class DataAggregationService {
         issue.setIssueId(getStringValue(issueData, "id", UUID.randomUUID().toString()));
         issue.setType(getStringValue(issueData, "type"));
         // Set title with fallback to type if title is null
+     // Set title with enhanced fallback logic
         String title = getStringValue(issueData, "title");
         if (title == null || title.isEmpty()) {
-            title = getStringValue(issueData, "type", "Unknown Issue");
-            // Make it more human-readable
-            title = title.replaceAll("_", " ").toLowerCase();
-            title = title.substring(0, 1).toUpperCase() + title.substring(1);
+            title = generateHumanReadableTitle(issueData);
         }
         issue.setTitle(title);
         issue.setDescription(getStringValue(issueData, "description"));
         issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM"));
         issue.setCategory(getStringValue(issueData, "category", "GENERAL"));
         issue.setFile(getStringValue(issueData, "file"));
-        issue.setLine(getIntValue(issueData, "line"));
+        // Enhanced line number extraction
+        Integer lineNumber = extractLineNumber(issueData);
+        issue.setLine(lineNumber != null ? lineNumber : 1); // Default to 1 instead of 0
         issue.setColumn(getIntValue(issueData, "column"));
         issue.setCode(getStringValue(issueData, "code"));
         issue.setLanguage(getStringValue(issueData, "language"));
@@ -276,7 +519,73 @@ public class DataAggregationService {
         
         return issue;
     }
-    
+    /**
+     * Extract line number from various possible formats
+     */
+    private Integer extractLineNumber(Map<String, Object> issueData) {
+        // Try multiple possible keys for line number
+        String[] lineKeys = {"line", "lineNumber", "startLine", "line_number", "lineNum"};
+        
+        for (String key : lineKeys) {
+            Object lineValue = issueData.get(key);
+            if (lineValue != null) {
+                try {
+                    if (lineValue instanceof Number) {
+                        int line = ((Number) lineValue).intValue();
+                        return line > 0 ? line : 1; // Ensure positive line numbers
+                    } else {
+                        int line = Integer.parseInt(lineValue.toString());
+                        return line > 0 ? line : 1;
+                    }
+                } catch (NumberFormatException e) {
+                    // Continue to next key
+                }
+            }
+        }
+        
+        // Try to extract from location string if available
+        String location = getStringValue(issueData, "location");
+        if (location != null && location.contains(":")) {
+            try {
+                String lineStr = location.substring(location.lastIndexOf(":") + 1);
+                int line = Integer.parseInt(lineStr.trim());
+                return line > 0 ? line : 1;
+            } catch (Exception e) {
+                // Ignore parsing errors
+            }
+        }
+        
+        // Try to extract from file path with line number (format: file.java:123)
+        String filePath = getStringValue(issueData, "file");
+        if (filePath != null && filePath.contains(":")) {
+            try {
+                String lineStr = filePath.substring(filePath.lastIndexOf(":") + 1);
+                int line = Integer.parseInt(lineStr.trim());
+                return line > 0 ? line : 1;
+            } catch (Exception e) {
+                // Ignore parsing errors
+            }
+        }
+        
+        // Try to extract from code snippet context if available
+        String codeSnippet = getStringValue(issueData, "codeSnippet");
+        if (codeSnippet != null && codeSnippet.contains("line")) {
+            try {
+                // Look for patterns like "line 45" or "Line: 123"
+                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("line[\\s:]+([0-9]+)", java.util.regex.Pattern.CASE_INSENSITIVE);
+                java.util.regex.Matcher matcher = pattern.matcher(codeSnippet);
+                if (matcher.find()) {
+                    int line = Integer.parseInt(matcher.group(1));
+                    return line > 0 ? line : 1;
+                }
+            } catch (Exception e) {
+                // Ignore parsing errors
+            }
+        }
+        
+        log.debug("⚠️ Could not extract line number from issue data: {}", issueData.keySet());
+        return 1; // Default to line 1 instead of null/0
+    }
     /**
      * Create Suggestion from suggestion data
      */
@@ -339,7 +648,44 @@ public class DataAggregationService {
         
         return suggestion;
     }
-    
+    /**
+     * Generate human-readable title from issue data
+     */
+    private String generateHumanReadableTitle(Map<String, Object> issueData) {
+        String type = getStringValue(issueData, "type", "Unknown Issue");
+        String severity = getStringValue(issueData, "severity", "");
+        String category = getStringValue(issueData, "category", "");
+        
+        // Handle specific issue types with better naming
+        String humanTitle = switch (type.toUpperCase()) {
+            case "SQL_INJECTION" -> "SQL Injection Vulnerability";
+            case "XSS", "CROSS_SITE_SCRIPTING" -> "Cross-Site Scripting (XSS)";
+            case "HARDCODED_CREDENTIALS" -> "Hardcoded Credentials";
+            case "INSECURE_DESERIALIZATION" -> "Insecure Deserialization";
+            case "INEFFICIENT_LOOP" -> "Inefficient Loop";
+            case "MEMORY_LEAK" -> "Memory Leak";
+            case "BLOCKING_IO" -> "Blocking I/O Operation";
+            case "RESOURCE_LEAK" -> "Resource Leak";
+            case "MISSING_ERROR_HANDLING" -> "Missing Error Handling";
+            case "INEFFICIENT_DATABASE_QUERY" -> "Inefficient Database Query";
+            case "MISSING_CACHE" -> "Missing Cache";
+            case "POTENTIAL_MEMORY_LEAK" -> "Potential Memory Leak";
+            default -> {
+                // Generic cleanup for other types
+                String cleaned = type.replaceAll("_", " ").toLowerCase();
+                yield cleaned.substring(0, 1).toUpperCase() + cleaned.substring(1);
+            }
+        };
+        
+        // Add severity qualifier for critical issues
+        if ("CRITICAL".equalsIgnoreCase(severity)) {
+            humanTitle = "Critical: " + humanTitle;
+        } else if ("HIGH".equalsIgnoreCase(severity) && "SECURITY".equalsIgnoreCase(category)) {
+            humanTitle = "High Risk: " + humanTitle;
+        }
+        
+        return humanTitle;
+    }
     /**
      * Create summary from detected issues
      */
@@ -465,10 +811,15 @@ public class DataAggregationService {
     private Integer getIntValue(Map<String, Object> map, String key) {
         Object value = map.get(key);
         if (value instanceof Number) {
-            return ((Number) value).intValue();
+            int intValue = ((Number) value).intValue();
+            return intValue > 0 ? intValue : null; // Don't return 0 or negative values
         }
         try {
-            return value != null ? Integer.parseInt(value.toString()) : null;
+            if (value != null) {
+                int intValue = Integer.parseInt(value.toString());
+                return intValue > 0 ? intValue : null; // Don't return 0 or negative values
+            }
+            return null;
         } catch (NumberFormatException e) {
             return null;
         }

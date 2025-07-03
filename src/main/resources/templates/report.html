@@ -147,6 +147,31 @@
 		.no-cve {
 			display: none;
 		}
+		/* Ensure consistent badge styling */
+		.badge {
+		    font-size: 0.75rem;
+		    font-weight: 600;
+		    padding: 0.375rem 0.75rem;
+		}
+
+		.bg-warning {
+		    background-color: #ffc107 !important;
+		    color: #000 !important;
+		}
+
+		.bg-info {
+		    background-color: #0dcaf0 !important;
+		    color: #000 !important;
+		}
+
+		.bg-danger, .bg-success, .bg-secondary {
+		    color: #fff !important;
+		}
+
+		/* Fix for table row highlighting */
+		.table .badge {
+		    font-size: 0.8rem;
+		}
 	</style>
 </head>
 
@@ -402,10 +427,12 @@
 															(${issue.severity == 'HIGH'} ? 'table-warning' : '')">
 											<td>
 												<span class="badge"
-													th:classappend="${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
-																	(${issue.severity == 'HIGH'} ? 'bg-warning' : 
-																	(${issue.severity == 'MEDIUM'} ? 'bg-info' : 'bg-secondary'))"
-													th:text="${issue.severity}"></span>
+												    th:classappend="
+												        ${issue.severity == 'CRITICAL'} ? 'bg-danger text-white' : 
+												        (${issue.severity == 'HIGH'} ? 'bg-warning text-dark' : 
+												        (${issue.severity == 'MEDIUM'} ? 'bg-info text-white' : 
+												        (${issue.severity == 'LOW'} ? 'bg-success text-white' : 'bg-secondary text-white')))"
+												    th:text="${issue.severity}"></span>
 											</td>
 											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
 												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
