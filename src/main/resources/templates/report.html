@@ -341,7 +341,8 @@
 																<h6 class="text-danger">Search for:</h6>
 																<div class="position-relative">
 																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-sec-search\')'">
+																		th:data-element-id="${issue.issueId} + '-sec-search'"
+																		onclick="copyToClipboardById(this, this.dataset.elementId)">
 																		<i class="bi bi-clipboard"></i>
 																	</button>
 																	<pre class="bg-white border rounded p-3" 
@@ -353,8 +354,9 @@
 																<h6 class="text-success">Replace with:</h6>
 																<div class="position-relative">
 																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-sec-replace\')'">
-																		<i class="bi bi-clipboard"></i>
+																	    th:data-element-id="${issue.issueId} + '-sec-replace'"
+																	    onclick="copyToClipboardById(this, this.dataset.elementId)">
+																	    <i class="bi bi-clipboard"></i>
 																	</button>
 																	<pre class="bg-white border rounded p-3" 
 																		th:id="${issue.issueId} + '-sec-replace'"
@@ -443,8 +445,9 @@
 																<h6 class="text-danger">Search for:</h6>
 																<div class="position-relative">
 																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-other-search\')'">
-																		<i class="bi bi-clipboard"></i>
+																	    th:data-element-id="${issue.issueId} + '-other-search'"
+																	    onclick="copyToClipboardById(this, this.dataset.elementId)">
+																	    <i class="bi bi-clipboard"></i>
 																	</button>
 																	<pre class="bg-white border rounded p-3" 
 																		th:id="${issue.issueId} + '-other-search'"
@@ -455,8 +458,9 @@
 																<h6 class="text-success">Replace with:</h6>
 																<div class="position-relative">
 																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-other-replace\')'">
-																		<i class="bi bi-clipboard"></i>
+																	    th:data-element-id="${issue.issueId} + '-other-replace'"
+																	    onclick="copyToClipboardById(this, this.dataset.elementId)">
+																	    <i class="bi bi-clipboard"></i>
 																	</button>
 																	<pre class="bg-white border rounded p-3" 
 																		th:id="${issue.issueId} + '-other-replace'"
@@ -525,6 +529,11 @@
 			} else {
 				fallbackCopyToClipboard(textToCopy, button);
 			}
+		}
+
+		// New function that uses data attributes instead of concatenated parameters
+		function copyToClipboardById(button, elementId) {
+			copyToClipboard(button, elementId);
 		}
 
 		function showCopySuccess(button) {
