@@ -264,16 +264,60 @@ public class AnalysisController {
             ReportResponse report = reportService.getReport(analysisId);
 
             // Segregate issues by type
+         // Segregate issues by type with severity-based sorting
             List<Issue> securityIssues = report.getIssues().stream()
-            	    .filter(i -> i.getCategory() != null && 
-            	                ("SECURITY".equalsIgnoreCase(i.getCategory()) || 
-            	                 "security".equalsIgnoreCase(i.getCategory()) ||
-            	                 i.getType() != null && i.getType().toUpperCase().contains("SECURITY")))
-            	    .collect(Collectors.toList());
+                .filter(i -> i.getCategory() != null && 
+                            ("SECURITY".equalsIgnoreCase(i.getCategory()) || 
+                             "security".equalsIgnoreCase(i.getCategory()) ||
+                             i.getType() != null && i.getType().toUpperCase().contains("SECURITY")))
+                .sorted((issue1, issue2) -> {
+                    // Primary sort: by severity (CRITICAL > HIGH > MEDIUM > LOW)
+                    int severityComparison = Integer.compare(
+                        getSeverityPriority(issue2.getSeverity()), 
+                        getSeverityPriority(issue1.getSeverity())
+                    );
+                    if (severityComparison != 0) return severityComparison;
+                    
+                    // Secondary sort: by CVE score (higher scores first)
+                    double score1 = issue1.getCveScore() != null ? issue1.getCveScore() : 0.0;
+                    double score2 = issue2.getCveScore() != null ? issue2.getCveScore() : 0.0;
+                    int scoreComparison = Double.compare(score2, score1);
+                    if (scoreComparison != 0) return scoreComparison;
+                    
+                    // Tertiary sort: by file name for consistency
+                    return issue1.getFile() != null && issue2.getFile() != null ? 
+                           issue1.getFile().compareTo(issue2.getFile()) : 0;
+                })
+                .collect(Collectors.toList());
             
             List<Issue> otherIssues = report.getIssues().stream()
-                .filter(i -> !securityIssues.contains(i))
-                .collect(Collectors.toList());
+            	    .filter(i -> !securityIssues.contains(i))
+            	    .sorted((issue1, issue2) -> {
+            	        // Primary sort: by severity (HIGH > MEDIUM > LOW > INFO)
+            	        int severityComparison = Integer.compare(
+            	            getSeverityPriority(issue2.getSeverity()), 
+            	            getSeverityPriority(issue1.getSeverity())
+            	        );
+            	        if (severityComparison != 0) return severityComparison;
+            	        
+            	        // Secondary sort: by category (performance > quality > best-practices)
+            	        int categoryComparison = Integer.compare(
+            	            getCategoryPriority(issue2.getCategory()),
+            	            getCategoryPriority(issue1.getCategory())
+            	        );
+            	        if (categoryComparison != 0) return categoryComparison;
+            	        
+            	        // Tertiary sort: by line number for issues in same file
+            	        if (issue1.getFile() != null && issue2.getFile() != null && 
+            	            issue1.getFile().equals(issue2.getFile())) {
+            	            return Integer.compare(issue1.getLine(), issue2.getLine());
+            	        }
+            	        
+            	        // Final sort: by file name
+            	        return issue1.getFile() != null && issue2.getFile() != null ? 
+            	               issue1.getFile().compareTo(issue2.getFile()) : 0;
+            	    })
+            	    .collect(Collectors.toList());
 
          // Debug logging
             log.info("Total issues found: {}", report.getIssues().size());
@@ -310,5 +354,28 @@ public class AnalysisController {
             model.addAttribute("error", "Error loading report: " + e.getMessage());
             return "error";
         }
+    }
+    
+ // Helper method for severity priority
+    private int getSeverityPriority(String severity) {
+        if (severity == null) return 0;
+        return switch (severity.toUpperCase()) {
+            case "CRITICAL" -> 4;
+            case "HIGH" -> 3;
+            case "MEDIUM" -> 2;
+            case "LOW" -> 1;
+            default -> 0;
+        };
+    }
+
+    // Helper method for category priority
+    private int getCategoryPriority(String category) {
+        if (category == null) return 0;
+        return switch (category.toLowerCase()) {
+            case "performance" -> 3;
+            case "quality" -> 2;
+            case "best-practices" -> 1;
+            default -> 0;
+        };
     }
 }
