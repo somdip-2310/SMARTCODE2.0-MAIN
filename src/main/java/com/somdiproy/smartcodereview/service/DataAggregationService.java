@@ -152,6 +152,7 @@ public class DataAggregationService {
         Map<String, Map<String, Object>> suggestionsByIssueId = new HashMap<>();
         
         // Extract suggestions from response
+     // Extract suggestions from response
         if (results.getSuggestionResponse() != null) {
             List<Map<String, Object>> suggestions = 
                 (List<Map<String, Object>>) results.getSuggestionResponse().get("suggestions");
@@ -163,6 +164,12 @@ public class DataAggregationService {
                     }
                 }
             }
+        }
+
+        // FALLBACK: If no suggestions found in response, try to fetch from DynamoDB directly
+        if (suggestionsByIssueId.isEmpty() && results.getDetectedIssues() != null) {
+            log.info("No suggestions found in response, attempting to fetch from DynamoDB for analysis {}", analysisId);
+            suggestionsByIssueId = fetchSuggestionsFromDynamoDB(analysisId, results.getDetectedIssues());
         }
         
         // Create Issue objects from detected issues
@@ -182,6 +189,57 @@ public class DataAggregationService {
         }
         
         return issues;
+    }
+    
+    /**
+     * Fallback method to fetch suggestions directly from DynamoDB
+     */
+    private Map<String, Map<String, Object>> fetchSuggestionsFromDynamoDB(String analysisId, List<Map<String, Object>> detectedIssues) {
+        Map<String, Map<String, Object>> suggestionsByIssueId = new HashMap<>();
+        
+        try {
+            // Try to query issue-details table for existing suggestions
+            for (Map<String, Object> issue : detectedIssues) {
+                String issueId = (String) issue.get("id");
+                if (issueId != null) {
+                    // Check if this issue has a suggestion stored
+                    Optional<Issue> existingIssue = issueDetailsRepository.findByAnalysisIdAndIssueId(analysisId, issueId);
+                    if (existingIssue.isPresent() && existingIssue.get().getSuggestion() != null) {
+                        // Convert existing suggestion to the format expected by createIssuesWithSuggestions
+                        Map<String, Object> suggestionData = convertSuggestionToMap(existingIssue.get().getSuggestion());
+                        suggestionData.put("issueId", issueId);
+                        suggestionsByIssueId.put(issueId, suggestionData);
+                        log.debug("Found existing suggestion for issue: {}", issueId);
+                    }
+                }
+            }
+            
+            log.info("Retrieved {} existing suggestions from DynamoDB for analysis {}", 
+                    suggestionsByIssueId.size(), analysisId);
+            
+        } catch (Exception e) {
+            log.warn("Failed to fetch suggestions from DynamoDB for analysis {}: {}", analysisId, e.getMessage());
+        }
+        
+        return suggestionsByIssueId;
+    }
+
+    /**
+     * Convert Suggestion object to Map format for processing
+     */
+    private Map<String, Object> convertSuggestionToMap(Suggestion suggestion) {
+        Map<String, Object> suggestionMap = new HashMap<>();
+        
+        if (suggestion.getImmediateFix() != null) {
+            Map<String, Object> immediateFix = new HashMap<>();
+            immediateFix.put("title", suggestion.getImmediateFix().getTitle());
+            immediateFix.put("searchCode", suggestion.getImmediateFix().getSearchCode());
+            immediateFix.put("replaceCode", suggestion.getImmediateFix().getReplaceCode());
+            immediateFix.put("explanation", suggestion.getImmediateFix().getExplanation());
+            suggestionMap.put("immediateFix", immediateFix);
+        }
+        
+        return suggestionMap;
     }
     
     /**
