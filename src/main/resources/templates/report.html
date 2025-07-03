@@ -400,13 +400,15 @@
 		</div>
 
 		<!-- Additional Security Improvements Section -->
+		<!-- Additional Security Improvements Section -->
 		<div class="row mb-4" th:if="${additionalSecurityIssues != null and !additionalSecurityIssues.isEmpty()}">
 		    <div class="col-12">
 		        <div class="card border-warning">
-		            <div class="card-header bg-warning text-dark">
-		                <h3 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Additional Security Improvements</h3>
-		                <small>These issues require manual review and don't have automated fixes</small>
-		            </div>
+					<div class="card-header bg-warning text-dark">
+					    <h3 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Additional Security Improvements</h3>
+					    <small>These issues require manual review and don't have automated fixes</small>
+					    <button class="btn btn-sm btn-outline-dark float-end" onclick="testAdditionalSecurityCollapse()">Debug Collapse</button>
+					</div>
 		            <div class="card-body">
 		                <div class="table-responsive">
 		                    <table class="table table-hover">
@@ -439,21 +441,31 @@
 		                                        <button class="btn btn-sm btn-outline-warning" type="button"
 		                                            data-bs-toggle="collapse"
 		                                            th:attr="data-bs-target='#additional-security-detail-' + ${issue.issueId}"
-		                                            aria-expanded="false">
+		                                            aria-expanded="false"
+		                                            th:onclick="'console.log(\"Clicking for issue: ' + ${issue.issueId} + '\");'">
 		                                            View Fix
 		                                        </button>
 		                                    </td>
 		                                </tr>
-		                                <!-- Inline collapsible row for fix details -->
-		                                <tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
-		                                    class="collapse" th:id="'additional-security-detail-' + ${issue.issueId}">
+		                                <!-- Inline collapsible row for fix details - ALWAYS show for additional security issues -->
+		                                <tr class="collapse" th:id="'additional-security-detail-' + ${issue.issueId}">
 		                                    <td colspan="6" class="p-0 inline-fix">
 		                                        <div class="card border-0 rounded-0">
 		                                            <div class="card-body bg-light">
 		                                                <h6 class="mb-3"><i class="bi bi-lightbulb text-warning"></i> Manual Review Required</h6>
-		                                                <p class="mb-3" th:text="${issue.suggestion.immediateFix.explanation}">Fix explanation</p>
 		                                                
-		                                                <div class="row">
+		                                                <!-- Show explanation if available -->
+		                                                <div th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null}">
+		                                                    <p class="mb-3" th:text="${issue.suggestion.immediateFix.explanation}">This issue requires manual security review.</p>
+		                                                </div>
+		                                                
+		                                                <!-- Show generic guidance if no specific explanation -->
+		                                                <div th:if="${issue.suggestion == null or issue.suggestion.immediateFix == null or issue.suggestion.immediateFix.explanation == null}">
+		                                                    <p class="mb-3">This security issue requires manual review and implementation of appropriate security measures. Please refer to security best practices for <span th:text="${issue.type}">this issue type</span>.</p>
+		                                                </div>
+		                                                
+		                                                <!-- Show code details if available -->
+		                                                <div th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" class="row">
 		                                                    <div class="col-md-6">
 		                                                        <h6 class="text-danger">Code to Review:</h6>
 		                                                        <div class="position-relative">
@@ -464,11 +476,11 @@
 		                                                            </button>
 		                                                            <pre class="bg-white border rounded p-3" 
 		                                                                th:id="${issue.issueId} + '-additional-search'"
-		                                                                th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+		                                                                th:text="${issue.suggestion.immediateFix.searchCode != null ? issue.suggestion.immediateFix.searchCode : 'Review code at line ' + ${issue.line} + ' in ' + ${issue.file}}">Search code</pre>
 		                                                        </div>
 		                                                    </div>
 		                                                    <div class="col-md-6">
-		                                                        <h6 class="text-success">Recommended Solution:</h6>
+		                                                        <h6 class="text-success">Recommended Action:</h6>
 		                                                        <div class="position-relative">
 		                                                            <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
 		                                                                th:data-element-id="${issue.issueId} + '-additional-replace'"
@@ -477,9 +489,20 @@
 		                                                            </button>
 		                                                            <pre class="bg-white border rounded p-3" 
 		                                                                th:id="${issue.issueId} + '-additional-replace'"
-		                                                                th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+		                                                                th:text="${issue.suggestion.immediateFix.replaceCode != null ? issue.suggestion.immediateFix.replaceCode : 'Apply appropriate security measures for ' + ${issue.type} + ' vulnerability. Refer to OWASP guidelines.'}">Replace code</pre>
 		                                                        </div>
 		                                                    </div>
+		                                                </div>
+		                                                
+		                                                <!-- Show generic guidance if no suggestion details -->
+		                                                <div th:if="${issue.suggestion == null or issue.suggestion.immediateFix == null}" class="alert alert-info">
+		                                                    <h6><i class="bi bi-info-circle"></i> Security Recommendations:</h6>
+		                                                    <ul class="mb-0">
+		                                                        <li>Review the code at line <span th:text="${issue.line}">X</span> in <code th:text="${issue.file}">filename</code></li>
+		                                                        <li>Implement appropriate security controls for <span th:text="${issue.type}">this issue type</span></li>
+		                                                        <li>Follow OWASP security guidelines</li>
+		                                                        <li>Consider security testing and code review</li>
+		                                                    </ul>
 		                                                </div>
 		                                            </div>
 		                                        </div>
@@ -690,17 +713,69 @@
 	
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
+		// Debug function to test collapse functionality
+		function debugCollapseClick(issueId) {
+			console.log('Debugging collapse for issue:', issueId);
+			const button = document.querySelector(`[data-bs-target="#additional-security-detail-${issueId}"]`);
+			const target = document.getElementById(`additional-security-detail-${issueId}`);
+			
+			console.log('Button found:', button);
+			console.log('Target found:', target);
+			
+			if (target) {
+				const bsCollapse = new bootstrap.Collapse(target, { toggle: false });
+				bsCollapse.toggle();
+			}
+		}
+
 		// Initialize Bootstrap components when DOM is loaded
 		document.addEventListener('DOMContentLoaded', function () {
-			// Initialize all collapse elements but don't toggle them
-			var collapseElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="collapse"]'));
-			var collapseList = collapseElementList.map(function (collapseEl) {
-				return new bootstrap.Collapse(collapseEl, {
-					toggle: false
+			console.log('DOM loaded, initializing Bootstrap components...');
+			
+			// Let Bootstrap handle collapse automatically - don't manually initialize
+			// The data-bs-toggle and data-bs-target attributes should work automatically
+			
+			// Add click event listeners for debugging
+			document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(button) {
+				button.addEventListener('click', function(e) {
+					console.log('Collapse button clicked:', this.getAttribute('data-bs-target'));
+					console.log('Button element:', this);
 				});
 			});
+			
+			// Check if Bootstrap is loaded
+			if (typeof bootstrap !== 'undefined') {
+				console.log('Bootstrap is loaded successfully');
+			} else {
+				console.error('Bootstrap is not loaded!');
+			}
 		});
 	</script>
+<script>
+// Debug function for Additional Security Improvements
+function testAdditionalSecurityCollapse() {
+    const additionalButtons = document.querySelectorAll('[data-bs-target*="additional-security-detail-"]');
+    console.log('Found', additionalButtons.length, 'additional security buttons');
+    
+    additionalButtons.forEach((button, index) => {
+        const target = button.getAttribute('data-bs-target');
+        const targetElement = document.querySelector(target);
+        console.log(`Button ${index + 1}:`, {
+            button: button,
+            target: target,
+            targetExists: !!targetElement,
+            targetElement: targetElement
+        });
+    });
+    
+    // Test the first button if available
+    if (additionalButtons.length > 0) {
+        console.log('Testing first additional security button...');
+        additionalButtons[0].click();
+    }
+}
+</script>
+
 </body>
 
 </html>
