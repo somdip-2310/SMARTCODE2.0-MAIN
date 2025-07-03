@@ -192,7 +192,15 @@ public class DataAggregationService {
         issue.setAnalysisId(analysisId);
         issue.setIssueId(getStringValue(issueData, "id", UUID.randomUUID().toString()));
         issue.setType(getStringValue(issueData, "type"));
-        issue.setTitle(getStringValue(issueData, "title"));
+        // Set title with fallback to type if title is null
+        String title = getStringValue(issueData, "title");
+        if (title == null || title.isEmpty()) {
+            title = getStringValue(issueData, "type", "Unknown Issue");
+            // Make it more human-readable
+            title = title.replaceAll("_", " ").toLowerCase();
+            title = title.substring(0, 1).toUpperCase() + title.substring(1);
+        }
+        issue.setTitle(title);
         issue.setDescription(getStringValue(issueData, "description"));
         issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM"));
         issue.setCategory(getStringValue(issueData, "category", "GENERAL"));

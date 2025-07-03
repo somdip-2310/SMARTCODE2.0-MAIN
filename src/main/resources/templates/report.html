@@ -118,26 +118,34 @@
 			vertical-align: middle;
 		}
 
-		.table td:nth-child(2) { /* Issue column for Security table */
+		.table td:nth-child(3) { /* Issue column */
 			width: 40%;
 			max-width: 400px;
 		}
 
-		.table td:nth-child(3) { /* Issue column for Performance table */
-			width: 40%;
-			max-width: 400px;
-		}
-
-		.table td:nth-child(4) { /* File column for Security table */
+		.table td:nth-child(4) { /* File column */
 			width: 20%;
 			max-width: 200px;
 			word-break: break-all;
 		}
 
-		.table td:nth-child(3) { /* File column for Performance table */
-			width: 20%;
-			max-width: 200px;
-			word-break: break-all;
+		/* Inline fix display styling */
+		.inline-fix {
+			background-color: #f8f9fa;
+			border-top: 2px solid #e9ecef;
+		}
+
+		.inline-fix .card-body {
+			padding: 20px;
+		}
+
+		.inline-fix .row {
+			margin-top: 15px;
+		}
+
+		/* Hide rows without CVE data */
+		.no-cve {
+			display: none;
 		}
 	</style>
 </head>
@@ -266,9 +274,8 @@
 			</div>
 		</div>
 
-
 		<!-- Security Issues Section -->
-		<div class="row mb-4" th:if="${securityIssues != null}">
+		<div class="row mb-4" th:if="${securityIssues != null and !securityIssues.isEmpty()}">
 			<div class="col-12">
 				<div class="card border-danger">
 					<div class="card-header bg-danger text-white">
@@ -288,76 +295,80 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr th:each="issue : ${securityIssues}">
-										<td>
-											<span th:text="${issue.cveId}">-</span>
-										</td>
-										<td>
-											<span class="badge bg-danger" th:if="${issue.cveScore != null}"
-												th:text="${issue.cveScore}">-</span>
-											<span th:unless="${issue.cveScore != null}">-</span>
-										</td>
-										<td th:text="${issue.title}"></td>
-										<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
-										<td th:text="${issue.line}"></td>
-										<td>
-											<button class="btn btn-sm btn-primary" type="button"
-												data-bs-toggle="collapse"
-												th:attr="data-bs-target='#security-detail-' + ${issue.issueId}"
-												aria-expanded="false">
-												View Fix
-											</button>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-
-						<!-- Security Issue Details (Collapsible) -->
-						<div th:each="issue : ${securityIssues}">
-							<div class="collapse mt-3" th:id="'security-detail-' + ${issue.issueId}">
-								<div class="card">
-									<div class="card-body">
-										<h5 th:text="${issue.title}">Issue Title</h5>
-										<p th:text="${issue.description}">Description</p>
-
-										<div th:if="${issue.suggestion != null}" class="fix-section">
-											<h6><i class="bi bi-lightbulb"></i> Recommended Fix</h6>
-
-											<div th:if="${issue.suggestion.immediateFix != null}" class="mb-3">
-												<p
-													th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'Analysis in progress...'}">
-													Explanation</p>
-
-												<div class="search-replace">
-													<div>
-														<strong>Search for:</strong>
-														<div class="code-block position-relative">
-															<button class="copy-button btn btn-sm btn-outline-secondary"
-																th:onclick="'copyToClipboard(this, \'' + issue.issueId + '-sec-search\')'">
-																<i class="bi bi-clipboard"></i> Copy
-															</button>
-															<pre th:id="${issue.issueId + '-sec-search'}"
-																th:text="${issue.suggestion.immediateFix.searchCode}">search code</pre>
-														</div>
-													</div>
-													<div>
-														<strong>Replace with:</strong>
-														<div class="code-block position-relative">
-															<button class="copy-button btn btn-sm btn-outline-secondary"
-																th:onclick="'copyToClipboard(this, \'' + issue.issueId + '-sec-replace\')'">
-																<i class="bi bi-clipboard"></i> Copy
-															</button>
-															<pre th:id="${issue.issueId + '-sec-replace'}"
-																th:text="${issue.suggestion.immediateFix.replaceCode}">replace code</pre>
+									<th:block th:each="issue : ${securityIssues}">
+										<!-- Only show row if it has CVE data OR if it has a suggestion -->
+										<tr th:if="${(issue.cveId != null and !issue.cveId.isEmpty()) or 
+													 (issue.cveScore != null) or 
+													 (issue.suggestion != null and issue.suggestion.immediateFix != null)}">
+											<td>
+												<span th:text="${issue.cveId ?: '-'}">-</span>
+											</td>
+											<td>
+												<span class="badge bg-danger" th:if="${issue.cveScore != null}"
+													th:text="${#numbers.formatDecimal(issue.cveScore, 1, 1)}">-</span>
+												<span th:unless="${issue.cveScore != null}">-</span>
+											</td>
+											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
+												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
+											<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? 
+												issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
+											<td th:text="${issue.line}"></td>
+											<td>
+												<button th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
+													class="btn btn-sm btn-primary" type="button"
+													data-bs-toggle="collapse"
+													th:attr="data-bs-target='#security-detail-' + ${issue.issueId}"
+													aria-expanded="false">
+													View Fix
+												</button>
+												<span th:unless="${issue.suggestion != null and issue.suggestion.immediateFix != null}"
+													class="badge bg-secondary">
+													No Fix Available
+												</span>
+											</td>
+										</tr>
+										<!-- Inline collapsible row for fix details -->
+										<tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
+											class="collapse" th:id="'security-detail-' + ${issue.issueId}">
+											<td colspan="6" class="p-0 inline-fix">
+												<div class="card border-0 rounded-0">
+													<div class="card-body bg-light">
+														<h6 class="mb-3"><i class="bi bi-lightbulb text-warning"></i> Recommended Fix</h6>
+														<p class="mb-3" th:text="${issue.suggestion.immediateFix.explanation}">Fix explanation</p>
+														
+														<div class="row">
+															<div class="col-md-6">
+																<h6 class="text-danger">Search for:</h6>
+																<div class="position-relative">
+																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-sec-search\')'">
+																		<i class="bi bi-clipboard"></i>
+																	</button>
+																	<pre class="bg-white border rounded p-3" 
+																		th:id="${issue.issueId} + '-sec-search'"
+																		th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<h6 class="text-success">Replace with:</h6>
+																<div class="position-relative">
+																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-sec-replace\')'">
+																		<i class="bi bi-clipboard"></i>
+																	</button>
+																	<pre class="bg-white border rounded p-3" 
+																		th:id="${issue.issueId} + '-sec-replace'"
+																		th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+																</div>
+															</div>
 														</div>
 													</div>
 												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+											</td>
+										</tr>
+									</th:block>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
@@ -384,95 +395,91 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr th:each="issue : ${otherIssues}" th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : 
-		                                                       (${issue.severity == 'HIGH'} ? 'table-warning' : '')">
-										<td>
-											<span class="badge"
-												th:classappend="${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
-		                                                                (${issue.severity == 'HIGH'} ? 'bg-warning' : 
-		                                                                (${issue.severity == 'MEDIUM'} ? 'bg-info' : 'bg-secondary'))"
-												th:text="${issue.severity}"></span>
-										</td>
-										<td th:text="${issue.title}"></td>
-										<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
-										<td th:text="${issue.line}"></td>
-										<td>
-											<button class="btn btn-sm btn-primary" type="button"
-												data-bs-toggle="collapse"
-												th:attr="data-bs-target='#other-detail-' + ${issue.issueId}"
-												aria-expanded="false">
-												View Fix
-											</button>
-										</td>
-									</tr>
+									<th:block th:each="issue : ${otherIssues}">
+										<tr th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : 
+															(${issue.severity == 'HIGH'} ? 'table-warning' : '')">
+											<td>
+												<span class="badge"
+													th:classappend="${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
+																	(${issue.severity == 'HIGH'} ? 'bg-warning' : 
+																	(${issue.severity == 'MEDIUM'} ? 'bg-info' : 'bg-secondary'))"
+													th:text="${issue.severity}"></span>
+											</td>
+											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
+												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
+											<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? 
+												issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
+											<td th:text="${issue.line}"></td>
+											<td>
+												<button th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
+													class="btn btn-sm btn-primary" type="button"
+													data-bs-toggle="collapse"
+													th:attr="data-bs-target='#other-detail-' + ${issue.issueId}"
+													aria-expanded="false">
+													View Fix
+												</button>
+												<span th:unless="${issue.suggestion != null and issue.suggestion.immediateFix != null}"
+													class="badge bg-secondary">
+													No Fix Available
+												</span>
+											</td>
+										</tr>
+										<!-- Inline collapsible row for fix details -->
+										<tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
+											class="collapse" th:id="'other-detail-' + ${issue.issueId}">
+											<td colspan="5" class="p-0 inline-fix">
+												<div class="card border-0 rounded-0">
+													<div class="card-body bg-light">
+														<h6 class="mb-3"><i class="bi bi-lightbulb text-warning"></i> Recommended Fix</h6>
+														<p class="mb-3" th:text="${issue.suggestion.immediateFix.explanation}">Fix explanation</p>
+														
+														<div th:if="${issue.description != null and !issue.description.isEmpty()}" class="mb-3">
+															<h6>Issue Description:</h6>
+															<p th:text="${issue.description}">Issue description</p>
+														</div>
+
+														<div class="row">
+															<div class="col-md-6">
+																<h6 class="text-danger">Search for:</h6>
+																<div class="position-relative">
+																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-other-search\')'">
+																		<i class="bi bi-clipboard"></i>
+																	</button>
+																	<pre class="bg-white border rounded p-3" 
+																		th:id="${issue.issueId} + '-other-search'"
+																		th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<h6 class="text-success">Replace with:</h6>
+																<div class="position-relative">
+																	<button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+																		th:onclick="'copyToClipboard(this, \'' + ${issue.issueId} + '-other-replace\')'">
+																		<i class="bi bi-clipboard"></i>
+																	</button>
+																	<pre class="bg-white border rounded p-3" 
+																		th:id="${issue.issueId} + '-other-replace'"
+																		th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+																</div>
+															</div>
+														</div>
+
+														<!-- Include other suggestion sections if available -->
+														<div th:if="${issue.suggestion.bestPractice != null}" class="mt-4">
+															<h6><i class="bi bi-star text-primary"></i> Best Practice</h6>
+															<p th:text="${issue.suggestion.bestPractice.title}">Best practice title</p>
+															<div class="code-block" th:if="${issue.suggestion.bestPractice.code != null}">
+																<pre th:text="${issue.suggestion.bestPractice.code}">best practice code</pre>
+															</div>
+														</div>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</th:block>
 								</tbody>
 							</table>
-						</div>
-
-						<!-- Other Issue Details (Collapsible) -->
-						<div th:each="issue : ${otherIssues}">
-							<div class="collapse mt-3" th:id="'other-detail-' + ${issue.issueId}">
-								<div class="card">
-									<div class="card-body">
-										<h5 th:text="${issue.title}">Issue Title</h5>
-										<p th:text="${issue.description}">Description</p>
-
-										<div th:if="${issue.code != null}" class="mb-3">
-											<h6>Code Context:</h6>
-											<div class="code-block">
-												<pre th:text="${issue.code}">code snippet</pre>
-											</div>
-										</div>
-
-										<div th:if="${issue.suggestion != null}" class="fix-section">
-											<h6><i class="bi bi-lightbulb"></i> Recommended Fix</h6>
-
-											<div th:if="${issue.suggestion.immediateFix != null}" class="mb-3">
-												<p
-													th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'Analysis in progress...'}">
-													Explanation</p>
-
-												<div class="search-replace">
-													<div>
-														<strong>Search for:</strong>
-														<div class="code-block position-relative">
-															<button class="copy-button btn btn-sm btn-outline-secondary"
-																th:onclick="'copyToClipboard(this, \'' + issue.issueId + '-other-search\')'">
-																<i class="bi bi-clipboard"></i> Copy
-															</button>
-															<pre th:id="${issue.issueId + '-other-search'}"
-																th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.searchCode != null ? issue.suggestion.immediateFix.searchCode : '// Code pattern to search'}">search code</pre>
-														</div>
-													</div>
-													<div>
-														<strong>Replace with:</strong>
-														<div class="code-block position-relative">
-															<button class="copy-button btn btn-sm btn-outline-secondary"
-																th:onclick="'copyToClipboard(this, \'' + issue.issueId + '-other-replace\')'">
-																<i class="bi bi-clipboard"></i> Copy
-															</button>
-															<pre th:id="${issue.issueId + '-other-replace'}"
-																th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.replaceCode != null ? issue.suggestion.immediateFix.replaceCode : '// Suggested replacement code'}">replace code</pre>
-														</div>
-													</div>
-												</div>
-											</div>
-
-											<!-- Include other suggestion sections if needed -->
-											<div th:if="${issue.suggestion.bestPractice != null}" class="mb-3">
-												<h6><i class="bi bi-star"></i> Best Practice</h6>
-												<p th:text="${issue.suggestion.bestPractice.title}">Best practice title
-												</p>
-												<div class="code-block"
-													th:if="${issue.suggestion.bestPractice.code != null}">
-													<pre
-														th:text="${issue.suggestion.bestPractice.code}">best practice code</pre>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -480,7 +487,7 @@
 		</div>
 
 		<!-- No Issues Message -->
-		<div class="row" th:if="${report.issues == null or report.issues.isEmpty()}">
+		<div class="row" th:if="${(securityIssues == null or securityIssues.isEmpty()) and (otherIssues == null or otherIssues.isEmpty())}">
 			<div class="col-12">
 				<div class="alert alert-success text-center">
 					<i class="bi bi-check-circle-fill"></i> No issues found in the analyzed code!
@@ -501,27 +508,6 @@
 	<script>
 		function copyToClipboard(button, elementId) {
 			const element = document.getElementById(elementId);
-			const text = element.textContent;
-
-			navigator.clipboard.writeText(text).then(() => {
-				// Change button text temporarily
-				const originalHTML = button.innerHTML;
-				button.innerHTML = '<i class="bi bi-check"></i> Copied!';
-				button.classList.remove('btn-outline-secondary');
-				button.classList.add('btn-success');
-
-				setTimeout(() => {
-					button.innerHTML = originalHTML;
-					button.classList.remove('btn-success');
-					button.classList.add('btn-outline-secondary');
-				}, 2000);
-			}).catch(err => {
-				console.error('Failed to copy text: ', err);
-			});
-		}
-
-		function copyToClipboard(button, elementId) {
-			const element = document.getElementById(elementId);
 			if (!element) {
 				console.error('Element not found:', elementId);
 				return;
@@ -531,26 +517,30 @@
 
 			if (navigator.clipboard && navigator.clipboard.writeText) {
 				navigator.clipboard.writeText(textToCopy).then(() => {
-					const originalText = button.innerHTML;
-					button.innerHTML = '<i class="bi bi-check"></i> Copied!';
-					button.classList.add('btn-success');
-					button.classList.remove('btn-outline-secondary');
-
-					setTimeout(() => {
-						button.innerHTML = originalText;
-						button.classList.remove('btn-success');
-						button.classList.add('btn-outline-secondary');
-					}, 2000);
+					showCopySuccess(button);
 				}).catch(err => {
 					console.error('Failed to copy:', err);
-					fallbackCopyToClipboard(textToCopy);
+					fallbackCopyToClipboard(textToCopy, button);
 				});
 			} else {
-				fallbackCopyToClipboard(textToCopy);
+				fallbackCopyToClipboard(textToCopy, button);
 			}
 		}
 
-		function fallbackCopyToClipboard(text) {
+		function showCopySuccess(button) {
+			const originalText = button.innerHTML;
+			button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+			button.classList.add('btn-success');
+			button.classList.remove('btn-outline-secondary');
+
+			setTimeout(() => {
+				button.innerHTML = originalText;
+				button.classList.remove('btn-success');
+				button.classList.add('btn-outline-secondary');
+			}, 2000);
+		}
+
+		function fallbackCopyToClipboard(text, button) {
 			const textArea = document.createElement("textarea");
 			textArea.value = text;
 			textArea.style.position = "fixed";
@@ -561,24 +551,25 @@
 
 			try {
 				document.execCommand('copy');
-				console.log('Fallback: Copied to clipboard');
+				showCopySuccess(button);
 			} catch (err) {
 				console.error('Fallback: Unable to copy', err);
 			}
 
 			document.body.removeChild(textArea);
 		}
-
 	</script>
+	
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-		// Initialize all collapsible elements
+		// Initialize Bootstrap components when DOM is loaded
 		document.addEventListener('DOMContentLoaded', function () {
-			var collapseElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="collapse"]'))
+			// Initialize all collapse elements but don't toggle them
+			var collapseElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="collapse"]'));
 			var collapseList = collapseElementList.map(function (collapseEl) {
 				return new bootstrap.Collapse(collapseEl, {
 					toggle: false
-				})
+				});
 			});
 		});
 	</script>

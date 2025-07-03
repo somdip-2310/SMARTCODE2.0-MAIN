@@ -275,10 +275,30 @@ public class AnalysisController {
                 .filter(i -> !securityIssues.contains(i))
                 .collect(Collectors.toList());
 
+         // Debug logging
+            log.info("Total issues found: {}", report.getIssues().size());
+            log.info("Security issues: {}", securityIssues.size());
+            log.info("Other issues: {}", otherIssues.size());
+
+            // Log sample data for debugging
+            if (!securityIssues.isEmpty()) {
+                Issue sampleSecurity = securityIssues.get(0);
+                log.info("Sample security issue: title={}, type={}, cveId={}, suggestion={}", 
+                    sampleSecurity.getTitle(), sampleSecurity.getType(), 
+                    sampleSecurity.getCveId(), sampleSecurity.getSuggestion() != null);
+            }
+
+            if (!otherIssues.isEmpty()) {
+                Issue sampleOther = otherIssues.get(0);
+                log.info("Sample other issue: title={}, type={}, category={}, suggestion={}", 
+                    sampleOther.getTitle(), sampleOther.getType(), 
+                    sampleOther.getCategory(), sampleOther.getSuggestion() != null);
+            }
+
             // Add all required attributes for the report template
             model.addAttribute("analysisId", analysisId);
             model.addAttribute("sessionId", sessionId);
-            model.addAttribute("report", report);  // Changed from 'analysis' to 'report'
+            model.addAttribute("report", report);
             model.addAttribute("remainingScans", session.getRemainingScans());
             model.addAttribute("securityIssues", securityIssues);
             model.addAttribute("otherIssues", otherIssues);

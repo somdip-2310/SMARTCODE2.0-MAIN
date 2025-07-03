@@ -136,20 +136,39 @@ public class AnalysisOrchestrator {
             dataAggregationService.storeDetectionResults(analysisId, issues);
             
             // Filter issues for suggestions - only high-severity security issues
-            List<Map<String, Object>> securityIssuesForSuggestions = filterSecurityIssuesForSuggestions(issues, logger);
+            List<Map<String, Object>> securityIssuesForSuggestions = filterSecurityIssuesForSuggestions(issues, log);
 
-            // Stage 4: Suggestions with Nova Premier (security issues only)
+            
+            // Stage 4: Suggestions with Nova Premier (security issues only) - Rate Limited Approach
             log.info("🔒 Stage 4: Generating suggestions for {} high-severity security issues (from {} total issues)", 
                      securityIssuesForSuggestions.size(), issues.size());
-                     
-            String suggestionResponse = lambdaInvokerService.invokeSuggestions(
-                    sessionId,
-                    analysisId,
-                    repoUrl,
-                    branch,
-                    securityIssuesForSuggestions,  // Only security issues
-                    scanNumber
-            );
+
+            // Prevent multiple Lambda instances for same analysis
+            String lockKey = "suggestions_" + analysisId;
+            if (!acquireAnalysisLock(lockKey)) {
+                log.warn("⚠️ Another Lambda instance is already processing suggestions for analysis {}", analysisId);
+                return;
+            }
+
+            try {
+                // Ultra-conservative rate limiting: Process fewer issues to reduce API calls
+                List<Map<String, Object>> reducedIssues = securityIssuesForSuggestions.stream()
+                        .limit(5)  // Limit to top 5 issues to reduce API pressure
+                        .collect(Collectors.toList());
+                
+                log.info("🎯 Processing top {} critical security issues to minimize rate limiting", reducedIssues.size());
+                
+                String suggestionResponse = lambdaInvokerService.invokeSuggestionsWithRateLimit(
+                        sessionId,
+                        analysisId,
+                        repoUrl,
+                        branch,
+                        reducedIssues,  // Reduced issue set
+                        scanNumber
+                );
+            } finally {
+                releaseAnalysisLock(lockKey);
+            }
 
             // Store ALL issues for display (including performance)
             dataAggregationService.storeDetectionResults(analysisId, issues);  // ALL issues for display
@@ -343,5 +362,24 @@ public class AnalysisOrchestrator {
         if (analysis.getProgress() < 33) return 120; // 2 minutes
         if (analysis.getProgress() < 66) return 60;  // 1 minute
         return 30; // 30 seconds
+    }
+    
+    private final ConcurrentHashMap<String, Long> analysisLocks = new ConcurrentHashMap<>();
+    private static final long LOCK_TIMEOUT_MS = 1800000; // 30 minutes
+
+    private boolean acquireAnalysisLock(String lockKey) {
+        long currentTime = System.currentTimeMillis();
+        Long existingLock = analysisLocks.get(lockKey);
+        
+        if (existingLock != null && (currentTime - existingLock) < LOCK_TIMEOUT_MS) {
+            return false; // Lock still active
+        }
+        
+        analysisLocks.put(lockKey, currentTime);
+        return true;
+    }
+
+    private void releaseAnalysisLock(String lockKey) {
+        analysisLocks.remove(lockKey);
     }
 }
