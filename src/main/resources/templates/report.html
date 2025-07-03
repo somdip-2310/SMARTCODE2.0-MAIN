@@ -321,10 +321,12 @@
 								</thead>
 								<tbody>
 									<th:block th:each="issue : ${securityIssues}">
-										<!-- Only show row if it has CVE data OR if it has a suggestion -->
-										<tr th:if="${(issue.cveId != null and !issue.cveId.isEmpty()) or 
-													 (issue.cveScore != null) or 
-													 (issue.suggestion != null and issue.suggestion.immediateFix != null)}">
+									    <!-- Only show rows with actionable suggestions -->
+									    <tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
+									                 issue.suggestion.immediateFix.searchCode != null and 
+									                 !issue.suggestion.immediateFix.searchCode.isEmpty() and
+									                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
+									                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}">
 											<td>
 												<span th:text="${issue.cveId ?: '-'}">-</span>
 											</td>
@@ -339,17 +341,12 @@
 												issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
 											<td th:text="${issue.line}"></td>
 											<td>
-												<button th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
-													class="btn btn-sm btn-primary" type="button"
-													data-bs-toggle="collapse"
-													th:attr="data-bs-target='#security-detail-' + ${issue.issueId}"
-													aria-expanded="false">
-													View Fix
-												</button>
-												<span th:unless="${issue.suggestion != null and issue.suggestion.immediateFix != null}"
-													class="badge bg-secondary">
-													No Fix Available
-												</span>
+											    <button class="btn btn-sm btn-primary" type="button"
+											        data-bs-toggle="collapse"
+											        th:attr="data-bs-target='#security-detail-' + ${issue.issueId}"
+											        aria-expanded="false">
+											        View Fix
+											    </button>
 											</td>
 										</tr>
 										<!-- Inline collapsible row for fix details -->
@@ -402,6 +399,48 @@
 			</div>
 		</div>
 
+		<!-- Additional Security Improvements Section -->
+		<div class="row mb-4" th:if="${additionalSecurityIssues != null and !additionalSecurityIssues.isEmpty()}">
+		    <div class="col-12">
+		        <div class="card border-warning">
+		            <div class="card-header bg-warning text-dark">
+		                <h3 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Additional Security Improvements</h3>
+		                <small>These issues require manual review and don't have automated fixes</small>
+		            </div>
+		            <div class="card-body">
+		                <div class="table-responsive">
+		                    <table class="table table-hover">
+		                        <thead>
+		                            <tr>
+		                                <th>Issue Type</th>
+		                                <th>Description</th>
+		                                <th>File</th>
+		                                <th>Line</th>
+		                                <th>Priority</th>
+		                            </tr>
+		                        </thead>
+		                        <tbody>
+		                            <th:block th:each="issue : ${additionalSecurityIssues}">
+		                                <tr>
+		                                    <td><span class="badge bg-warning text-dark" th:text="${issue.type}">Type</span></td>
+		                                    <td th:text="${issue.title ?: issue.description}">Description</td>
+		                                    <td><code th:text="${issue.file}">file.java</code></td>
+		                                    <td th:text="${issue.line}">1</td>
+		                                    <td>
+		                                        <span class="badge" 
+		                                              th:classappend="${issue.severity == 'HIGH'} ? 'bg-warning' : 'bg-info'"
+		                                              th:text="${issue.severity}">Medium</span>
+		                                    </td>
+		                                </tr>
+		                            </th:block>
+		                        </tbody>
+		                    </table>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
 		<!-- Performance and Code Issues Section -->
 		<div class="row mb-4" th:if="${otherIssues != null and !otherIssues.isEmpty()}">
 			<div class="col-12">
@@ -423,8 +462,13 @@
 								</thead>
 								<tbody>
 									<th:block th:each="issue : ${otherIssues}">
-										<tr th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : 
-															(${issue.severity == 'HIGH'} ? 'table-warning' : '')">
+									    <!-- Only show if it has actionable suggestions -->
+									    <tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
+									                 issue.suggestion.immediateFix.searchCode != null and 
+									                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
+									                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}"
+									        th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : 
+									                        (${issue.severity == 'HIGH'} ? 'table-warning' : '')">
 											<td>
 												<span class="badge"
 												    th:classappend="
@@ -440,17 +484,12 @@
 												issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : ''}"></code></td>
 											<td th:text="${issue.line}"></td>
 											<td>
-												<button th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
-													class="btn btn-sm btn-primary" type="button"
-													data-bs-toggle="collapse"
-													th:attr="data-bs-target='#other-detail-' + ${issue.issueId}"
-													aria-expanded="false">
-													View Fix
-												</button>
-												<span th:unless="${issue.suggestion != null and issue.suggestion.immediateFix != null}"
-													class="badge bg-secondary">
-													No Fix Available
-												</span>
+											    <button class="btn btn-sm btn-primary" type="button"
+											        data-bs-toggle="collapse"
+											        th:attr="data-bs-target='#other-detail-' + ${issue.issueId}"
+											        aria-expanded="false">
+											        View Fix
+											    </button>
 											</td>
 										</tr>
 										<!-- Inline collapsible row for fix details -->

@@ -350,16 +350,23 @@ public class LambdaInvokerService {
 	            if (analysisStatus != null) {
 	                String status = (String) analysisStatus.get("status");
 	                
-	                if ("suggestions_complete".equals(status)) {
-	                    log.debug("✅ Suggestions completed for analysis: {} in {} attempts", 
-	                        analysisId, consecutiveNotFoundCount + 1);
+	             // FIX: Handle all terminal states properly
+	                if ("suggestions_complete".equals(status) || "completed".equals(status)) {
+	                    log.debug("✅ Analysis completed for: {} with status: {} in {} attempts", 
+	                        analysisId, status, consecutiveNotFoundCount + 1);
 	                    return "COMPLETED";
-	                } else if ("failed".equals(status)) {
-	                    log.error("❌ Suggestions failed for analysis: {}", analysisId);
+	                } else if ("failed".equals(status) || "error".equals(status)) {
+	                    log.error("❌ Analysis failed for: {} with status: {}", analysisId, status);
 	                    return "FAILED";
+	                } else if ("suggestions".equals(status) || "in_progress".equals(status) || 
+	                          "screening".equals(status) || "detection".equals(status)) {
+	                    // Valid in-progress states, continue polling
+	                    log.debug("🔍 Analysis {} in progress with status: {}, continuing to poll", analysisId, status);
+	                    consecutiveNotFoundCount = 0; // Reset counter for valid status updates
 	                } else {
-	                    // Don't reset backoff for non-terminal states, continue polling normally
-	                    log.debug("🔍 Analysis {} status: {}, continuing to poll", analysisId, status);
+	                    // Unknown status - treat as in-progress but increment counter
+	                    log.warn("⚠️ Unknown status '{}' for analysis {}, continuing to poll", status, analysisId);
+	                    consecutiveNotFoundCount++;
 	                }
 	            } else {
 	                // Increment not found count for exponential backoff
@@ -455,7 +462,80 @@ public class LambdaInvokerService {
 		// Remaining 1% - use Nova Lite instead of skipping
 		return "nova-lite";
 	}
+	/**
+	 * Validate Lambda response format before processing
+	 */
+	private String validateLambdaResponse(String response, String operation) {
+	    if (response == null || response.trim().isEmpty()) {
+	        log.warn("Empty response from Lambda operation: {}", operation);
+	        return null;
+	    }
+	    
+	    String trimmedResponse = response.trim();
+	    
+	    // Check for known problematic response formats
+	    if (trimmedResponse.startsWith("SUCCESS") || 
+	        trimmedResponse.startsWith("FAILURE") || 
+	        trimmedResponse.startsWith("ERROR") ||
+	        trimmedResponse.startsWith("COMPLETED")) {
+	        
+	        log.error("Lambda {} returned plain text response instead of JSON: {}", 
+	                 operation, trimmedResponse.substring(0, Math.min(100, trimmedResponse.length())));
+	        
+	        // Try to create a synthetic JSON response
+	        return createSyntheticJsonResponse(trimmedResponse, operation);
+	    }
+	    
+	    // Validate JSON structure
+	    if (!trimmedResponse.startsWith("{") && !trimmedResponse.startsWith("[")) {
+	        log.warn("Lambda {} response doesn't start with JSON delimiter: {}", 
+	                operation, trimmedResponse.substring(0, Math.min(50, trimmedResponse.length())));
+	        return null;
+	    }
+	    
+	    return trimmedResponse;
+	}
 
+	/**
+	 * Create synthetic JSON response from plain text Lambda response
+	 */
+	private String createSyntheticJsonResponse(String plainTextResponse, String operation) {
+	    try {
+	        Map<String, Object> syntheticResponse = new HashMap<>();
+	        
+	        if (plainTextResponse.startsWith("SUCCESS")) {
+	            syntheticResponse.put("status", "success");
+	            syntheticResponse.put("message", plainTextResponse);
+	        } else if (plainTextResponse.startsWith("COMPLETED")) {
+	            syntheticResponse.put("status", "completed");
+	            syntheticResponse.put("message", plainTextResponse);
+	        } else {
+	            syntheticResponse.put("status", "error");
+	            syntheticResponse.put("message", plainTextResponse);
+	        }
+	        
+	        syntheticResponse.put("operation", operation);
+	        syntheticResponse.put("timestamp", System.currentTimeMillis());
+	        syntheticResponse.put("synthetic", true);
+	        
+	        if ("suggestions".equals(operation)) {
+	            syntheticResponse.put("suggestions", new ArrayList<>());
+	            syntheticResponse.put("summary", Map.of(
+	                "totalSuggestions", 0,
+	                "tokensUsed", 0,
+	                "totalCost", 0.0
+	            ));
+	        }
+	        
+	        String jsonResponse = objectMapper.writeValueAsString(syntheticResponse);
+	        log.info("Created synthetic JSON response for {} operation", operation);
+	        return jsonResponse;
+	        
+	    } catch (Exception e) {
+	        log.error("Failed to create synthetic JSON response: {}", e.getMessage());
+	        return null;
+	    }
+	}
 	/**
 	 * Enhanced suggestions invocation with hybrid strategy support
 	 */

@@ -61,12 +61,79 @@ public class DataAggregationService {
      */
     public void storeSuggestionResults(String analysisId, String suggestionResponseJson) {
         try {
-            Map<String, Object> response = objectMapper.readValue(suggestionResponseJson, Map.class);
+            // Validate and clean response before parsing
+            String cleanedResponse = validateAndCleanResponse(suggestionResponseJson);
+            
+            if (cleanedResponse == null || cleanedResponse.trim().isEmpty()) {
+                log.warn("Empty or invalid suggestion response for analysis {}, creating fallback", analysisId);
+                createFallbackSuggestionResponse(analysisId);
+                return;
+            }
+            
+            Map<String, Object> response = objectMapper.readValue(cleanedResponse, Map.class);
             getLambdaResults(analysisId).setSuggestionResponse(response);
             log.info("Stored suggestion results for analysis {}", analysisId);
         } catch (Exception e) {
-            log.error("Failed to parse suggestion response", e);
+            log.error("Failed to parse suggestion response for analysis {}: {}", analysisId, e.getMessage());
+            log.debug("Raw response content: {}", suggestionResponseJson);
+            createFallbackSuggestionResponse(analysisId);
         }
+    }
+
+    /**
+     * Validate and clean Lambda response to ensure it's valid JSON
+     */
+    private String validateAndCleanResponse(String response) {
+        if (response == null || response.trim().isEmpty()) {
+            return null;
+        }
+        
+        String trimmedResponse = response.trim();
+        
+        // Check for plain text responses that start with SUCCESS, FAILURE, etc.
+        if (trimmedResponse.startsWith("SUCCESS") || 
+            trimmedResponse.startsWith("FAILURE") || 
+            trimmedResponse.startsWith("ERROR") ||
+            trimmedResponse.startsWith("COMPLETED")) {
+            log.warn("Received plain text response instead of JSON: {}", trimmedResponse.substring(0, Math.min(50, trimmedResponse.length())));
+            return null;
+        }
+        
+        // Ensure response starts and ends with JSON delimiters
+        if (!trimmedResponse.startsWith("{") && !trimmedResponse.startsWith("[")) {
+            // Try to extract JSON from within the response
+            int jsonStart = trimmedResponse.indexOf("{");
+            int jsonEnd = trimmedResponse.lastIndexOf("}");
+            
+            if (jsonStart != -1 && jsonEnd != -1 && jsonStart < jsonEnd) {
+                trimmedResponse = trimmedResponse.substring(jsonStart, jsonEnd + 1);
+                log.debug("Extracted JSON from response: {}", trimmedResponse.substring(0, Math.min(100, trimmedResponse.length())));
+            } else {
+                log.warn("No valid JSON found in response");
+                return null;
+            }
+        }
+        
+        return trimmedResponse;
+    }
+
+    /**
+     * Create fallback suggestion response when parsing fails
+     */
+    private void createFallbackSuggestionResponse(String analysisId) {
+        Map<String, Object> fallbackResponse = new HashMap<>();
+        fallbackResponse.put("status", "partial_success");
+        fallbackResponse.put("analysisId", analysisId);
+        fallbackResponse.put("suggestions", new ArrayList<>());
+        fallbackResponse.put("summary", Map.of(
+            "totalSuggestions", 0,
+            "tokensUsed", 0,
+            "totalCost", 0.0,
+            "message", "Suggestions generation completed but response parsing failed"
+        ));
+        
+        getLambdaResults(analysisId).setSuggestionResponse(fallbackResponse);
+        log.info("Created fallback suggestion response for analysis {}", analysisId);
     }
     
     /**

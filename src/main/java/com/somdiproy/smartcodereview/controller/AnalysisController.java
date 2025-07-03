@@ -263,61 +263,57 @@ public class AnalysisController {
          // Get comprehensive report using ReportService
             ReportResponse report = reportService.getReport(analysisId);
 
-            // Segregate issues by type
-         // Segregate issues by type with severity-based sorting
+         // Separate security issues with actionable fixes
             List<Issue> securityIssues = report.getIssues().stream()
-                .filter(i -> i.getCategory() != null && 
-                            ("SECURITY".equalsIgnoreCase(i.getCategory()) || 
-                             "security".equalsIgnoreCase(i.getCategory()) ||
-                             i.getType() != null && i.getType().toUpperCase().contains("SECURITY")))
+                .filter(issue -> "security".equalsIgnoreCase(issue.getCategory()))
+                .filter(issue -> hasActionableFix(issue)) // Only issues with real fixes
                 .sorted((issue1, issue2) -> {
-                    // Primary sort: by severity (CRITICAL > HIGH > MEDIUM > LOW)
-                    int severityComparison = Integer.compare(
+                    int severityCompare = Integer.compare(
                         getSeverityPriority(issue2.getSeverity()), 
                         getSeverityPriority(issue1.getSeverity())
                     );
-                    if (severityComparison != 0) return severityComparison;
-                    
-                    // Secondary sort: by CVE score (higher scores first)
-                    double score1 = issue1.getCveScore() != null ? issue1.getCveScore() : 0.0;
-                    double score2 = issue2.getCveScore() != null ? issue2.getCveScore() : 0.0;
-                    int scoreComparison = Double.compare(score2, score1);
-                    if (scoreComparison != 0) return scoreComparison;
-                    
-                    // Tertiary sort: by file name for consistency
-                    return issue1.getFile() != null && issue2.getFile() != null ? 
-                           issue1.getFile().compareTo(issue2.getFile()) : 0;
+                    return severityCompare != 0 ? severityCompare : 
+                        (issue1.getFile() != null && issue2.getFile() != null ? 
+                            issue1.getFile().compareTo(issue2.getFile()) : 0);
                 })
                 .collect(Collectors.toList());
-            
+
+            // Additional security issues without automated fixes
+            List<Issue> additionalSecurityIssues = report.getIssues().stream()
+                .filter(issue -> "security".equalsIgnoreCase(issue.getCategory()))
+                .filter(issue -> !hasActionableFix(issue)) // Issues without automated fixes
+                .filter(issue -> issue.getCveId() != null || issue.getTitle() != null) // But with meaningful data
+                .sorted((issue1, issue2) -> {
+                    int severityCompare = Integer.compare(
+                        getSeverityPriority(issue2.getSeverity()), 
+                        getSeverityPriority(issue1.getSeverity())
+                    );
+                    return severityCompare != 0 ? severityCompare : 
+                        (issue1.getFile() != null && issue2.getFile() != null ? 
+                            issue1.getFile().compareTo(issue2.getFile()) : 0);
+                })
+                .collect(Collectors.toList());
+
+            // Filter other issues to only those with actionable suggestions
             List<Issue> otherIssues = report.getIssues().stream()
-            	    .filter(i -> !securityIssues.contains(i))
-            	    .sorted((issue1, issue2) -> {
-            	        // Primary sort: by severity (HIGH > MEDIUM > LOW > INFO)
-            	        int severityComparison = Integer.compare(
-            	            getSeverityPriority(issue2.getSeverity()), 
-            	            getSeverityPriority(issue1.getSeverity())
-            	        );
-            	        if (severityComparison != 0) return severityComparison;
-            	        
-            	        // Secondary sort: by category (performance > quality > best-practices)
-            	        int categoryComparison = Integer.compare(
-            	            getCategoryPriority(issue2.getCategory()),
-            	            getCategoryPriority(issue1.getCategory())
-            	        );
-            	        if (categoryComparison != 0) return categoryComparison;
-            	        
-            	        // Tertiary sort: by line number for issues in same file
-            	        if (issue1.getFile() != null && issue2.getFile() != null && 
-            	            issue1.getFile().equals(issue2.getFile())) {
-            	            return Integer.compare(issue1.getLine(), issue2.getLine());
-            	        }
-            	        
-            	        // Final sort: by file name
-            	        return issue1.getFile() != null && issue2.getFile() != null ? 
-            	               issue1.getFile().compareTo(issue2.getFile()) : 0;
-            	    })
-            	    .collect(Collectors.toList());
+                .filter(issue -> !"security".equalsIgnoreCase(issue.getCategory()))
+                .filter(issue -> hasActionableFix(issue)) // Only issues with real fixes
+                .sorted((issue1, issue2) -> {
+                    int categoryCompare = Integer.compare(
+                        getCategoryPriority(issue2.getCategory()), 
+                        getCategoryPriority(issue1.getCategory())
+                    );
+                    if (categoryCompare != 0) return categoryCompare;
+                    
+                    int severityCompare = Integer.compare(
+                        getSeverityPriority(issue2.getSeverity()), 
+                        getSeverityPriority(issue1.getSeverity())
+                    );
+                    return severityCompare != 0 ? severityCompare : 
+                        (issue1.getFile() != null && issue2.getFile() != null ? 
+                            issue1.getFile().compareTo(issue2.getFile()) : 0);
+                })
+                .collect(Collectors.toList());
 
          // Debug logging
             log.info("Total issues found: {}", report.getIssues().size());
@@ -345,6 +341,7 @@ public class AnalysisController {
             model.addAttribute("report", report);
             model.addAttribute("remainingScans", session.getRemainingScans());
             model.addAttribute("securityIssues", securityIssues);
+            model.addAttribute("additionalSecurityIssues", additionalSecurityIssues);
             model.addAttribute("otherIssues", otherIssues);
 
             return "report";
@@ -368,7 +365,7 @@ public class AnalysisController {
         };
     }
 
-    // Helper method for category priority
+ // Helper method for category priority
     private int getCategoryPriority(String category) {
         if (category == null) return 0;
         return switch (category.toLowerCase()) {
@@ -377,5 +374,30 @@ public class AnalysisController {
             case "best-practices" -> 1;
             default -> 0;
         };
+    }
+
+    // Helper method to check if issue has actionable fix
+    private boolean hasActionableFix(Issue issue) {
+        if (issue.getSuggestion() == null || 
+            issue.getSuggestion().getImmediateFix() == null) {
+            return false;
+        }
+        
+        String searchCode = issue.getSuggestion().getImmediateFix().getSearchCode();
+        String replaceCode = issue.getSuggestion().getImmediateFix().getReplaceCode();
+        
+        // Check for generic/dummy content
+        if (searchCode == null || replaceCode == null ||
+            searchCode.contains("Review the identified") ||
+            searchCode.contains("Manual review required") ||
+            replaceCode.contains("Apply appropriate") ||
+            replaceCode.contains("TODO:") ||
+            searchCode.equals(replaceCode) ||
+            searchCode.length() < 10 ||
+            replaceCode.length() < 10) {
+            return false;
+        }
+        
+        return true;
     }
 }
