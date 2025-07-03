@@ -469,7 +469,14 @@ public class DataAggregationService {
             log.debug("🔍 Checking analysis progress for: {}", analysisId);
             
             // Query the analysis repository for the current analysis
-            AnalysisResult analysisResult = analysisRepository.findById(analysisId);
+            Optional<AnalysisResult> analysisResultOpt = analysisRepository.findById(analysisId);
+            
+            if (analysisResultOpt.isEmpty()) {
+                log.debug("❌ No analysis found for ID: {}", analysisId);
+                return null;
+            }
+
+            AnalysisResult analysisResult = analysisResultOpt.get();
             
             if (analysisResult != null) {
                 Map<String, Object> progress = new HashMap<>();
