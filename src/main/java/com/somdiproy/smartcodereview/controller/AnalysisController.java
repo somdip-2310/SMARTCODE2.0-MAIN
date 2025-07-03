@@ -265,9 +265,11 @@ public class AnalysisController {
 
             // Segregate issues by type
             List<Issue> securityIssues = report.getIssues().stream()
-                    .filter(i -> "SECURITY".equalsIgnoreCase(i.getCategory()) || 
-                                (i.getCveId() != null && !i.getCveId().isEmpty()))
-                    .collect(Collectors.toList());
+            	    .filter(i -> i.getCategory() != null && 
+            	                ("SECURITY".equalsIgnoreCase(i.getCategory()) || 
+            	                 "security".equalsIgnoreCase(i.getCategory()) ||
+            	                 i.getType() != null && i.getType().toUpperCase().contains("SECURITY")))
+            	    .collect(Collectors.toList());
             
             List<Issue> otherIssues = report.getIssues().stream()
                 .filter(i -> !securityIssues.contains(i))

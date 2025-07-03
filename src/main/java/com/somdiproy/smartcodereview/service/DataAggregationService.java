@@ -342,19 +342,19 @@ public class DataAggregationService {
             else qualityIssues++;
             
             if ("CRITICAL".equalsIgnoreCase(severity)) criticalCount++;
-            else if ("HIGH".equalsIgnoreCase(severity)) highCount++;
-        }
-        
-        // Calculate scores (simple formula - can be improved)
-     // Calculate scores (simple formula - can be improved)
-     // Calculate scores (10 = perfect, 0 = worst)
-        double securityScore = 10.0 - (securityIssues * 0.5) - (criticalCount * 1.0);
-        double performanceScore = 10.0 - (performanceIssues * 0.3);
-        double qualityScore = 10.0 - (qualityIssues * 0.2) - (highCount * 0.5);
-        
-        scores.setSecurity(Math.max(0.0, Math.min(10.0, securityScore)));
-        scores.setPerformance(Math.max(0.0, Math.min(10.0, performanceScore)));
-        scores.setQuality(Math.max(0.0, Math.min(10.0, qualityScore)));
+			else if ("HIGH".equalsIgnoreCase(severity))
+				highCount++;
+		}
+
+		// Calculate scores (10 = perfect, 0 = worst)
+		// Use logarithmic scale to handle high issue counts better
+		double securityScore = 10.0 - Math.min(10.0, Math.log10(securityIssues + 1) * 2.5 + (criticalCount * 0.5));
+		double performanceScore = 10.0 - Math.min(10.0, Math.log10(performanceIssues + 1) * 2.0);
+		double qualityScore = 10.0 - Math.min(10.0, Math.log10(qualityIssues + 1) * 1.5 + (highCount * 0.3));
+
+		scores.setSecurity(Math.max(0.0, Math.min(10.0, securityScore)));
+		scores.setPerformance(Math.max(0.0, Math.min(10.0, performanceScore)));
+		scores.setQuality(Math.max(0.0, Math.min(10.0, qualityScore)));
         
         // Overall score is weighted average
         double overallScore = (scores.getSecurity() * 0.5 + scores.getPerformance() * 0.3 + scores.getQuality() * 0.2);
