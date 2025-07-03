@@ -337,10 +337,13 @@ public class LambdaInvokerService {
 	 */
 	private String pollForSuggestionsCompletion(String analysisId, long maxWaitTimeMs) {
 	    long startTime = System.currentTimeMillis();
-	    long pollingInterval = 30000; // 30 seconds
+	    long pollingInterval = 2000; // Start with 2 seconds for immediate results
+	    long maxPollingInterval = 15000; // Cap at 15 seconds maximum
+	    int consecutiveNotFoundCount = 0;
+	    final int EXPONENTIAL_THRESHOLD = 3; // Start exponential backoff after 3 attempts
 	    
 	    while (System.currentTimeMillis() - startTime < maxWaitTimeMs) {
-	        try {
+	    	try {
 	            // Check analysis progress in DynamoDB
 	            Map<String, Object> analysisStatus = dataAggregationService.getAnalysisProgress(analysisId);
 	            
@@ -348,13 +351,34 @@ public class LambdaInvokerService {
 	                String status = (String) analysisStatus.get("status");
 	                
 	                if ("suggestions_complete".equals(status)) {
-	                    log.info("✅ Suggestions completed for analysis: {}", analysisId);
+	                    log.debug("✅ Suggestions completed for analysis: {} in {} attempts", 
+	                        analysisId, consecutiveNotFoundCount + 1);
 	                    return "COMPLETED";
 	                } else if ("failed".equals(status)) {
 	                    log.error("❌ Suggestions failed for analysis: {}", analysisId);
 	                    return "FAILED";
+	                } else {
+	                    // Don't reset backoff for non-terminal states, continue polling normally
+	                    log.debug("🔍 Analysis {} status: {}, continuing to poll", analysisId, status);
 	                }
+	            } else {
+	                // Increment not found count for exponential backoff
+	                consecutiveNotFoundCount++;
 	            }
+	            
+	            // Adaptive polling: fast initially, slower if not ready
+	            if (consecutiveNotFoundCount <= EXPONENTIAL_THRESHOLD) {
+	                pollingInterval = 2000; // Keep checking every 2 seconds for first few attempts
+	            } else {
+	                // Exponential backoff: 4s, 8s, 15s (capped)
+	                pollingInterval = Math.min(
+	                    pollingInterval * 2, 
+	                    maxPollingInterval
+	                );
+	            }
+	            
+	            log.debug("🔍 Checking analysis progress for: {} (attempt {}, next check in {}ms)", 
+	                analysisId, consecutiveNotFoundCount + 1, pollingInterval);
 	            
 	            // Wait before next poll
 	            Thread.sleep(pollingInterval);
