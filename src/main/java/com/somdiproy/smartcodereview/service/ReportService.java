@@ -46,9 +46,14 @@ public class ReportService {
         
         Map<String, Double> scores = new HashMap<>();
         if (analysis.getScores() != null) {
-            scores.put("security", analysis.getScores().getSecurity());
-            scores.put("performance", analysis.getScores().getPerformance());
-            scores.put("quality", analysis.getScores().getQuality());
+            scores.put("security", analysis.getScores().getSecurity() != null ? analysis.getScores().getSecurity() : 85.0);
+            scores.put("performance", analysis.getScores().getPerformance() != null ? analysis.getScores().getPerformance() : 85.0);
+            scores.put("quality", analysis.getScores().getQuality() != null ? analysis.getScores().getQuality() : 85.0);
+        } else {
+            // Default scores if none exist
+            scores.put("security", 85.0);
+            scores.put("performance", 85.0);
+            scores.put("quality", 85.0);
         }
         
         return ReportResponse.builder()

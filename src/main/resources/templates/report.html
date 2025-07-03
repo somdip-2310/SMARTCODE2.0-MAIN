@@ -142,7 +142,7 @@
             </div>
             
             <!-- Scores Section -->
-            <div class="col-md-4" th:if="${report.scores != null and !report.scores.isEmpty()}">
+            <div class="col-md-4" th:if="${report.scores != null}"
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Quality Scores</h5>
@@ -210,7 +210,7 @@
         
   
 		<!-- Security Issues Section -->
-		        <div class="row mb-4" th:if="${securityIssues != null and !securityIssues.isEmpty()}">
+		        <div class="row mb-4" th:if="${securityIssues != null}">
 		            <div class="col-12">
 		                <div class="card border-danger">
 		                    <div class="card-header bg-danger text-white">
@@ -246,7 +246,7 @@
 		                                            <button class="btn btn-sm btn-primary" 
 		                                                    type="button"
 		                                                    data-bs-toggle="collapse" 
-		                                                    th:data-bs-target="'#security-detail-' + ${issue.issueId}"
+		                                                    th:attr="data-bs-target='#security-detail-' + ${issue.issueId}"
 		                                                    aria-expanded="false">
 		                                                View Fix
 		                                            </button>
@@ -268,7 +268,7 @@
 		                                            <h6><i class="bi bi-lightbulb"></i> Recommended Fix</h6>
 		                                            
 		                                            <div th:if="${issue.suggestion.immediateFix != null}" class="mb-3">
-		                                                <p th:text="${issue.suggestion.immediateFix.explanation}">Explanation</p>
+		                                                <p th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'Analysis in progress...'}">Explanation</p>
 		                                                
 		                                                <div class="search-replace">
 		                                                    <div>
@@ -342,7 +342,7 @@
 		                                            <button class="btn btn-sm btn-primary" 
 		                                                    type="button"
 		                                                    data-bs-toggle="collapse" 
-		                                                    th:data-bs-target="'#other-detail-' + ${issue.issueId}"
+		                                                    th:attr="data-bs-target='#other-detail-' + ${issue.issueId}"
 		                                                    aria-expanded="false">
 		                                                View Fix
 		                                            </button>
@@ -371,7 +371,7 @@
 		                                            <h6><i class="bi bi-lightbulb"></i> Recommended Fix</h6>
 		                                            
 		                                            <div th:if="${issue.suggestion.immediateFix != null}" class="mb-3">
-		                                                <p th:text="${issue.suggestion.immediateFix.explanation}">Explanation</p>
+		                                                <p th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'Analysis in progress...'}">Explanation</p>
 		                                                
 		                                                <div class="search-replace">
 		                                                    <div>
@@ -382,7 +382,7 @@
 		                                                                <i class="bi bi-clipboard"></i> Copy
 		                                                            </button>
 		                                                            <pre th:id="${issue.issueId + '-other-search'}" 
-		                                                                 th:text="${issue.suggestion.immediateFix.searchCode}">search code</pre>
+		                                                                 th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.searchCode != null ? issue.suggestion.immediateFix.searchCode : '// Code pattern to search'}">search code</pre>
 		                                                        </div>
 		                                                    </div>
 		                                                    <div>
@@ -393,7 +393,7 @@
 		                                                                <i class="bi bi-clipboard"></i> Copy
 		                                                            </button>
 		                                                            <pre th:id="${issue.issueId + '-other-replace'}" 
-		                                                                 th:text="${issue.suggestion.immediateFix.replaceCode}">replace code</pre>
+		                                                                 th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.replaceCode != null ? issue.suggestion.immediateFix.replaceCode : '// Suggested replacement code'}">replace code</pre>
 		                                                        </div>
 		                                                    </div>
 		                                                </div>
