@@ -190,15 +190,14 @@ public class LambdaInvokerService {
                 return null;
             }
 
-            // Ultra-conservative approach: Only process top 5 issues to minimize rate limiting
-            List<Map<String, Object>> reducedIssues = issues.stream()
-                    .limit(5)
-                    .collect(Collectors.toList());
+            // Apply hybrid strategy to issues before processing
+            List<Map<String, Object>> hybridProcessedIssues = applyHybridStrategy(issues);
             
-            log.info("🎯 Processing top {} critical issues to minimize Nova rate limiting (reduced from {})", 
-                     reducedIssues.size(), issues.size());
+            log.info("🎯 Hybrid Strategy: Processing {} issues out of {} total (optimized for cost)", 
+                     hybridProcessedIssues.size(), issues.size());
 
-            return invokeSuggestionsWithRateLimit(sessionId, analysisId, repository, branch, reducedIssues, scanNumber);
+            return invokeSuggestionsWithHybridStrategy(sessionId, analysisId, repository, branch, 
+                                                      hybridProcessedIssues, scanNumber);
             
         } catch (Exception e) {
             log.error("❌ Failed to invoke suggestions Lambda for analysis {}", analysisId, e);
@@ -208,7 +207,147 @@ public class LambdaInvokerService {
             releaseAnalysisLock(lockKey);
         }
     }
+    
+    /**
+     * Apply hybrid strategy for cost-effective suggestions
+     * Priority: Nova Lite (90%) → Templates (9%) → Nova Premier (1%)
+     */
+    private List<Map<String, Object>> applyHybridStrategy(List<Map<String, Object>> issues) {
+        List<Map<String, Object>> processedIssues = new ArrayList<>();
+        
+        for (Map<String, Object> issue : issues) {
+            String severity = (String) issue.getOrDefault("severity", "MEDIUM");
+            String category = (String) issue.getOrDefault("category", "quality");
+            
+            // Apply hybrid priority logic
+            String selectedModel = determineModelForIssue(severity, category);
+            issue.put("selectedModel", selectedModel);
+            issue.put("processingStrategy", "hybrid");
+            
+            // Only process if not skipped
+            if (!"SKIP".equals(selectedModel)) {
+                processedIssues.add(issue);
+            }
+        }
+        
+        log.info("🔄 Hybrid Strategy Applied: {} issues selected for processing from {} total", 
+                 processedIssues.size(), issues.size());
+        
+        return processedIssues;
+    }
 
+    /**
+     * Determine model based on issue severity and category
+     * Implements the 90/9/1 strategy from the Lambda
+     */
+    private String determineModelForIssue(String severity, String category) {
+        // 1% Nova Premier for CRITICAL security issues only
+        if ("CRITICAL".equalsIgnoreCase(severity) && "security".equalsIgnoreCase(category)) {
+            return Math.random() < 0.01 ? "nova-premier" : "nova-lite";
+        }
+        
+        // 90% Nova Lite for most issues
+        if (Math.random() < 0.90) {
+            return "nova-lite";
+        }
+        
+        // 9% Enhanced Templates for fallback
+        if (Math.random() < 0.99) { // 9% of remaining 10%
+            return "template";
+        }
+        
+        // Skip remaining 1%
+        return "SKIP";
+    }
+
+    /**
+     * Enhanced suggestions invocation with hybrid strategy support
+     */
+    public String invokeSuggestionsWithHybridStrategy(String sessionId, String analysisId, String repository, 
+            String branch, List<Map<String, Object>> issues, int scanNumber) throws Exception {
+        
+        log.info("🚀 Invoking suggestions Lambda with hybrid strategy for {} issues", issues.size());
+        
+        // Pre-delay to ensure we don't hit rate limits
+        enforceRateLimit("suggestions", SUGGESTIONS_RATE_LIMIT_DELAY);
+        
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("sessionId", sessionId);
+        payload.put("analysisId", analysisId);
+        payload.put("repository", repository);
+        payload.put("branch", branch);
+        payload.put("issues", issues);
+        payload.put("scanNumber", scanNumber);
+        
+        // Enable hybrid strategy in Lambda
+        payload.put("strategy", "hybrid");
+        payload.put("modelId", determineOverallModelStrategy(issues));
+        payload.put("processingMode", "hybrid");
+        
+        // Add issue severity for routing decisions
+        if (!issues.isEmpty()) {
+            String maxSeverity = issues.stream()
+                .map(issue -> (String) issue.getOrDefault("severity", "MEDIUM"))
+                .max(this::compareSeverity)
+                .orElse("MEDIUM");
+            payload.put("issueSeverity", maxSeverity);
+        }
+        
+        // Rate limiting configuration
+        payload.put("rateLimitMode", true);
+        payload.put("maxConcurrentRequests", 1);
+        payload.put("batchSize", 1);
+        payload.put("delayBetweenRequests", 15000); // 15 seconds between Nova API calls
+        payload.put("maxRetries", 10);
+        payload.put("exponentialBackoffMaxDelay", 120000);
+        payload.put("timestamp", System.currentTimeMillis());
+        
+        String payloadJson = objectMapper.writeValueAsString(payload);
+        
+        log.info("📤 Invoking suggestions Lambda with hybrid strategy, payload size: {} bytes", 
+                 payloadJson.length());
+        
+        InvokeRequest request = InvokeRequest.builder()
+                .functionName(suggestionsFunctionArn)
+                .invocationType(InvocationType.REQUEST_RESPONSE)
+                .payload(SdkBytes.fromUtf8String(payloadJson))
+                .build();
+        
+        return invokeWithRetryAndCircuitBreaker(request, "suggestions");
+    }
+
+    /**
+     * Determine overall model strategy based on issues
+     */
+    private String determineOverallModelStrategy(List<Map<String, Object>> issues) {
+        boolean hasCriticalSecurity = issues.stream()
+            .anyMatch(issue -> "CRITICAL".equalsIgnoreCase((String) issue.get("severity")) &&
+                              "security".equalsIgnoreCase((String) issue.get("category")));
+        
+        if (hasCriticalSecurity && Math.random() < 0.01) {
+            return "nova-premier";
+        }
+        
+        return Math.random() < 0.90 ? "nova-lite" : "template";
+    }
+
+    /**
+     * Compare severity levels for priority ordering
+     */
+    private int compareSeverity(String s1, String s2) {
+        Map<String, Integer> severityOrder = Map.of(
+            "LOW", 1,
+            "MEDIUM", 2, 
+            "HIGH", 3,
+            "CRITICAL", 4
+        );
+        
+        return Integer.compare(
+            severityOrder.getOrDefault(s1, 2),
+            severityOrder.getOrDefault(s2, 2)
+        );
+    }
+    
     /**
      * Enhanced suggestions invocation with aggressive rate limiting
      */
@@ -519,6 +658,25 @@ public class LambdaInvokerService {
     /**
      * Utility methods
      */
+    
+    /**
+     * Get hybrid strategy metrics
+     */
+    public Map<String, Object> getHybridMetrics() {
+        Map<String, Object> metrics = getHealthMetrics();
+        
+        // Add hybrid-specific metrics
+        metrics.put("hybridStrategyEnabled", true);
+        metrics.put("costOptimizationActive", true);
+        metrics.put("modelDistribution", Map.of(
+            "novaLite", "90%",
+            "templates", "9%", 
+            "novaPremier", "1%"
+        ));
+        
+        return metrics;
+    }
+    
     private void enforceRateLimit(String operation) {
         enforceRateLimit(operation, LAMBDA_RATE_LIMIT_DELAY);
     }

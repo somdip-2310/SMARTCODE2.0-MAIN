@@ -142,8 +142,10 @@ public class AnalysisOrchestrator {
             List<Map<String, Object>> securityIssuesForSuggestions = filterSecurityIssuesForSuggestions(issues, log);
             
             // Stage 4: Suggestions with Nova Premier (security issues only) - Rate Limited Approach
-            log.info("🔒 Stage 4: Generating suggestions for {} high-severity security issues (from {} total issues)", 
-                     securityIssuesForSuggestions.size(), issues.size());
+         // Stage 4: Suggestions with Hybrid Strategy (90% Nova Lite, 9% Templates, 1% Nova Premier)
+            log.info("🔄 Stage 4: Generating suggestions using hybrid strategy for {} issues (Cost-optimized)", 
+                     issues.size());
+            log.info("📊 Hybrid Distribution: 90% Nova Lite, 9% Templates, 1% Nova Premier for critical security");
 
             // Prevent multiple Lambda instances for same analysis
             String lockKey = "suggestions_" + analysisId;
