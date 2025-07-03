@@ -220,7 +220,8 @@ public class LambdaInvokerService {
             String category = (String) issue.getOrDefault("category", "quality");
             
             // Apply hybrid priority logic
-            String selectedModel = determineModelForIssue(severity, category);
+         // Apply hybrid priority logic
+            String selectedModel = determineModelForIssue(severity, category, issue);
             issue.put("selectedModel", selectedModel);
             issue.put("processingStrategy", "hybrid");
             
@@ -236,28 +237,39 @@ public class LambdaInvokerService {
         return processedIssues;
     }
 
+   
     /**
      * Determine model based on issue severity and category
-     * Implements the 90/9/1 strategy from the Lambda
+     * Implements the 90/9/1 strategy using deterministic selection
      */
-    private String determineModelForIssue(String severity, String category) {
+    private String determineModelForIssue(String severity, String category, Map<String, Object> issue) {
+        // Create deterministic hash from issue characteristics
+        String issueKey = String.format("%s_%s_%s_%s", 
+            issue.getOrDefault("id", "unknown"),
+            issue.getOrDefault("type", "unknown"),
+            issue.getOrDefault("file", "unknown"),
+            issue.getOrDefault("line", "0")
+        );
+        
+        int hash = Math.abs(issueKey.hashCode()) % 100;
+        
         // 1% Nova Premier for CRITICAL security issues only
         if ("CRITICAL".equalsIgnoreCase(severity) && "security".equalsIgnoreCase(category)) {
-            return Math.random() < 0.01 ? "nova-premier" : "nova-lite";
+            return hash < 1 ? "nova-premier" : "nova-lite";
         }
         
         // 90% Nova Lite for most issues
-        if (Math.random() < 0.90) {
+        if (hash < 90) {
             return "nova-lite";
         }
         
-        // 9% Enhanced Templates for fallback
-        if (Math.random() < 0.99) { // 9% of remaining 10%
+        // 9% Enhanced Templates for fallback (90-98)
+        if (hash < 99) {
             return "template";
         }
         
-        // Skip remaining 1%
-        return "SKIP";
+        // Remaining 1% - use Nova Lite instead of skipping
+        return "nova-lite";
     }
 
     /**
@@ -316,19 +328,28 @@ public class LambdaInvokerService {
         return invokeWithRetryAndCircuitBreaker(request, "suggestions");
     }
 
-    /**
-     * Determine overall model strategy based on issues
-     */
     private String determineOverallModelStrategy(List<Map<String, Object>> issues) {
         boolean hasCriticalSecurity = issues.stream()
             .anyMatch(issue -> "CRITICAL".equalsIgnoreCase((String) issue.get("severity")) &&
                               "security".equalsIgnoreCase((String) issue.get("category")));
         
-        if (hasCriticalSecurity && Math.random() < 0.01) {
-            return "nova-premier";
+        // Use first issue's characteristics for consistency
+        if (!issues.isEmpty()) {
+            Map<String, Object> firstIssue = issues.get(0);
+            String issueKey = String.format("%s_%d", 
+                firstIssue.getOrDefault("analysisId", "unknown"),
+                issues.size()
+            );
+            int hash = Math.abs(issueKey.hashCode()) % 100;
+            
+            if (hasCriticalSecurity && hash < 1) {
+                return "nova-premier";
+            }
+            
+            return hash < 90 ? "nova-lite" : "template";
         }
         
-        return Math.random() < 0.90 ? "nova-lite" : "template";
+        return "nova-lite";
     }
 
     /**

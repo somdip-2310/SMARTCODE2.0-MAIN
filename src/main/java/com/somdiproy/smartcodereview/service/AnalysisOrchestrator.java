@@ -139,9 +139,6 @@ public class AnalysisOrchestrator {
             dataAggregationService.storeDetectionResults(analysisId, issues);
             
             // Filter issues for suggestions - only high-severity security issues
-            List<Map<String, Object>> securityIssuesForSuggestions = filterSecurityIssuesForSuggestions(issues, log);
-            
-            // Stage 4: Suggestions with Nova Premier (security issues only) - Rate Limited Approach
          // Stage 4: Suggestions with Hybrid Strategy (90% Nova Lite, 9% Templates, 1% Nova Premier)
             log.info("🔄 Stage 4: Generating suggestions using hybrid strategy for {} issues (Cost-optimized)", 
                      issues.size());
@@ -154,20 +151,21 @@ public class AnalysisOrchestrator {
                 // Continue with analysis completion even if suggestions are skipped
             } else {
                 try {
-                    // Ultra-conservative rate limiting: Process fewer issues to reduce API calls
-                    List<Map<String, Object>> reducedIssues = securityIssuesForSuggestions.stream()
-                            .limit(5)  // Limit to top 5 issues to reduce API pressure
+                    // Process ALL issues with hybrid strategy (no filtering needed)
+                    // Hybrid strategy will automatically prioritize critical security issues
+                    List<Map<String, Object>> issuesForSuggestions = issues.stream()
+                            .limit(25)  // Limit total issues to prevent timeout
                             .collect(Collectors.toList());
                     
-                    log.info("🎯 Processing top {} critical security issues to minimize rate limiting", reducedIssues.size());
+                    log.info("🎯 Processing {} issues with hybrid strategy for cost-effective suggestions", issuesForSuggestions.size());
                     
-                    // Use public method instead of private one
+                    // Use hybrid suggestions with all issue types
                     suggestionResponse = lambdaInvokerService.invokeSuggestions(
                             sessionId,
                             analysisId,
                             repoUrl,
                             branch,
-                            reducedIssues,  // Reduced issue set
+                            issuesForSuggestions,  // All issues, hybrid strategy will handle routing
                             scanNumber
                     );
                     
