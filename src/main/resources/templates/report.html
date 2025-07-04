@@ -321,12 +321,13 @@
 								</thead>
 								<tbody>
 									<th:block th:each="issue : ${securityIssues}">
-									    <!-- Only show rows with actionable suggestions -->
+									    <!-- FIX 3: Only show rows with actionable suggestions AND CVE data -->
 									    <tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
 									                 issue.suggestion.immediateFix.searchCode != null and 
 									                 !issue.suggestion.immediateFix.searchCode.isEmpty() and
 									                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
-									                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}">
+									                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required') and
+									                 (issue.cveId != null or issue.cveScore != null)}">
 											<td>
 												<span th:text="${issue.cveId ?: '-'}">-</span>
 											</td>
@@ -337,7 +338,7 @@
 											</td>
 											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
 												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
-											<td><code th:text="${issue.file != null ? (#strings.substringAfterLast(issue.file, '/') ?: issue.file) : 'Unknown File'}">File</code></td>
+											<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code></td>
 											<td th:text="${issue.line}"></td>
 											<td>
 											    <button class="btn btn-sm btn-primary" type="button"
@@ -348,9 +349,9 @@
 											    </button>
 											</td>
 										</tr>
-										<!-- Inline collapsible row for fix details -->
-										<tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
-											class="collapse" th:id="'security-detail-' + ${issue.issueId}">
+										<!-- FIX 2: Remove conditional rendering from collapsible row -->
+										<tr class="collapse" th:id="'security-detail-' + ${issue.issueId}"
+											th:attr="data-parent-issue=${issue.issueId}">
 											<td colspan="6" class="p-0 inline-fix">
 												<div class="card border-0 rounded-0">
 													<div class="card-body bg-light">
@@ -425,7 +426,7 @@
 		                                    <td><span class="badge bg-warning text-dark" th:text="${issue.type}">Type</span></td>
 		                                    <td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
 		                                        (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
-		                                    <td><code th:text="${issue.file != null ? (#strings.substringAfterLast(issue.file, '/') ?: issue.file) : 'Unknown File'}">File</code></td>
+		                                    <td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code></td>
 		                                    <td th:text="${issue.line}"></td>
 		                                    <td>
 		                                        <span class="badge bg-danger" th:if="${issue.severity == 'CRITICAL'}">CRITICAL</span>
@@ -442,8 +443,9 @@
 		                                        </button>
 		                                    </td>
 		                                </tr>
-		                                <!-- Inline collapsible row for fix details -->
-		                                <tr class="collapse" th:id="'additional-security-detail-' + ${issue.issueId}">
+		                                <!-- FIX 2: Remove conditional rendering from collapsible row -->
+		                                <tr class="collapse" th:id="'additional-security-detail-' + ${issue.issueId}"
+		                                	th:attr="data-parent-issue=${issue.issueId}">
 		                                    <td colspan="6" class="p-0 inline-fix">
 		                                        <div class="card border-0 rounded-0">
 		                                            <div class="card-body bg-light">
@@ -539,7 +541,8 @@
 									                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
 									                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}"
 									        th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : 
-									                        (${issue.severity == 'HIGH'} ? 'table-warning' : '')">
+									                        (${issue.severity == 'HIGH'} ? 'table-warning' : '')"
+									        th:attr="data-issue-id=${issue.issueId}">
 											<td>
 												<span class="badge"
 												    th:classappend="
@@ -551,7 +554,7 @@
 											</td>
 											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
 												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
-											<td><code th:text="${issue.file != null ? (#strings.substringAfterLast(issue.file, '/') ?: issue.file) : 'Unknown File'}">File</code></td>
+											<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code></td>
 											<td th:text="${issue.line}"></td>
 											<td>
 											    <button class="btn btn-sm btn-primary" type="button"
@@ -562,9 +565,9 @@
 											    </button>
 											</td>
 										</tr>
-										<!-- Inline collapsible row for fix details -->
-										<tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}" 
-											class="collapse" th:id="'other-detail-' + ${issue.issueId}">
+										<!-- FIX 2: Remove conditional rendering from collapsible row -->
+										<tr class="collapse" th:id="'other-detail-' + ${issue.issueId}"
+											th:attr="data-parent-issue=${issue.issueId}">
 											<td colspan="5" class="p-0 inline-fix">
 												<div class="card border-0 rounded-0">
 													<div class="card-body bg-light">
