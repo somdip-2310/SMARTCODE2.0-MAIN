@@ -172,6 +172,26 @@
 		.table .badge {
 		    font-size: 0.8rem;
 		}
+
+		/* SOLUTION: Custom collapse styles that don't interfere with each other */
+		.custom-collapse-row {
+			display: none;
+			transition: all 0.3s ease-in-out;
+		}
+
+		.custom-collapse-row.show {
+			display: table-row;
+		}
+
+		.custom-toggle-btn.collapsed .bi-chevron-down {
+			transform: rotate(0deg);
+			transition: transform 0.3s ease;
+		}
+
+		.custom-toggle-btn:not(.collapsed) .bi-chevron-down {
+			transform: rotate(180deg);
+			transition: transform 0.3s ease;
+		}
 	</style>
 </head>
 
@@ -341,16 +361,15 @@
 											<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code></td>
 											<td th:text="${issue.line}"></td>
 											<td>
-											    <button class="btn btn-sm btn-primary" type="button"
-											        data-bs-toggle="collapse"
-											        th:attr="data-bs-target='#security-detail-' + ${issue.issueId}"
+											    <button class="btn btn-sm btn-primary custom-toggle-btn collapsed" type="button"
+											        th:onclick="'toggleCustomCollapse(\'security-detail-' + ${issue.issueId} + '\', this)'"
 											        aria-expanded="false">
-											        View Fix
+											        View Fix <i class="bi bi-chevron-down"></i>
 											    </button>
 											</td>
 										</tr>
-										<!-- FIX 2: Remove conditional rendering from collapsible row -->
-										<tr class="collapse" th:id="'security-detail-' + ${issue.issueId}"
+										<!-- SOLUTION: Custom collapse row without Bootstrap dependencies -->
+										<tr class="custom-collapse-row" th:id="'security-detail-' + ${issue.issueId}"
 											th:attr="data-parent-issue=${issue.issueId}">
 											<td colspan="6" class="p-0 inline-fix">
 												<div class="card border-0 rounded-0">
@@ -435,16 +454,15 @@
 		                                        <span class="badge bg-success" th:if="${issue.severity == 'LOW'}">LOW</span>
 		                                    </td>
 		                                    <td>
-		                                        <button class="btn btn-sm btn-outline-warning" type="button"
-		                                            data-bs-toggle="collapse"
-		                                            th:attr="data-bs-target='#additional-security-detail-' + ${issue.issueId}"
+		                                        <button class="btn btn-sm btn-outline-warning custom-toggle-btn collapsed" type="button"
+		                                            th:onclick="'toggleCustomCollapse(\'additional-security-detail-' + ${issue.issueId} + '\', this)'"
 		                                            aria-expanded="false">
-		                                            View Fix
+		                                            View Fix <i class="bi bi-chevron-down"></i>
 		                                        </button>
 		                                    </td>
 		                                </tr>
-		                                <!-- FIX 2: Remove conditional rendering from collapsible row -->
-		                                <tr class="collapse" th:id="'additional-security-detail-' + ${issue.issueId}"
+		                                <!-- SOLUTION: Custom collapse row without Bootstrap dependencies -->
+		                                <tr class="custom-collapse-row" th:id="'additional-security-detail-' + ${issue.issueId}"
 		                                	th:attr="data-parent-issue=${issue.issueId}">
 		                                    <td colspan="6" class="p-0 inline-fix">
 		                                        <div class="card border-0 rounded-0">
@@ -557,16 +575,15 @@
 											<td><code th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code></td>
 											<td th:text="${issue.line}"></td>
 											<td>
-											    <button class="btn btn-sm btn-primary" type="button"
-											        data-bs-toggle="collapse"
-											        th:attr="data-bs-target='#other-detail-' + ${issue.issueId}"
+											    <button class="btn btn-sm btn-primary custom-toggle-btn collapsed" type="button"
+											        th:onclick="'toggleCustomCollapse(\'other-detail-' + ${issue.issueId} + '\', this)'"
 											        aria-expanded="false">
-											        View Fix
+											        View Fix <i class="bi bi-chevron-down"></i>
 											    </button>
 											</td>
 										</tr>
-										<!-- FIX 2: Remove conditional rendering from collapsible row -->
-										<tr class="collapse" th:id="'other-detail-' + ${issue.issueId}"
+										<!-- SOLUTION: Custom collapse row without Bootstrap dependencies -->
+										<tr class="custom-collapse-row" th:id="'other-detail-' + ${issue.issueId}"
 											th:attr="data-parent-issue=${issue.issueId}">
 											<td colspan="5" class="p-0 inline-fix">
 												<div class="card border-0 rounded-0">
@@ -729,21 +746,36 @@
 
 			document.body.removeChild(textArea);
 		}
+
+		// SOLUTION: Custom collapse function that doesn't interfere with Bootstrap
+		function toggleCustomCollapse(targetId, button) {
+			const targetElement = document.getElementById(targetId);
+			if (!targetElement) {
+				console.error('Target element not found:', targetId);
+				return;
+			}
+
+			const isCurrentlyVisible = targetElement.classList.contains('show');
+			
+			if (isCurrentlyVisible) {
+				// Hide the element
+				targetElement.classList.remove('show');
+				button.classList.add('collapsed');
+				button.setAttribute('aria-expanded', 'false');
+			} else {
+				// Show the element
+				targetElement.classList.add('show');
+				button.classList.remove('collapsed');
+				button.setAttribute('aria-expanded', 'true');
+			}
+		}
 	</script>
 	
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-		// Initialize Bootstrap components when DOM is loaded
+		// Initialize Bootstrap components when DOM is loaded (kept for other components)
 		document.addEventListener('DOMContentLoaded', function () {
-			console.log('DOM loaded, initializing Bootstrap components...');
-			
-			// Add click event listeners for debugging
-			document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(button) {
-				button.addEventListener('click', function(e) {
-					console.log('Collapse button clicked:', this.getAttribute('data-bs-target'));
-					console.log('Button element:', this);
-				});
-			});
+			console.log('DOM loaded, custom collapse system initialized...');
 			
 			// Check if Bootstrap is loaded
 			if (typeof bootstrap !== 'undefined') {

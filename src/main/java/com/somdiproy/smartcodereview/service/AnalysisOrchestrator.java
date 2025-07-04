@@ -39,6 +39,8 @@ public class AnalysisOrchestrator {
 
     // In-memory storage for analysis progress (replace with Redis in production)
     private final ConcurrentHashMap<String, Analysis> analysisProgress = new ConcurrentHashMap<>();
+    @Autowired
+    private BalancedAllocationService balancedAllocationService;
     
     @Autowired
     public AnalysisOrchestrator(SessionService sessionService,
@@ -151,23 +153,21 @@ public class AnalysisOrchestrator {
                 // Continue with analysis completion even if suggestions are skipped
             } else {
                 try {
-                    // Process ALL issues with hybrid strategy (no filtering needed)
-                    // Hybrid strategy will automatically prioritize critical security issues
-                    List<Map<String, Object>> issuesForSuggestions = issues.stream()
-                            .limit(25)  // Limit total issues to prevent timeout
-                            .collect(Collectors.toList());
-                    
-                    log.info("🎯 Processing {} issues with hybrid strategy for cost-effective suggestions", issuesForSuggestions.size());
-                    
-                    // Use hybrid suggestions with all issue types
-                    suggestionResponse = lambdaInvokerService.invokeSuggestions(
-                            sessionId,
-                            analysisId,
-                            repoUrl,
-                            branch,
-                            issuesForSuggestions,  // All issues, hybrid strategy will handle routing
-                            scanNumber
-                    );
+                	// Apply balanced allocation strategy instead of simple limit
+                	List<Map<String, Object>> issuesForSuggestions = applyBalancedAllocationForSuggestions(issues, log);
+
+                	log.info("🎯 Processing {} issues with balanced allocation strategy ensuring CRITICAL/HIGH coverage across all categories", 
+                	         issuesForSuggestions.size());
+
+                	// Use balanced suggestions covering all categories
+                	suggestionResponse = lambdaInvokerService.invokeSuggestions(
+                	        sessionId,
+                	        analysisId,
+                	        repoUrl,
+                	        branch,
+                	        issuesForSuggestions,  // Balanced allocation across categories
+                	        scanNumber
+                	);
                     
                     log.info("✓ Suggestions generated successfully");
                     
@@ -216,39 +216,27 @@ public class AnalysisOrchestrator {
             }
         }
     }
-    
+
     /**
-     * Filter issues to only include high-severity security issues for suggestions
-     * while keeping ALL issues for display in results
+     * Apply balanced allocation strategy for suggestions across all categories
+     * Replaces the old security-only filtering approach
      */
-    private List<Map<String, Object>> filterSecurityIssuesForSuggestions(List<Map<String, Object>> allIssues, 
-                                                                         org.slf4j.Logger logger) {
-        List<Map<String, Object>> securityIssues = allIssues.stream()
-            .filter(issue -> {
-                String category = (String) issue.getOrDefault("category", "");
-                return "security".equalsIgnoreCase(category);
-            })
-            .filter(issue -> {
-                String severity = (String) issue.getOrDefault("severity", "LOW");
-                return "CRITICAL".equalsIgnoreCase(severity) || "HIGH".equalsIgnoreCase(severity);
-            })
-            .filter(issue -> {
-                // Estimate CVE score
-                double cveScore = estimateCVEScore(issue);
-                return cveScore > 7.0;
-            })
-            .sorted((a, b) -> {
-                String severityA = (String) a.getOrDefault("severity", "LOW");
-                String severityB = (String) b.getOrDefault("severity", "LOW");
-                return getSeverityPriority(severityB) - getSeverityPriority(severityA);
-            })
-            .limit(15) // Max 15 security issues for suggestions
-            .collect(Collectors.toList());
+    private List<Map<String, Object>> applyBalancedAllocationForSuggestions(List<Map<String, Object>> allIssues, 
+                                                                            org.slf4j.Logger logger) {
+        // Use the new balanced allocation service
+        BalancedAllocationService.AllocationResult allocationResult = 
+                balancedAllocationService.allocateIssuesForSuggestions(allIssues);
         
-        logger.info("📊 Filtered {} high-severity security issues for suggestions from {} total issues", 
-                   securityIssues.size(), allIssues.size());
+        // Log the balanced distribution
+        Map<String, Integer> categoryCounts = allocationResult.getCategoryCounts();
+        logger.info("🎯 Balanced allocation complete - Security: {}, Performance: {}, Quality: {}, Total: {}",
+                    categoryCounts.get("security"),
+                    categoryCounts.get("performance"), 
+                    categoryCounts.get("quality"),
+                    allocationResult.getTotalSelected());
         
-        return securityIssues;
+        // Return all selected issues for suggestion generation
+        return allocationResult.getAllSelectedIssues();
     }
 
     /**
