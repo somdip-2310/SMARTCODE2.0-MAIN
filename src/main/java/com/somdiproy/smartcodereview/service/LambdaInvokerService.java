@@ -198,6 +198,153 @@ public class LambdaInvokerService {
 				return null;
 			}
 
+			// Validate inputs
+			if (issues == null || issues.isEmpty()) {
+				log.warn("⚠️ No issues provided for suggestions generation");
+				return createEmptySuggestionsResponse(analysisId);
+			}
+
+			// Apply hybrid strategy to issues before processing
+			List<Map<String, Object>> hybridProcessedIssues = applyHybridStrategy(issues);
+
+			log.info("🎯 Hybrid Strategy: Processing {} issues out of {} total (optimized for cost)",
+					hybridProcessedIssues.size(), issues.size());
+
+			// Add fallback mechanism for failed suggestions
+			String result = invokeSuggestionsWithFallback(sessionId, analysisId, repository, branch, 
+					hybridProcessedIssues, scanNumber);
+			
+			if (result == null || "FAILED".equals(result)) {
+				log.warn("⚠️ Suggestions generation failed, creating partial response");
+				return createPartialSuggestionsResponse(analysisId, hybridProcessedIssues);
+			}
+			
+			return result;
+
+		} catch (Exception e) {
+			log.error("❌ Failed to invoke suggestions Lambda for analysis {}", analysisId, e);
+			recordFailure("suggestions");
+			return createPartialSuggestionsResponse(analysisId, issues);
+		} finally {
+			releaseAnalysisLock(lockKey);
+		}
+	}
+
+	private String invokeSuggestionsWithFallback(String sessionId, String analysisId, String repository, 
+			String branch, List<Map<String, Object>> issues, int scanNumber) {
+		try {
+			// Primary suggestion generation
+			return invokeSuggestionsWithTimeout(sessionId, analysisId, repository, branch, issues, scanNumber);
+		} catch (Exception e) {
+			log.warn("⚠️ Primary suggestions failed, attempting fallback: {}", e.getMessage());
+			// Fallback: Generate basic suggestions locally
+			return generateBasicSuggestions(analysisId, issues);
+		}
+	}
+
+	private String createEmptySuggestionsResponse(String analysisId) {
+		Map<String, Object> response = new HashMap<>();
+		response.put("analysisId", analysisId);
+		response.put("suggestions", new ArrayList<>());
+		response.put("status", "NO_ISSUES");
+		response.put("timestamp", System.currentTimeMillis());
+		
+		try {
+			return objectMapper.writeValueAsString(response);
+		} catch (Exception e) {
+			log.error("Failed to create empty suggestions response", e);
+			return "{\"status\":\"ERROR\"}";
+		}
+	}
+
+	private String createPartialSuggestionsResponse(String analysisId, List<Map<String, Object>> issues) {
+		try {
+			List<Map<String, Object>> basicSuggestions = new ArrayList<>();
+			
+			for (Map<String, Object> issue : issues) {
+				Map<String, Object> suggestion = new HashMap<>();
+				suggestion.put("issueId", issue.get("id"));
+				suggestion.put("title", "Basic Fix Available");
+				suggestion.put("description", generateBasicDescription(issue));
+				suggestion.put("fix", generateBasicFix(issue));
+				suggestion.put("automated", false);
+				basicSuggestions.add(suggestion);
+			}
+			
+			Map<String, Object> response = new HashMap<>();
+			response.put("analysisId", analysisId);
+			response.put("suggestions", basicSuggestions);
+			response.put("status", "PARTIAL");
+			response.put("timestamp", System.currentTimeMillis());
+			
+			return objectMapper.writeValueAsString(response);
+		} catch (Exception e) {
+			log.error("Failed to create partial suggestions response", e);
+			return "{\"status\":\"ERROR\"}";
+		}
+	}
+
+	private String generateBasicDescription(Map<String, Object> issue) {
+		String type = (String) issue.get("type");
+		String file = (String) issue.get("file");
+		
+		switch (type) {
+			case "HARDCODED_CREDENTIALS":
+				return "Remove hardcoded credentials from " + file + " and use environment variables or secure configuration.";
+			case "SQL_INJECTION":
+				return "Use parameterized queries to prevent SQL injection vulnerabilities in " + file + ".";
+			case "XSS":
+			case "CROSS_SITE_SCRIPTING (XSS)":
+				return "Sanitize user inputs and encode outputs to prevent XSS attacks in " + file + ".";
+			case "HIGH_CYCLOMATIC_COMPLEXITY":
+				return "Refactor complex methods in " + file + " to improve maintainability.";
+			case "CODE_DUPLICATION":
+				return "Extract common code patterns in " + file + " into reusable methods.";
+			case "MISSING_ERROR_HANDLING":
+				return "Add proper error handling and exception management in " + file + ".";
+			default:
+				return "Review and improve code quality in " + file + " for " + type.toLowerCase().replace("_", " ") + ".";
+		}
+	}
+
+	private String generateBasicFix(Map<String, Object> issue) {
+		String type = (String) issue.get("type");
+		
+		switch (type) {
+			case "HARDCODED_CREDENTIALS":
+				return "1. Move credentials to environment variables\n2. Use @Value annotation for Spring properties\n3. Implement secure credential management";
+			case "SQL_INJECTION":
+				return "1. Replace string concatenation with PreparedStatement\n2. Use parameter placeholders (?)\n3. Validate and sanitize inputs";
+			case "XSS":
+			case "CROSS_SITE_SCRIPTING (XSS)":
+				return "1. Use Thymeleaf's th:text instead of th:utext\n2. Implement input validation\n3. Apply output encoding";
+			case "HIGH_CYCLOMATIC_COMPLEXITY":
+				return "1. Break down large methods into smaller ones\n2. Use early returns to reduce nesting\n3. Apply strategy or command patterns";
+			case "CODE_DUPLICATION":
+				return "1. Extract common code into utility methods\n2. Create base classes for shared functionality\n3. Use composition over inheritance";
+			case "MISSING_ERROR_HANDLING":
+				return "1. Add try-catch blocks for risky operations\n2. Implement proper logging\n3. Return meaningful error responses";
+			default:
+				return "1. Review code for best practices\n2. Apply relevant design patterns\n3. Add comprehensive testing";
+		}
+	}
+
+	private String generateBasicSuggestions(String analysisId, List<Map<String, Object>> issues) {
+		return createPartialSuggestionsResponse(analysisId, issues);
+	}
+
+		String lockKey = "suggestions_" + analysisId;
+		if (!acquireAnalysisLock(lockKey)) {
+			log.warn("⚠️ Another suggestions process is already running for analysis {}", analysisId);
+			return null;
+		}
+
+		try {
+			if (isCircuitBreakerOpen("suggestions")) {
+				log.warn("🔴 Circuit breaker is OPEN for suggestions. Skipping invocation.");
+				return null;
+			}
+
 			// Apply hybrid strategy to issues before processing
 			List<Map<String, Object>> hybridProcessedIssues = applyHybridStrategy(issues);
 

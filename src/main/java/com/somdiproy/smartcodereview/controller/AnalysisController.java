@@ -10,6 +10,7 @@ import com.somdiproy.smartcodereview.model.Branch;
 import com.somdiproy.smartcodereview.model.Issue;
 import com.somdiproy.smartcodereview.model.Repository;
 import com.somdiproy.smartcodereview.model.Session;
+import com.somdiproy.smartcodereview.model.Suggestion.ImmediateFix;
 import com.somdiproy.smartcodereview.service.AnalysisOrchestrator;
 import com.somdiproy.smartcodereview.service.GitHubService;
 import com.somdiproy.smartcodereview.service.ReportService;
@@ -23,7 +24,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -241,63 +246,65 @@ public class AnalysisController {
         }
     }
     
-    /**
-     * Show analysis report
-     */
     @GetMapping("/report/{analysisId}")
     public String showReport(@PathVariable String analysisId,
                             @RequestParam String sessionId,
                             Model model) {
         try {
-            // Verify session
+            // Verify session with enhanced validation
             Session session = sessionService.getSession(sessionId);
+            if (session == null) {
+                log.warn("⚠️ Invalid session for report request: {}", sessionId);
+                model.addAttribute("error", "Invalid session. Please log in again.");
+                return "error";
+            }
             
-            // Get analysis to verify ownership
+            // Get analysis with validation
             Analysis analysis = analysisOrchestrator.getAnalysis(analysisId);
+            if (analysis == null) {
+                log.warn("⚠️ Analysis not found: {}", analysisId);
+                model.addAttribute("error", "Analysis not found.");
+                return "error";
+            }
 
             // Verify this analysis belongs to the session
             if (!analysis.getSessionId().equals(sessionId)) {
+                log.warn("⚠️ Unauthorized access attempt to analysis {} by session {}", analysisId, sessionId);
                 throw new SecurityException("Analysis does not belong to this session");
             }
 
-         // Get comprehensive report using ReportService
+            // Get comprehensive report using ReportService with fallback
             ReportResponse report = reportService.getReport(analysisId);
+            if (report == null) {
+                log.error("❌ Failed to generate report for analysis {}", analysisId);
+                report = createEmptyReport(analysisId, analysis);
+            }
 
-         // Filter security issues for main security table (CVE issues with high severity)
-            List<Issue> securityIssues = report.getIssues().stream()
-                .filter(issue -> "security".equalsIgnoreCase(issue.getCategory()))
+            // Ensure all required fields are populated with null safety
+            ensureReportDefaults(report, analysis);
+
+            // Get all issues with null safety
+            List<Issue> allIssues = report.getIssues() != null ? report.getIssues() : new ArrayList<>();
+            
+            // Filter security issues for main security table (CVE issues with actionable fixes)
+            List<Issue> securityIssues = allIssues.stream()
+                .filter(issue -> issue != null && "security".equalsIgnoreCase(issue.getCategory()))
                 .filter(this::isMainSecurityIssue) // Issues that belong in main security table
-                .sorted((issue1, issue2) -> {
-                    int severityCompare = Integer.compare(
-                        getSeverityPriority(issue2.getSeverity()), 
-                        getSeverityPriority(issue1.getSeverity())
-                    );
-                    return severityCompare != 0 ? severityCompare : 
-                        (issue1.getFile() != null && issue2.getFile() != null ? 
-                            issue1.getFile().compareTo(issue2.getFile()) : 0);
-                })
+                .sorted(this::compareIssuesBySeverity)
                 .collect(Collectors.toList());
 
             // Additional security issues for manual review (lower severity or no CVE data)
-            List<Issue> additionalSecurityIssues = report.getIssues().stream()
-                .filter(issue -> "security".equalsIgnoreCase(issue.getCategory()))
+            List<Issue> additionalSecurityIssues = allIssues.stream()
+                .filter(issue -> issue != null && "security".equalsIgnoreCase(issue.getCategory()))
                 .filter(issue -> !isMainSecurityIssue(issue)) // Issues not in main security table
                 .filter(issue -> issue.getTitle() != null || issue.getType() != null) // But with meaningful data
-                .sorted((issue1, issue2) -> {
-                    int severityCompare = Integer.compare(
-                        getSeverityPriority(issue2.getSeverity()), 
-                        getSeverityPriority(issue1.getSeverity())
-                    );
-                    return severityCompare != 0 ? severityCompare : 
-                        (issue1.getFile() != null && issue2.getFile() != null ? 
-                            issue1.getFile().compareTo(issue2.getFile()) : 0);
-                })
+                .sorted(this::compareIssuesBySeverity)
                 .collect(Collectors.toList());
 
             // Filter other issues to only those with actionable suggestions
-            List<Issue> otherIssues = report.getIssues().stream()
-                .filter(issue -> !"security".equalsIgnoreCase(issue.getCategory()))
-                .filter(issue -> hasActionableFix(issue)) // Only issues with real fixes
+            List<Issue> otherIssues = allIssues.stream()
+                .filter(issue -> issue != null && !"security".equalsIgnoreCase(issue.getCategory()))
+                .filter(this::hasActionableFix) // Only issues with real fixes
                 .sorted((issue1, issue2) -> {
                     int categoryCompare = Integer.compare(
                         getCategoryPriority(issue2.getCategory()), 
@@ -305,19 +312,14 @@ public class AnalysisController {
                     );
                     if (categoryCompare != 0) return categoryCompare;
                     
-                    int severityCompare = Integer.compare(
-                        getSeverityPriority(issue2.getSeverity()), 
-                        getSeverityPriority(issue1.getSeverity())
-                    );
-                    return severityCompare != 0 ? severityCompare : 
-                        (issue1.getFile() != null && issue2.getFile() != null ? 
-                            issue1.getFile().compareTo(issue2.getFile()) : 0);
+                    return compareIssuesBySeverity(issue1, issue2);
                 })
                 .collect(Collectors.toList());
 
-         // Debug logging
-            log.info("Total issues found: {}", report.getIssues().size());
+            // Debug logging
+            log.info("Total issues found: {}", allIssues.size());
             log.info("Security issues: {}", securityIssues.size());
+            log.info("Additional security issues: {}", additionalSecurityIssues.size());
             log.info("Other issues: {}", otherIssues.size());
 
             // Log sample data for debugging
@@ -335,49 +337,152 @@ public class AnalysisController {
                     sampleOther.getCategory(), sampleOther.getSuggestion() != null);
             }
 
-            // Add all required attributes for the report template
+            // Add all required attributes for the report template with null safety
             model.addAttribute("analysisId", analysisId);
             model.addAttribute("sessionId", sessionId);
             model.addAttribute("report", report);
-            model.addAttribute("remainingScans", session.getRemainingScans());
+            model.addAttribute("analysis", analysis);
+            model.addAttribute("session", session);
+            model.addAttribute("remainingScans", session.getRemainingScans() != null ? session.getRemainingScans() : 0);
             model.addAttribute("securityIssues", securityIssues);
             model.addAttribute("additionalSecurityIssues", additionalSecurityIssues);
             model.addAttribute("otherIssues", otherIssues);
 
+            log.info("✅ Report displayed for analysis {} with {} total issues", 
+                    analysisId, allIssues.size());
+
             return "report";
             
+        } catch (SecurityException e) {
+            log.warn("⚠️ Security violation in report access: {}", e.getMessage());
+            model.addAttribute("error", "Access denied.");
+            return "error";
         } catch (Exception e) {
-            log.error("Error showing report", e);
+            log.error("❌ Error showing report for analysis {}", analysisId, e);
             model.addAttribute("error", "Error loading report: " + e.getMessage());
             return "error";
         }
     }
-    
- // Helper method for severity priority
-    private int getSeverityPriority(String severity) {
-        if (severity == null) return 0;
-        return switch (severity.toUpperCase()) {
-            case "CRITICAL" -> 4;
-            case "HIGH" -> 3;
-            case "MEDIUM" -> 2;
-            case "LOW" -> 1;
-            default -> 0;
-        };
+
+    // Helper method to ensure report has all required defaults
+    private void ensureReportDefaults(ReportResponse report, Analysis analysis) {
+        if (report.getRepository() == null || report.getRepository().trim().isEmpty()) {
+            report.setRepository(analysis.getRepository() != null ? analysis.getRepository() : "Unknown Repository");
+        }
+        if (report.getBranch() == null || report.getBranch().trim().isEmpty()) {
+            report.setBranch(analysis.getBranch() != null ? analysis.getBranch() : "main");
+        }
+        if (report.getIssues() == null) {
+            report.setIssues(new ArrayList<>());
+        }
+        if (report.getDate() == null) {
+            report.setDate(new Date(analysis.getStartTime() != null ? analysis.getStartTime() : System.currentTimeMillis()));
+        }
+        if (report.getScores() == null) {
+            Map<String, Double> defaultScores = new HashMap<>();
+            defaultScores.put("security", 50.0);
+            defaultScores.put("performance", 50.0);
+            defaultScores.put("quality", 50.0);
+            defaultScores.put("overall", 50.0);
+            report.setScores(defaultScores);
+        }
+        
+        // Ensure counts are set
+        if (report.getCriticalCount() == null) report.setCriticalCount(0);
+        if (report.getHighCount() == null) report.setHighCount(0);
+        if (report.getMediumCount() == null) report.setMediumCount(0);
+        if (report.getLowCount() == null) report.setLowCount(0);
+        if (report.getSecurityCount() == null) report.setSecurityCount(0);
+        if (report.getPerformanceCount() == null) report.setPerformanceCount(0);
+        if (report.getQualityCount() == null) report.setQualityCount(0);
+        if (report.getTotalIssues() == null) report.setTotalIssues(report.getIssues().size());
+        if (report.getFilesAnalyzed() == null) report.setFilesAnalyzed(0);
+        if (report.getProcessingTime() == null) {
+            if (analysis.getStartTime() != null && analysis.getEndTime() != null) {
+                report.setProcessingTime(analysis.getEndTime() - analysis.getStartTime());
+            } else {
+                report.setProcessingTime(0L);
+            }
+        }
     }
 
- // Helper method for category priority
+    // Helper method to create empty report for error cases
+    private ReportResponse createEmptyReport(String analysisId, Analysis analysis) {
+        ReportResponse report = new ReportResponse();
+        report.setAnalysisId(analysisId);
+        report.setRepository(analysis.getRepository() != null ? analysis.getRepository() : "Unknown Repository");
+        report.setBranch(analysis.getBranch() != null ? analysis.getBranch() : "main");
+        report.setDate(new Date());
+        report.setIssues(new ArrayList<>());
+        report.setCriticalCount(0);
+        report.setHighCount(0);
+        report.setMediumCount(0);
+        report.setLowCount(0);
+        report.setSecurityCount(0);
+        report.setPerformanceCount(0);
+        report.setQualityCount(0);
+        report.setTotalIssues(0);
+        report.setFilesAnalyzed(0);
+        report.setProcessingTime(0L);
+        
+        Map<String, Double> scores = new HashMap<>();
+        scores.put("overall", 100.0);
+        scores.put("security", 100.0);
+        scores.put("performance", 100.0);
+        scores.put("quality", 100.0);
+        report.setScores(scores);
+        
+        return report;
+    }
+
+    // Enhanced comparison method with null safety
+    private int compareIssuesBySeverity(Issue issue1, Issue issue2) {
+        if (issue1 == null && issue2 == null) return 0;
+        if (issue1 == null) return 1;
+        if (issue2 == null) return -1;
+        
+        int severityCompare = Integer.compare(
+            getSeverityPriority(issue2.getSeverity()), 
+            getSeverityPriority(issue1.getSeverity())
+        );
+        
+        if (severityCompare != 0) return severityCompare;
+        
+        // Secondary sort by file name
+        String file1 = issue1.getFile();
+        String file2 = issue2.getFile();
+        
+        if (file1 == null && file2 == null) return 0;
+        if (file1 == null) return 1;
+        if (file2 == null) return -1;
+        
+        return file1.compareTo(file2);
+    }
+
+    // Enhanced getSeverityPriority with null safety
+    private int getSeverityPriority(String severity) {
+        if (severity == null) return 0;
+        switch (severity.toUpperCase()) {
+            case "CRITICAL": return 4;
+            case "HIGH": return 3;
+            case "MEDIUM": return 2;
+            case "LOW": return 1;
+            default: return 0;
+        }
+    }
+
+    // Enhanced getCategoryPriority with null safety
     private int getCategoryPriority(String category) {
         if (category == null) return 0;
-        return switch (category.toLowerCase()) {
-            case "performance" -> 3;
-            case "quality" -> 2;
-            case "best-practices" -> 1;
-            default -> 0;
-        };
+        switch (category.toLowerCase()) {
+            case "security": return 4;
+            case "performance": return 3;
+            case "quality": return 2;
+            default: return 1;
+        }
     }
 
     // Helper method to check if issue has actionable fix
- // Helper method to check if issue has actionable fix
     private boolean hasActionableFix(Issue issue) {
         if (issue.getSuggestion() == null || 
             issue.getSuggestion().getImmediateFix() == null) {

@@ -5268,3 +5268,11 @@ java.lang.IllegalArgumentException: Attribute name cannot be null or empty
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.42.jar:10.1.42]
 	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
 
+2025-07-04T03:44:14.342+05:30  INFO 1460 --- [smart-code-review] [RMI TCP Connection(25)-127.0.0.1] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2025-07-04T03:44:14.585+05:30  INFO 1460 --- [smart-code-review] [RMI TCP Connection(25)-127.0.0.1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-04T03:44:14.625+05:30  INFO 1460 --- [smart-code-review] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-04T03:44:15.107+05:30  INFO 1460 --- [smart-code-review] [RMI TCP Connection(25)-127.0.0.1] c.s.s.service.SessionService             : Shutting down SecureTokenService, clearing 1 tokens
+2025-07-04T03:44:20.111+05:30  INFO 1460 --- [smart-code-review] [RMI TCP Connection(25)-127.0.0.1] c.s.s.service.SessionService             : Cleaned up all temporary tokens on shutdown
+2025-07-04T03:44:20.117+05:30  INFO 1460 --- [smart-code-review] [RMI TCP Connection(25)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-04T03:44:20.188+05:30  INFO 1460 --- [smart-code-review] [RMI TCP Connection(25)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-07-04T03:44:20.210+05:30  INFO 1460 --- [smart-code-review] [RMI TCP Connection(25)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
