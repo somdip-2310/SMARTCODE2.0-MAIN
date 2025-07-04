@@ -230,60 +230,6 @@ public class LambdaInvokerService {
 		}
 	}
 
-	private String invokeSuggestionsWithFallback(String sessionId, String analysisId, String repository, 
-			String branch, List<Map<String, Object>> issues, int scanNumber) {
-		try {
-			// Primary suggestion generation
-			return invokeSuggestionsWithTimeout(sessionId, analysisId, repository, branch, issues, scanNumber);
-		} catch (Exception e) {
-			log.warn("⚠️ Primary suggestions failed, attempting fallback: {}", e.getMessage());
-			// Fallback: Generate basic suggestions locally
-			return generateBasicSuggestions(analysisId, issues);
-		}
-	}
-
-	private String createEmptySuggestionsResponse(String analysisId) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("analysisId", analysisId);
-		response.put("suggestions", new ArrayList<>());
-		response.put("status", "NO_ISSUES");
-		response.put("timestamp", System.currentTimeMillis());
-		
-		try {
-			return objectMapper.writeValueAsString(response);
-		} catch (Exception e) {
-			log.error("Failed to create empty suggestions response", e);
-			return "{\"status\":\"ERROR\"}";
-		}
-	}
-
-	private String createPartialSuggestionsResponse(String analysisId, List<Map<String, Object>> issues) {
-		try {
-			List<Map<String, Object>> basicSuggestions = new ArrayList<>();
-			
-			for (Map<String, Object> issue : issues) {
-				Map<String, Object> suggestion = new HashMap<>();
-				suggestion.put("issueId", issue.get("id"));
-				suggestion.put("title", "Basic Fix Available");
-				suggestion.put("description", generateBasicDescription(issue));
-				suggestion.put("fix", generateBasicFix(issue));
-				suggestion.put("automated", false);
-				basicSuggestions.add(suggestion);
-			}
-			
-			Map<String, Object> response = new HashMap<>();
-			response.put("analysisId", analysisId);
-			response.put("suggestions", basicSuggestions);
-			response.put("status", "PARTIAL");
-			response.put("timestamp", System.currentTimeMillis());
-			
-			return objectMapper.writeValueAsString(response);
-		} catch (Exception e) {
-			log.error("Failed to create partial suggestions response", e);
-			return "{\"status\":\"ERROR\"}";
-		}
-	}
-
 	private String generateBasicDescription(Map<String, Object> issue) {
 		String type = (String) issue.get("type");
 		String file = (String) issue.get("file");
@@ -329,39 +275,87 @@ public class LambdaInvokerService {
 		}
 	}
 
-	private String generateBasicSuggestions(String analysisId, List<Map<String, Object>> issues) {
-		return createPartialSuggestionsResponse(analysisId, issues);
+	private String generateBasicSuggestionsResponse(List<Map<String, Object>> issues) {
+	    try {
+	        List<Map<String, Object>> basicSuggestions = new ArrayList<>();
+	        
+	        for (Map<String, Object> issue : issues) {
+	            Map<String, Object> suggestion = new HashMap<>();
+	            suggestion.put("issueId", issue.get("id"));
+	            suggestion.put("title", "Basic Fix Available");
+	            suggestion.put("description", generateBasicDescription(issue));
+	            suggestion.put("fix", generateBasicFix(issue));
+	            suggestion.put("automated", false);
+	            basicSuggestions.add(suggestion);
+	        }
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("suggestions", basicSuggestions);
+	        response.put("status", "PARTIAL");
+	        response.put("timestamp", System.currentTimeMillis());
+	        
+	        return objectMapper.writeValueAsString(response);
+	    } catch (Exception e) {
+	        log.error("Failed to create basic suggestions response", e);
+	        return "{\"status\":\"ERROR\"}";
+	    }
 	}
 
-		String lockKey = "suggestions_" + analysisId;
-		if (!acquireAnalysisLock(lockKey)) {
-			log.warn("⚠️ Another suggestions process is already running for analysis {}", analysisId);
-			return null;
-		}
+	// Fix the invokeSuggestionsWithFallback method
+	private String invokeSuggestionsWithFallback(String sessionId, String analysisId, String repository, 
+	        String branch, List<Map<String, Object>> issues, int scanNumber) {
+	    try {
+	        // Primary suggestion generation
+	        return invokeSuggestionsWithTimeout(sessionId, analysisId, repository, branch, issues, scanNumber);
+	    } catch (Exception e) {
+	        log.warn("⚠️ Primary suggestions failed, attempting fallback: {}", e.getMessage());
+	        // Fallback: Generate basic suggestions locally
+	        return generateBasicSuggestionsResponse(issues);
+	    }
+	}
 
-		try {
-			if (isCircuitBreakerOpen("suggestions")) {
-				log.warn("🔴 Circuit breaker is OPEN for suggestions. Skipping invocation.");
-				return null;
-			}
+	// Fix the createPartialSuggestionsResponse method
+	private String createPartialSuggestionsResponse(String analysisId, List<Map<String, Object>> issues) {
+	    try {
+	        List<Map<String, Object>> basicSuggestions = new ArrayList<>();
+	        
+	        for (Map<String, Object> issue : issues) {
+	            Map<String, Object> suggestion = new HashMap<>();
+	            suggestion.put("issueId", issue.get("id"));
+	            suggestion.put("title", "Basic Fix Available");
+	            suggestion.put("description", generateBasicDescription(issue));
+	            suggestion.put("fix", generateBasicFix(issue));
+	            suggestion.put("automated", false);
+	            basicSuggestions.add(suggestion);
+	        }
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("analysisId", analysisId);
+	        response.put("suggestions", basicSuggestions);
+	        response.put("status", "PARTIAL");
+	        response.put("timestamp", System.currentTimeMillis());
+	        
+	        return objectMapper.writeValueAsString(response);
+	    } catch (Exception e) {
+	        log.error("Failed to create partial suggestions response", e);
+	        return "{\"status\":\"ERROR\"}";
+	    }
+	}
 
-			// Apply hybrid strategy to issues before processing
-			List<Map<String, Object>> hybridProcessedIssues = applyHybridStrategy(issues);
-
-			log.info("🎯 Hybrid Strategy: Processing {} issues out of {} total (optimized for cost)",
-					hybridProcessedIssues.size(), issues.size());
-
-			// Use async invocation with timeout protection
-			return invokeSuggestionsWithTimeout(sessionId, analysisId, repository, branch, hybridProcessedIssues,
-					scanNumber);
-
-		} catch (Exception e) {
-			log.error("❌ Failed to invoke suggestions Lambda for analysis {}", analysisId, e);
-			recordFailure("suggestions");
-			return null;
-		} finally {
-			releaseAnalysisLock(lockKey);
-		}
+	// Fix the createEmptySuggestionsResponse method
+	private String createEmptySuggestionsResponse(String analysisId) {
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("analysisId", analysisId);
+	    response.put("suggestions", new ArrayList<>());
+	    response.put("status", "NO_ISSUES");
+	    response.put("timestamp", System.currentTimeMillis());
+	    
+	    try {
+	        return objectMapper.writeValueAsString(response);
+	    } catch (Exception e) {
+	        log.error("Failed to create empty suggestions response", e);
+	        return "{\"status\":\"ERROR\"}";
+	    }
 	}
 	/**
 	 * Asynchronous suggestions invocation with timeout protection

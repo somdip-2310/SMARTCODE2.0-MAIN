@@ -376,7 +376,8 @@ public class AnalysisController {
             report.setIssues(new ArrayList<>());
         }
         if (report.getDate() == null) {
-            report.setDate(new Date(analysis.getStartTime() != null ? analysis.getStartTime() : System.currentTimeMillis()));
+            // Use getStartedAt() instead of getStartTime()
+            report.setDate(new Date(analysis.getStartedAt() != null ? analysis.getStartedAt() : System.currentTimeMillis()));
         }
         if (report.getScores() == null) {
             Map<String, Double> defaultScores = new HashMap<>();
@@ -387,19 +388,23 @@ public class AnalysisController {
             report.setScores(defaultScores);
         }
         
-        // Ensure counts are set
+        // Ensure counts are set with null safety
         if (report.getCriticalCount() == null) report.setCriticalCount(0);
         if (report.getHighCount() == null) report.setHighCount(0);
         if (report.getMediumCount() == null) report.setMediumCount(0);
         if (report.getLowCount() == null) report.setLowCount(0);
+        
+        // Initialize category counts if they don't exist
         if (report.getSecurityCount() == null) report.setSecurityCount(0);
         if (report.getPerformanceCount() == null) report.setPerformanceCount(0);
         if (report.getQualityCount() == null) report.setQualityCount(0);
+        
         if (report.getTotalIssues() == null) report.setTotalIssues(report.getIssues().size());
         if (report.getFilesAnalyzed() == null) report.setFilesAnalyzed(0);
         if (report.getProcessingTime() == null) {
-            if (analysis.getStartTime() != null && analysis.getEndTime() != null) {
-                report.setProcessingTime(analysis.getEndTime() - analysis.getStartTime());
+            // Use getStartedAt() and getCompletedAt() instead of getStartTime()/getEndTime()
+            if (analysis.getStartedAt() != null && analysis.getCompletedAt() != null) {
+                report.setProcessingTime(analysis.getCompletedAt() - analysis.getStartedAt());
             } else {
                 report.setProcessingTime(0L);
             }
@@ -482,49 +487,43 @@ public class AnalysisController {
         }
     }
 
-    // Helper method to check if issue has actionable fix
-    private boolean hasActionableFix(Issue issue) {
-        if (issue.getSuggestion() == null || 
-            issue.getSuggestion().getImmediateFix() == null) {
-            return false;
-        }
+    // Enhanced isMainSecurityIssue with comprehensive null safety
+    private boolean isMainSecurityIssue(Issue issue) {
+        if (issue == null) return false;
         
-        String searchCode = issue.getSuggestion().getImmediateFix().getSearchCode();
-        String replaceCode = issue.getSuggestion().getImmediateFix().getReplaceCode();
-        
-        // Check for generic/dummy content
-        if (searchCode == null || replaceCode == null ||
-            searchCode.contains("Review the identified") ||
-            searchCode.contains("Manual review required") ||
-            replaceCode.contains("Apply appropriate") ||
-            replaceCode.contains("TODO:") ||
-            searchCode.equals(replaceCode) ||
-            searchCode.length() < 10 ||
-            replaceCode.length() < 10) {
-            return false;
-        }
-        
-        return true;
+        return issue.getSuggestion() != null && 
+               issue.getSuggestion().getImmediateFix() != null &&
+               issue.getSuggestion().getImmediateFix().getSearchCode() != null &&
+               !issue.getSuggestion().getImmediateFix().getSearchCode().trim().isEmpty() &&
+               !issue.getSuggestion().getImmediateFix().getSearchCode().contains("Review the identified") &&
+               !issue.getSuggestion().getImmediateFix().getSearchCode().contains("Manual review required") &&
+               issue.getSuggestion().getImmediateFix().getReplaceCode() != null &&
+               !issue.getSuggestion().getImmediateFix().getReplaceCode().trim().isEmpty();
     }
 
-    // Helper method to check if security issue should be in main security table
-    private boolean isMainSecurityIssue(Issue issue) {
-        if (!"security".equalsIgnoreCase(issue.getCategory())) {
+    // Enhanced hasActionableFix with comprehensive null safety
+    private boolean hasActionableFix(Issue issue) {
+        if (issue == null) return false;
+        
+        // Must have a suggestion with immediate fix
+        if (issue.getSuggestion() == null || issue.getSuggestion().getImmediateFix() == null) {
             return false;
         }
         
-        // Issues with CVE ID and score should be in main security table
-        if (issue.getCveId() != null && issue.getCveScore() != null && issue.getCveScore() > 0) {
-            return true;
-        }
+        ImmediateFix fix = issue.getSuggestion().getImmediateFix();
         
-        // Critical and High severity security issues should be in main table
-        if ("CRITICAL".equalsIgnoreCase(issue.getSeverity()) || 
-            "HIGH".equalsIgnoreCase(issue.getSeverity())) {
-            return true;
-        }
+        // Must have both search and replace code that are meaningful
+        boolean hasSearchCode = fix.getSearchCode() != null && 
+                               !fix.getSearchCode().trim().isEmpty() &&
+                               !fix.getSearchCode().contains("Review the identified") &&
+                               !fix.getSearchCode().contains("Manual review required");
         
-        // Issues with actionable fixes should be in main table
-        return hasActionableFix(issue);
+        boolean hasReplaceCode = fix.getReplaceCode() != null && 
+                                !fix.getReplaceCode().trim().isEmpty() &&
+                                !fix.getReplaceCode().contains("Manual review required") &&
+                                !fix.getReplaceCode().contains("Apply appropriate security measures");
+        
+        return hasSearchCode && hasReplaceCode;
     }
+
 }

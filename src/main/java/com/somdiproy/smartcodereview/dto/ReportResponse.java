@@ -29,6 +29,10 @@ public class ReportResponse {
     private List<Issue> issues;
     private Map<String, Double> scores;
     
+    private Integer securityCount;
+    private Integer performanceCount; 
+    private Integer qualityCount;
+    
     // Default constructor
     public ReportResponse() {}
     
@@ -226,5 +230,29 @@ public class ReportResponse {
     
     public void setScores(Map<String, Double> scores) {
         this.scores = scores;
+    }
+ // Add these getter/setter methods
+    public Integer getSecurityCount() {
+        return securityCount;
+    }
+
+    public void setSecurityCount(Integer securityCount) {
+        this.securityCount = securityCount;
+    }
+
+    public Integer getPerformanceCount() {
+        return performanceCount;
+    }
+
+    public void setPerformanceCount(Integer performanceCount) {
+        this.performanceCount = performanceCount;
+    }
+
+    public Integer getQualityCount() {
+        return qualityCount;
+    }
+
+    public void setQualityCount(Integer qualityCount) {
+        this.qualityCount = qualityCount;
     }
 }
