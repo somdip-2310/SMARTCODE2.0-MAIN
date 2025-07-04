@@ -362,7 +362,8 @@
 											<td th:text="${issue.line}"></td>
 											<td>
 											    <button class="btn btn-sm btn-primary custom-toggle-btn collapsed" type="button"
-											        th:onclick="'toggleCustomCollapse(\'security-detail-' + ${issue.issueId} + '\', this)'"
+											        th:data-target="'security-detail-' + ${issue.issueId}"
+											        onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
 											        aria-expanded="false">
 											        View Fix <i class="bi bi-chevron-down"></i>
 											    </button>
@@ -455,7 +456,8 @@
 		                                    </td>
 		                                    <td>
 		                                        <button class="btn btn-sm btn-outline-warning custom-toggle-btn collapsed" type="button"
-		                                            th:onclick="'toggleCustomCollapse(\'additional-security-detail-' + ${issue.issueId} + '\', this)'"
+		                                            th:data-target="'additional-security-detail-' + ${issue.issueId}"
+		                                            onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
 		                                            aria-expanded="false">
 		                                            View Fix <i class="bi bi-chevron-down"></i>
 		                                        </button>
@@ -491,7 +493,7 @@
 		                                                            </button>
 		                                                            <pre class="bg-white border rounded p-3" 
 		                                                                th:id="'additional-search-' + ${issue.issueId}"
-		                                                                th:text="${issue.suggestion.immediateFix.searchCode != null ? issue.suggestion.immediateFix.searchCode : ('Review code at line ' + issue.line + ' in ' + issue.file)}">Search code</pre>
+		                                                                th:text="${issue.suggestion.immediateFix.searchCode != null ? issue.suggestion.immediateFix.searchCode : 'Review code at line ' + issue.line + ' in file: ' + issue.file}">Search code</pre>
 		                                                        </div>
 		                                                    </div>
 		                                                    <div class="col-md-6">
@@ -504,7 +506,7 @@
 		                                                            </button>
 		                                                            <pre class="bg-white border rounded p-3" 
 		                                                                th:id="'additional-replace-' + ${issue.issueId}"
-		                                                                th:text="${issue.suggestion.immediateFix.replaceCode != null ? issue.suggestion.immediateFix.replaceCode : ('Apply appropriate security measures for ' + issue.type + ' vulnerability. Refer to OWASP guidelines.')}">Replace code</pre>
+		                                                                th:text="${issue.suggestion.immediateFix.replaceCode != null ? issue.suggestion.immediateFix.replaceCode : 'Apply appropriate security measures for ' + issue.type + ' vulnerability. Refer to OWASP guidelines.'}">Replace code</pre>
 		                                                        </div>
 		                                                    </div>
 		                                                </div>
@@ -576,7 +578,8 @@
 											<td th:text="${issue.line}"></td>
 											<td>
 											    <button class="btn btn-sm btn-primary custom-toggle-btn collapsed" type="button"
-											        th:onclick="'toggleCustomCollapse(\'other-detail-' + ${issue.issueId} + '\', this)'"
+											        th:data-target="'other-detail-' + ${issue.issueId}"
+											        onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
 											        aria-expanded="false">
 											        View Fix <i class="bi bi-chevron-down"></i>
 											    </button>
