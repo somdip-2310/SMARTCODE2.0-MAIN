@@ -195,7 +195,7 @@ public class AnalysisController {
             
             // Update session scan count immediately
             session.incrementScanCount();
-            sessionService.saveSession(session);
+            //sessionService.saveSession(session);
             
             log.info("Analysis started with ID: {}, redirecting to progress page", analysisId);
             

@@ -271,7 +271,24 @@ public class SessionService {
         
         return org.toLowerCase();
     }
-    
+    /**
+     * Save or update a session
+     */
+    public Session saveSession(Session session) {
+        // Validate session
+        if (session.getSessionId() == null) {
+            throw new IllegalArgumentException("Session ID cannot be null");
+        }
+        
+        // Update TTL if needed
+        if (session.getTtl() == null) {
+            long currentTime = System.currentTimeMillis() / 1000;
+            session.setTtl(currentTime + 3600); // 1 hour TTL
+        }
+        
+        // Save to repository
+        return sessionRepository.save(session);
+    }
     /**
      * Get client IP address
      */
