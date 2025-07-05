@@ -215,14 +215,23 @@ public class AnalysisController {
             // Verify session
             Session session = sessionService.getSession(sessionId);
             
-            // Get analysis details
-            Analysis analysis = analysisOrchestrator.getAnalysis(analysisId);
+            // Try to get analysis details, but don't fail if not found yet
+            String repository = "Repository";
+            String branch = "Branch";
+            try {
+                Analysis analysis = analysisOrchestrator.getAnalysis(analysisId);
+                repository = analysis.getRepository();
+                branch = analysis.getBranch();
+            } catch (Exception analysisEx) {
+                // Analysis might not be in cache yet, use default values
+                log.debug("Analysis not found in cache yet for {}, using defaults", analysisId);
+            }
             
             model.addAttribute("analysisId", analysisId);
             model.addAttribute("sessionId", sessionId);
             model.addAttribute("email", session.getEmailMasked());
-            model.addAttribute("repository", analysis.getRepository());
-            model.addAttribute("branch", analysis.getBranch());
+            model.addAttribute("repository", repository);
+            model.addAttribute("branch", branch);
             
             return "analysis-progress";
             
