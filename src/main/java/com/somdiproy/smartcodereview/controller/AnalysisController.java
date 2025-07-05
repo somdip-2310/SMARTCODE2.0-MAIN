@@ -215,9 +215,14 @@ public class AnalysisController {
             // Verify session
             Session session = sessionService.getSession(sessionId);
             
+            // Get analysis details
+            Analysis analysis = analysisOrchestrator.getAnalysis(analysisId);
+            
             model.addAttribute("analysisId", analysisId);
             model.addAttribute("sessionId", sessionId);
             model.addAttribute("email", session.getEmailMasked());
+            model.addAttribute("repository", analysis.getRepository());
+            model.addAttribute("branch", analysis.getBranch());
             
             return "analysis-progress";
             
