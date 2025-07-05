@@ -9,6 +9,7 @@ import java.util.List;
 @DynamoDbBean
 public class Suggestion {
     
+    private String issueDescription;
     private ImmediateFix immediateFix;
     private BestPractice bestPractice;
     private Testing testing;
@@ -16,6 +17,15 @@ public class Suggestion {
     
     // Default constructor
     public Suggestion() {}
+    
+    // Getter and Setter for issueDescription
+    public String getIssueDescription() {
+        return issueDescription;
+    }
+    
+    public void setIssueDescription(String issueDescription) {
+        this.issueDescription = issueDescription;
+    }
     
     // Getters and Setters
     public ImmediateFix getImmediateFix() {

@@ -734,6 +734,9 @@ public class DataAggregationService {
     private Suggestion createSuggestion(Map<String, Object> suggestionData) {
         Suggestion suggestion = new Suggestion();
         
+        // Set issue description
+        suggestion.setIssueDescription(getStringValue(suggestionData, "issueDescription"));
+        
         // Immediate Fix
         Map<String, Object> immediateFix = (Map<String, Object>) suggestionData.get("immediateFix");
         if (immediateFix != null) {
