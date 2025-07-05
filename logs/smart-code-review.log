@@ -2447,3 +2447,11 @@ This generated password is for development use only. Your security configuration
 2025-07-05T19:27:38.729+05:30  INFO 14098 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.SessionService             : Sample security issue: title=Critical: Hardcoded Credentials, type=HARDCODED_CREDENTIALS, cveId=CVE-2023-38501, suggestion=true
 2025-07-05T19:27:38.729+05:30  INFO 14098 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.SessionService             : Sample other issue: title=Missing accessors, type=MISSING_ACCESSORS, category=performance, suggestion=true
 2025-07-05T19:27:38.729+05:30  INFO 14098 --- [smart-code-review] [http-nio-8083-exec-7] c.s.s.service.SessionService             : ✅ Report displayed for analysis c1f91ee0-f491-49b4-9ca3-3036cc16d0a6 with 233 total issues
+2025-07-05T19:44:09.210+05:30  INFO 14098 --- [smart-code-review] [RMI TCP Connection(69)-127.0.0.1] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2025-07-05T19:44:09.287+05:30  INFO 14098 --- [smart-code-review] [RMI TCP Connection(69)-127.0.0.1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-05T19:44:09.313+05:30  INFO 14098 --- [smart-code-review] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-05T19:44:09.589+05:30  INFO 14098 --- [smart-code-review] [RMI TCP Connection(69)-127.0.0.1] c.s.s.service.SessionService             : Shutting down SecureTokenService, clearing 1 tokens
+2025-07-05T19:44:14.590+05:30  INFO 14098 --- [smart-code-review] [RMI TCP Connection(69)-127.0.0.1] c.s.s.service.SessionService             : Cleaned up all temporary tokens on shutdown
+2025-07-05T19:44:14.595+05:30  INFO 14098 --- [smart-code-review] [RMI TCP Connection(69)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-05T19:44:14.611+05:30  INFO 14098 --- [smart-code-review] [RMI TCP Connection(69)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-07-05T19:44:14.621+05:30  INFO 14098 --- [smart-code-review] [RMI TCP Connection(69)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

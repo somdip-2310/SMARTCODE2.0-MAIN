@@ -643,7 +643,7 @@ public class DataAggregationService {
         }
         issue.setTitle(title);
         issue.setDescription(getStringValue(issueData, "description"));
-        issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM"));
+        issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM").toUpperCase());
         issue.setCategory(getStringValue(issueData, "category", "GENERAL"));
         issue.setFile(getStringValue(issueData, "file"));
         // Enhanced line number extraction
@@ -894,20 +894,24 @@ public class DataAggregationService {
             String category = getStringValue(issue, "category", "GENERAL");
             String severity = getStringValue(issue, "severity", "MEDIUM");
             
-            if ("SECURITY".equalsIgnoreCase(category)) securityIssues++;
-            else if ("PERFORMANCE".equalsIgnoreCase(category)) performanceIssues++;
-            else qualityIssues++;
+            if ("SECURITY".equalsIgnoreCase(category) || "security".equalsIgnoreCase(category)) securityIssues++;
+            else if ("PERFORMANCE".equalsIgnoreCase(category) || "performance".equalsIgnoreCase(category)) performanceIssues++;
+            else if ("QUALITY".equalsIgnoreCase(category) || "quality".equalsIgnoreCase(category) || "GENERAL".equalsIgnoreCase(category)) qualityIssues++;
             
             if ("CRITICAL".equalsIgnoreCase(severity)) criticalCount++;
 			else if ("HIGH".equalsIgnoreCase(severity))
 				highCount++;
 		}
 
+     // Debug logging
+        log.info("Score calculation - Security: {}, Performance: {}, Quality: {} issues", 
+                securityIssues, performanceIssues, qualityIssues);
+        
 		// Calculate scores (10 = perfect, 0 = worst)
 		// Use logarithmic scale to handle high issue counts better
 		double securityScore = 10.0 - Math.min(10.0, Math.log10(securityIssues + 1) * 2.5 + (criticalCount * 0.5));
 		double performanceScore = 10.0 - Math.min(10.0, Math.log10(performanceIssues + 1) * 2.0);
-		double qualityScore = 10.0 - Math.min(10.0, Math.log10(qualityIssues + 1) * 1.5 + (highCount * 0.3));
+		double qualityScore = qualityIssues == 0 ? 10.0 : (10.0 - Math.min(10.0, Math.log10(qualityIssues + 1) * 1.5 + (highCount * 0.3)));
 
 		scores.setSecurity(Math.max(0.0, Math.min(10.0, securityScore)));
 		scores.setPerformance(Math.max(0.0, Math.min(10.0, performanceScore)));

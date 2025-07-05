@@ -83,6 +83,12 @@
 			color: white;
 		}
 
+		/* Orange highlighting for HIGH severity issues */
+		.high-severity-badge {
+			background-color: #fd7e14 !important;
+			color: white !important;
+		}
+
 		.severity-badge.medium {
 			background-color: #ffc107;
 			color: dark;
@@ -158,9 +164,15 @@
 			padding: 0.375rem 0.75rem;
 		}
 
+		/* Specific styling for HIGH severity in performance table */
+		.table .badge.bg-warning {
+			background-color: #fd7e14 !important;
+			color: #ffffff !important;
+		}
+
 		.bg-warning {
-			background-color: #ffc107 !important;
-			color: #000 !important;
+			background-color: #fd7e14 !important;
+			color: #fff !important;
 		}
 
 		.bg-info {
@@ -169,9 +181,15 @@
 		}
 
 		.bg-danger,
+		.bg-warning,
 		.bg-success,
 		.bg-secondary {
 			color: #fff !important;
+		}
+
+		/* Override Bootstrap's yellow warning with orange */
+		.badge.bg-warning {
+			background-color: #fd7e14 !important;
 		}
 
 		/* Fix for table row highlighting */
@@ -259,7 +277,7 @@
 			<div class="col-md-4" th:if="${report.scores != null}">
 				<div class="card">
 					<div class="card-body">
-						<h5 class="card-title">Quality Scores</h5>
+						<h5 class="card-title">Overall Scores Out of 100 </h5>
 						<div class="row text-center">
 							<div class="col-4" th:if="${report.scores.containsKey('security')}">
 								<div class="score-card">
@@ -506,10 +524,10 @@
 														<h6 class="mb-3"><i
 																class="bi bi-exclamation-triangle text-warning"></i>
 															Issue Description</h6>
-														<div class="alert alert-warning mb-3"
-															th:if="${issue.suggestion != null and issue.suggestion.issueDescription != null}">
+														<div class="alert alert-warning mb-3">
 															<p class="mb-0"
-																th:text="${issue.suggestion.issueDescription}">This
+																th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : 'No description available')}">
+																This
 																issue can be exploited...</p>
 														</div>
 
@@ -618,19 +636,19 @@
 									<th:block th:each="issue : ${otherIssues}">
 										<!-- Only show if it has actionable suggestions -->
 										<tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
-									                 issue.suggestion.immediateFix.searchCode != null and 
-									                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
-									                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}"
-											th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : 
-									                        (${issue.severity == 'HIGH'} ? 'table-warning' : '')"
+																			                 issue.suggestion.immediateFix.searchCode != null and 
+																			                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
+																			                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}"
+											th:style="${issue.severity == 'HIGH'} ? 'background-color: #fff3cd;' : ''"
+											th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : ''"
 											th:attr="data-issue-id=${issue.issueId}">
 											<td>
 												<span class="badge" th:classappend="
-												        ${issue.severity == 'CRITICAL'} ? 'bg-danger text-white' : 
-												        (${issue.severity == 'HIGH'} ? 'bg-warning text-dark' : 
-												        (${issue.severity == 'MEDIUM'} ? 'bg-info text-white' : 
-												        (${issue.severity == 'LOW'} ? 'bg-success text-white' : 'bg-secondary text-white')))"
-													th:text="${issue.severity}"></span>
+																							        ${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
+																							        (${issue.severity == 'HIGH'} ? 'bg-warning' : 
+																							        (${issue.severity == 'MEDIUM'} ? 'bg-info' : 
+																							        (${issue.severity == 'LOW'} ? 'bg-success' : 'bg-secondary')))"
+													th:text="${issue.severity}">HIGH</span>
 											</td>
 											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
 												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
@@ -669,10 +687,11 @@
 															th:text="${issue.suggestion.immediateFix.explanation}">Fix
 															explanation</p>
 
-														<div th:if="${issue.description != null and !issue.description.isEmpty()}"
-															class="mb-3">
+														<div class="mb-3">
 															<h6>Issue Description:</h6>
-															<p th:text="${issue.description}">Issue description</p>
+															<p
+																th:text="${issue.description != null && !issue.description.isEmpty() ? issue.description : (issue.title != null ? issue.title : 'No description available')}">
+																Issue description</p>
 														</div>
 
 														<div class="row">

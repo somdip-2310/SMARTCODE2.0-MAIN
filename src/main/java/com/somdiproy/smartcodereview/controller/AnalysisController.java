@@ -283,8 +283,21 @@ public class AnalysisController {
             // Ensure all required fields are populated with null safety
             ensureReportDefaults(report, analysis);
 
-            // Get all issues with null safety
+         // Get all issues with null safety
             List<Issue> allIssues = report.getIssues() != null ? report.getIssues() : new ArrayList<>();
+            
+            // Ensure all issues have descriptions
+            allIssues.forEach(issue -> {
+                if (issue != null && (issue.getDescription() == null || issue.getDescription().isEmpty())) {
+                    if (issue.getTitle() != null && !issue.getTitle().isEmpty()) {
+                        issue.setDescription(issue.getTitle());
+                    } else if (issue.getType() != null) {
+                        issue.setDescription("Issue detected: " + issue.getType());
+                    } else {
+                        issue.setDescription("No description available");
+                    }
+                }
+            });
             
             // Filter security issues for main security table (CVE issues with actionable fixes)
             List<Issue> securityIssues = allIssues.stream()
@@ -325,15 +338,15 @@ public class AnalysisController {
             // Log sample data for debugging
             if (!securityIssues.isEmpty()) {
                 Issue sampleSecurity = securityIssues.get(0);
-                log.info("Sample security issue: title={}, type={}, cveId={}, suggestion={}", 
-                    sampleSecurity.getTitle(), sampleSecurity.getType(), 
+                log.info("Sample security issue: title={}, description={}, type={}, cveId={}, suggestion={}", 
+                    sampleSecurity.getTitle(), sampleSecurity.getDescription(), sampleSecurity.getType(), 
                     sampleSecurity.getCveId(), sampleSecurity.getSuggestion() != null);
             }
 
             if (!otherIssues.isEmpty()) {
                 Issue sampleOther = otherIssues.get(0);
-                log.info("Sample other issue: title={}, type={}, category={}, suggestion={}", 
-                    sampleOther.getTitle(), sampleOther.getType(), 
+                log.info("Sample other issue: title={}, type={}, severity={}, category={}, suggestion={}", 
+                    sampleOther.getTitle(), sampleOther.getType(), sampleOther.getSeverity(),
                     sampleOther.getCategory(), sampleOther.getSuggestion() != null);
             }
 

@@ -44,6 +44,15 @@ public class ReportService {
 
 		// Enrich issues with CVE data
 		issues.forEach(issue -> {
+			// Ensure description is populated
+			if (issue.getDescription() == null || issue.getDescription().isEmpty()) {
+				if (issue.getTitle() != null && !issue.getTitle().isEmpty()) {
+					issue.setDescription(issue.getTitle());
+				} else {
+					issue.setDescription("Issue detected: " + issue.getType());
+				}
+			}
+			
 			if ("SECURITY".equalsIgnoreCase(issue.getCategory())
 					&& (issue.getCveId() == null || issue.getCveId().isEmpty())) {
 				String cveId = cveMappingService.getCVEId(issue.getType());
