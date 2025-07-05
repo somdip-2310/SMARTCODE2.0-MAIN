@@ -235,7 +235,15 @@ public class AnalysisController {
     @ResponseBody
     public AnalysisStatusResponse getStatus(@PathVariable String analysisId) {
         try {
-            return analysisOrchestrator.getAnalysisStatus(analysisId);
+            AnalysisStatusResponse response = analysisOrchestrator.getAnalysisStatus(analysisId);
+            
+            // Add preview data if available
+            if (response.getProgress() != null && response.getProgress().getOverall() > 33) {
+                List<Map<String, String>> preview = analysisOrchestrator.getAnalysisPreview(analysisId);
+                response.setPreview(preview);
+            }
+            
+            return response;
         } catch (Exception e) {
             log.error("Error getting analysis status", e);
             return AnalysisStatusResponse.builder()

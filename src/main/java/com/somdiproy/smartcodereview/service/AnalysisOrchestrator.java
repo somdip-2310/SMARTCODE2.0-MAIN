@@ -16,6 +16,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -360,13 +362,53 @@ public class AnalysisOrchestrator {
     }
     
     /**
-     * Calculate estimated time remaining
+     * Calculate estimated time remaining based on actual progress
      */
     private Integer calculateETA(Analysis analysis) {
         if (analysis.getProgress() >= 100) return 0;
-        if (analysis.getProgress() < 33) return 120; // 2 minutes
-        if (analysis.getProgress() < 66) return 60;  // 1 minute
-        return 30; // 30 seconds
+        
+     // More accurate ETA based on stage and file count
+        int filesCount = analysis.getTotalFiles() != null ? analysis.getTotalFiles() : 20;
+        int baseTime = 5 + (filesCount / 10) * 2; // Base time increases with file count
+        
+        if (analysis.getProgress() < 33) {
+            // Screening phase
+            return baseTime + 60; // 1-2 minutes
+        } else if (analysis.getProgress() < 66) {
+            // Detection phase  
+            return baseTime + 30; // 30-60 seconds
+        } else {
+            // Suggestion phase
+            return baseTime + 15; // 15-30 seconds
+        }
+    }
+    
+    /**
+     * Get analysis preview data
+     */
+    public List<Map<String, String>> getAnalysisPreview(String analysisId) {
+        try {
+            // Check if we have detection results in the data aggregation service
+            List<Map<String, Object>> detectionResults = dataAggregationService.getDetectionResults(analysisId);
+            if (detectionResults == null || detectionResults.isEmpty()) {
+                return new ArrayList<>();
+            }
+            
+            // Convert first 3 issues to preview format
+            return detectionResults.stream()
+                .limit(3)
+                .map(issue -> {
+                    Map<String, String> preview = new HashMap<>();
+                    preview.put("type", (String) issue.getOrDefault("type", "Unknown"));
+                    preview.put("severity", (String) issue.getOrDefault("severity", "MEDIUM"));
+                    preview.put("file", (String) issue.getOrDefault("file", "Unknown file"));
+                    return preview;
+                })
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error getting analysis preview: ", e);
+            return new ArrayList<>();
+        }
     }
     
     // Analysis lock management for preventing concurrent suggestions processing

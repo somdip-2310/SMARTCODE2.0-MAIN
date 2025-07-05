@@ -57,6 +57,17 @@ public class DataAggregationService {
     }
     
     /**
+     * Get detection results from cache
+     */
+    public List<Map<String, Object>> getDetectionResults(String analysisId) {
+        LambdaResults results = lambdaResultsCache.get(analysisId);
+        if (results != null && results.getDetectedIssues() != null) {
+            return results.getDetectedIssues();
+        }
+        return new ArrayList<>();
+    }
+    
+    /**
      * Store suggestion results from Lambda
      */
     public void storeSuggestionResults(String analysisId, String suggestionResponseJson) {

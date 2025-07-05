@@ -1,5 +1,6 @@
 package com.somdiproy.smartcodereview.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public class AnalysisStatusResponse {
@@ -11,6 +12,8 @@ public class AnalysisStatusResponse {
     private Integer issuesFound;
     private Integer estimatedTimeRemaining;
     private String error;
+    private Integer scanNumber;
+    private List<Map<String, String>> preview;
     
     // Constructors
     public AnalysisStatusResponse() {}
@@ -80,7 +83,23 @@ public class AnalysisStatusResponse {
         this.error = error;
     }
     
-    // Builder pattern
+    public Integer getScanNumber() {
+		return scanNumber;
+	}
+
+	public void setScanNumber(Integer scanNumber) {
+		this.scanNumber = scanNumber;
+	}
+
+	public List<Map<String, String>> getPreview() {
+		return preview;
+	}
+
+	public void setPreview(List<Map<String, String>> preview) {
+		this.preview = preview;
+	}
+
+	// Builder pattern
     public static AnalysisStatusResponseBuilder builder() {
         return new AnalysisStatusResponseBuilder();
     }
@@ -125,6 +144,16 @@ public class AnalysisStatusResponse {
         
         public AnalysisStatusResponseBuilder error(String error) {
             response.setError(error);
+            return this;
+        }
+        
+        public AnalysisStatusResponseBuilder scanNumber(Integer scanNumber) {
+            response.setScanNumber(scanNumber);
+            return this;
+        }
+        
+        public AnalysisStatusResponseBuilder preview(List<Map<String, String>> preview) {
+            response.setPreview(preview);
             return this;
         }
         

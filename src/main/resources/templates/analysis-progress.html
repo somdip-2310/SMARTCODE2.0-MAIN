@@ -3,26 +3,226 @@
 <head>
     <title>Analysis in Progress - Smart Code Review</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .analysis-container {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .stage-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stage-card.active {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: #ffc107;
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.3);
+        }
+        
+        .stage-card.completed {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: #28a745;
+        }
+        
+        .stage-card .stage-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .progress {
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+        
+        .architecture-diagram {
+            width: 100%;
+            max-width: 800px;
+            margin: 30px auto;
+            position: relative;
+        }
+        
+        .fun-message {
+            font-style: italic;
+            color: #a0a0a0;
+            text-align: center;
+            margin: 20px 0;
+            animation: fadeInOut 4s infinite;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .warning-alert {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .preview-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .issue-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Analyzing Your Code</h1>
-        
-        <div class="progress mb-4" style="height: 30px;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                 role="progressbar" 
-                 style="width: 0%"
-                 id="progress-bar">0%</div>
-        </div>
-        
-        <div class="card">
-            <div class="card-body">
-                <h5>Analysis Status</h5>
-                <ul class="list-group">
-                    <li class="list-group-item">Files to analyze: <span id="file-count">-</span></li>
-                    <li class="list-group-item">Issues found: <span id="issue-count">-</span></li>
-                    <li class="list-group-item">Status: <span id="status">Initializing...</span></li>
-                </ul>
+        <div class="analysis-container">
+            <div class="warning-alert">
+                <i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Please do not close or refresh this page while analysis is in progress.
+            </div>
+            
+            <h1 class="text-center mb-4">
+                <i class="fas fa-code"></i> Analyzing Your Code
+            </h1>
+            
+            <div class="text-center mb-3">
+                <p class="lead">Repository: <strong th:text="${repository}">owner/repo</strong> | Branch: <strong th:text="${branch}">main</strong></p>
+            </div>
+            
+            <div class="progress mb-4">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" 
+                     id="overall-progress"
+                     style="width: 0%">0%</div>
+            </div>
+            
+            <p class="fun-message" id="fun-message">🚀 Initializing AI agents...</p>
+            
+            <!-- Architecture Visualization -->
+            <div class="architecture-diagram" id="architecture-svg">
+                <!-- SVG will be inserted here -->
+            </div>
+            
+            <!-- Stage Cards -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="stage-card" id="screening-stage">
+                        <div class="stage-icon text-center">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <h5>Stage 1: File Screening</h5>
+                        <p class="mb-1">Status: <span id="screening-status">Pending</span></p>
+                        <p class="mb-0"><small>LLM 1 is filtering files...</small></p>
+                        <div class="mt-2">
+                            <small class="text-muted">Est. time: 5-10 seconds</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="stage-card" id="detection-stage">
+                        <div class="stage-icon text-center">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h5>Stage 2: Issue Detection</h5>
+                        <p class="mb-1">Status: <span id="detection-status">Pending</span></p>
+                        <p class="mb-0"><small>LLM 2 is scanning for issues...</small></p>
+                        <div class="mt-2">
+                            <small class="text-muted">Est. time: 15-30 seconds</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="stage-card" id="suggestion-stage">
+                        <div class="stage-icon text-center">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h5>Stage 3: Fix Generation</h5>
+                        <p class="mb-1">Status: <span id="suggestion-status">Pending</span></p>
+                        <p class="mb-0"><small>LLM 3 is crafting solutions...</small></p>
+                        <div class="mt-2">
+                            <small class="text-muted">Est. time: 30-45 seconds</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analysis Metrics -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <h3 id="files-count">0</h3>
+                        <p>Files Analyzed</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <h3 id="issues-count">0</h3>
+                        <p>Issues Found</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <h3 id="eta-display">--:--</h3>
+                        <p>Time Remaining</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Live Preview Section -->
+            <div class="preview-section" id="preview-section" style="display: none;">
+                <h5>🔍 Analysis Preview</h5>
+                <div id="preview-content">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
@@ -31,26 +231,184 @@
         const analysisId = /*[[${analysisId}]]*/ '';
         const sessionId = /*[[${sessionId}]]*/ '';
         
+        const funMessages = [
+            "🎯 Good things take time... Your code is worth the wait!",
+            "☕ Perfect time for a coffee break!",
+            "🧙‍♂️ Our AI wizards are working their magic...",
+            "🔍 Examining every semicolon with care...",
+            "💡 Brewing brilliant suggestions just for you!",
+            "🚀 Optimizing your code to warp speed...",
+            "🛡️ Fortifying your security like a digital fortress!",
+            "⚡ Lightning-fast analysis in progress...",
+            "🎨 Crafting elegant solutions...",
+            "🧠 AI neurons firing at maximum capacity!"
+        ];
+        
+        let messageIndex = 0;
+        
+        // Insert simplified architecture SVG
+        document.getElementById('architecture-svg').innerHTML = `
+            <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="activeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffc107;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="completeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#28a745;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#20c997;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Nodes -->
+                <g id="github-node">
+                    <circle cx="100" cy="200" r="40" fill="#24292e" stroke="#fff" stroke-width="2"/>
+                    <text x="100" y="205" text-anchor="middle" fill="white" font-size="12">GitHub</text>
+                </g>
+                
+                <g id="screening-node">
+                    <circle cx="300" cy="100" r="40" fill="#666" stroke="#fff" stroke-width="2"/>
+                    <text x="300" y="105" text-anchor="middle" fill="white" font-size="12">LLM 1</text>
+                </g>
+                
+                <g id="detection-node">
+                    <circle cx="500" cy="200" r="40" fill="#666" stroke="#fff" stroke-width="2"/>
+                    <text x="500" y="205" text-anchor="middle" fill="white" font-size="12">LLM 2</text>
+                </g>
+                
+                <g id="suggestion-node">
+                    <circle cx="300" cy="300" r="40" fill="#666" stroke="#fff" stroke-width="2"/>
+                    <text x="300" y="305" text-anchor="middle" fill="white" font-size="12">LLM 3</text>
+                </g>
+                
+                <g id="report-node">
+                    <circle cx="700" cy="200" r="40" fill="#666" stroke="#fff" stroke-width="2"/>
+                    <text x="700" y="205" text-anchor="middle" fill="white" font-size="12">Report</text>
+                </g>
+                
+                <!-- Connections -->
+                <path id="path1" d="M 140 200 L 260 100" stroke="#666" stroke-width="2" fill="none"/>
+                <path id="path2" d="M 340 100 L 460 200" stroke="#666" stroke-width="2" fill="none"/>
+                <path id="path3" d="M 500 240 L 300 340" stroke="#666" stroke-width="2" fill="none"/>
+                <path id="path4" d="M 340 300 L 660 200" stroke="#666" stroke-width="2" fill="none"/>
+                
+                <!-- Animated particle -->
+                <circle r="5" fill="#ffc107" id="particle">
+                    <animateMotion dur="8s" repeatCount="indefinite">
+                        <mpath href="#fullPath"/>
+                    </animateMotion>
+                </circle>
+                
+                <path id="fullPath" d="M 140 200 L 260 100 L 460 200 L 300 340 L 660 200" fill="none"/>
+            </svg>
+        `;
+        
         function updateProgress() {
             fetch(`/api/analysis/${analysisId}/status`)
                 .then(response => response.json())
                 .then(data => {
-                    const progressBar = document.getElementById('progress-bar');
-                    progressBar.style.width = (data.progress?.overall || 0) + '%';
-                    progressBar.textContent = (data.progress?.overall || 0) + '%';
+                    // Update overall progress
+                    const progressBar = document.getElementById('overall-progress');
+                    const progress = data.progress?.overall || 0;
+                    progressBar.style.width = progress + '%';
+                    progressBar.textContent = progress + '%';
                     
-                    document.getElementById('file-count').textContent = data.filesProcessed || '-';
-                    document.getElementById('issue-count').textContent = data.issuesFound || '-';
-                    document.getElementById('status').textContent = data.status || 'Processing...';
+                    // Update stage statuses
+                    updateStageStatus('screening', data.progress?.screening || 'pending', data);
+                    updateStageStatus('detection', data.progress?.detection || 'pending', data);
+                    updateStageStatus('suggestion', data.progress?.suggestions || 'pending', data);
                     
-                    if (data.status === 'completed') {
-                        window.location.href = `/report/${analysisId}?sessionId=${sessionId}`;
+                    // Update metrics
+                    document.getElementById('files-count').textContent = data.filesProcessed || '0';
+                    document.getElementById('issues-count').textContent = data.issuesFound || '0';
+                    
+                    // Update ETA
+                    const eta = data.estimatedTimeRemaining || 0;
+                    document.getElementById('eta-display').textContent = formatTime(eta);
+                    
+                    // Update preview if available
+                    if (data.preview && data.preview.length > 0) {
+                        showPreview(data.preview);
                     }
+                    
+                    // Redirect when complete
+                    if (data.status === 'completed') {
+                        setTimeout(() => {
+                            window.location.href = `/report/${analysisId}?sessionId=${sessionId}`;
+                        }, 1000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching status:', error);
                 });
         }
         
+        function updateStageStatus(stage, status, data) {
+            const stageCard = document.getElementById(`${stage}-stage`);
+            const statusSpan = document.getElementById(`${stage}-status`);
+            const svg = document.querySelector('#architecture-svg svg');
+            const node = svg.querySelector(`#${stage}-node circle`);
+            
+            if (status === 'in_progress') {
+                stageCard.classList.add('active');
+                stageCard.classList.remove('completed');
+                statusSpan.innerHTML = '<span class="spinner"></span> Processing...';
+                node.setAttribute('fill', 'url(#activeGrad)');
+                
+                // Update message based on stage
+                if (stage === 'screening') {
+                    updateFunMessage(`📁 Screening ${data.filesProcessed || 0} files...`);
+                } else if (stage === 'detection' && data.issuesFound) {
+                    updateFunMessage(`🔍 Found ${data.issuesFound} issues so far...`);
+                } else if (stage === 'suggestion' && data.issuesFound) {
+                    updateFunMessage(`🔧 Generating fixes for ${data.issuesFound} issues...`);
+                }
+            } else if (status === 'completed') {
+                stageCard.classList.remove('active');
+                stageCard.classList.add('completed');
+                statusSpan.innerHTML = '<i class="fas fa-check-circle" style="color: #28a745;"></i> Completed';
+                node.setAttribute('fill', 'url(#completeGrad)');
+            } else {
+                statusSpan.textContent = 'Pending';
+            }
+        }
+        
+        function formatTime(seconds) {
+            if (seconds <= 0) return '00:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function updateFunMessage(customMessage) {
+            const messageEl = document.getElementById('fun-message');
+            if (customMessage) {
+                messageEl.textContent = customMessage;
+            } else {
+                messageEl.textContent = funMessages[messageIndex % funMessages.length];
+                messageIndex++;
+            }
+        }
+        
+        function showPreview(issues) {
+            const previewSection = document.getElementById('preview-section');
+            const previewContent = document.getElementById('preview-content');
+            
+            previewSection.style.display = 'block';
+            previewContent.innerHTML = issues.slice(0, 3).map(issue => `
+                <div class="issue-preview">
+                    <strong>${issue.type}</strong> - ${issue.severity}
+                    <br><small>${issue.file}</small>
+                </div>
+            `).join('');
+        }
+        
+        // Update progress every 2 seconds
         setInterval(updateProgress, 2000);
         updateProgress();
+        
+        // Rotate fun messages every 5 seconds
+        setInterval(() => updateFunMessage(), 5000);
     </script>
 </body>
 </html>
