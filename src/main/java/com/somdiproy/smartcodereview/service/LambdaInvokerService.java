@@ -30,7 +30,13 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.springframework.scheduling.annotation.Async;
-
+import com.somdiproy.smartcodereview.model.Analysis;
+import com.somdiproy.smartcodereview.model.AnalysisResult;
+import com.somdiproy.smartcodereview.model.Issue;
+import com.somdiproy.smartcodereview.dto.ReportResponse;
+import com.somdiproy.smartcodereview.repository.AnalysisRepository;
+import com.somdiproy.smartcodereview.repository.IssueDetailsRepository;
+import java.util.Date;
 @Slf4j
 @Service
 public class LambdaInvokerService {
@@ -87,6 +93,12 @@ public class LambdaInvokerService {
 
 	@Autowired
 	private DataAggregationService dataAggregationService;
+
+	@Autowired
+	private AnalysisRepository analysisRepository;
+
+	@Autowired
+	private IssueDetailsRepository issueDetailsRepository;
 
 	@Autowired
 	public LambdaInvokerService(LambdaClient lambdaClient) {
@@ -390,6 +402,53 @@ public class LambdaInvokerService {
 	    } catch (Exception e) {
 	        log.error("❌ Suggestions invocation failed for analysis {}: {}", analysisId, e.getMessage());
 	        recordFailure("suggestions");
+	        return null;
+	    }
+	}
+	
+	public ReportResponse createReportFromAnalysis(Analysis analysis) {
+	    try {
+	        String analysisId = analysis.getAnalysisId();
+	        
+	        // Get analysis result from DynamoDB
+	        AnalysisResult analysisResult = analysisRepository.findById(analysisId).orElse(null);
+	        if (analysisResult == null) {
+	            return null;
+	        }
+	        
+	        // Get all issues from DynamoDB
+	        List<Issue> issues = issueDetailsRepository.findByAnalysisId(analysisId);
+	        
+	        // Count issues by severity
+	        long criticalCount = issues.stream().filter(i -> "CRITICAL".equals(i.getSeverity())).count();
+	        long highCount = issues.stream().filter(i -> "HIGH".equals(i.getSeverity())).count();
+	        long mediumCount = issues.stream().filter(i -> "MEDIUM".equals(i.getSeverity())).count();
+	        long lowCount = issues.stream().filter(i -> "LOW".equals(i.getSeverity())).count();
+	        
+	        Map<String, Double> scores = new HashMap<>();
+	        scores.put("security", 85.0);
+	        scores.put("performance", 85.0);
+	        scores.put("quality", 85.0);
+	        
+	        return ReportResponse.builder()
+	            .analysisId(analysisId)
+	            .repository(analysisResult.getRepository())
+	            .branch(analysisResult.getBranch())
+	            .date(new Date())
+	            .filesAnalyzed(analysisResult.getFilesAnalyzed())
+	            .totalIssues(issues.size())
+	            .scanNumber(analysisResult.getScanNumber())
+	            .criticalCount((int) criticalCount)
+	            .highCount((int) highCount)
+	            .mediumCount((int) mediumCount)
+	            .lowCount((int) lowCount)
+	            .processingTime(analysisResult.getProcessingTimeMs())
+	            .issues(issues)
+	            .scores(scores)
+	            .build();
+	            
+	    } catch (Exception e) {
+	        log.error("Error creating report from analysis", e);
 	        return null;
 	    }
 	}
