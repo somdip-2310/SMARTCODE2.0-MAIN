@@ -190,9 +190,18 @@ public class AnalysisController {
                 return "redirect:/error";
             }
             
-            // Start analysis with token
+         // Start analysis with token
             String analysisId = analysisOrchestrator.startAnalysis(sessionId, repoUrl, branch, githubToken, session.getScanCount() + 1);
-            return "redirect:/analysis/progress?analysisId=" + analysisId + "&sessionId=" + sessionId;
+            
+            // Update session scan count immediately
+            session.incrementScanCount();
+            sessionService.saveSession(session);
+            
+            log.info("Analysis started with ID: {}, redirecting to progress page", analysisId);
+            
+            // Ensure redirect happens
+            String redirectUrl = "/analysis/progress?analysisId=" + analysisId + "&sessionId=" + sessionId;
+            return "redirect:" + redirectUrl;
             
         } catch (ScanLimitExceededException e) {
             redirectAttributes.addFlashAttribute("error", "Maximum 3 scans per session reached");

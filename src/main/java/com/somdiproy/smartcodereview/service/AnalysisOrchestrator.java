@@ -91,8 +91,8 @@ public class AnalysisOrchestrator {
         return analysisId;
     }
     
-    @Async
-    protected void processAnalysisAsync(String analysisId, String sessionId, String repoUrl, 
+    @Async("lambdaTaskExecutor")
+    public void processAnalysisAsync(String analysisId, String sessionId, String repoUrl, 
                                        String branch, String githubToken, int scanNumber) {
         Analysis analysis = analysisProgress.get(analysisId);
         String suggestionResponse = null; // Declare at method level for proper scope
