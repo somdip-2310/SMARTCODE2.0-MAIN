@@ -1,899 +1,1289 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-	<title>Analysis Report - Smart Code Review</title>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
-	<style>
-		.issue-card {
-			border-left: 4px solid #dee2e6;
-			margin-bottom: 20px;
-			transition: all 0.3s ease;
-		}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Report - SmartCode 2.0</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Comprehensive code analysis report with security vulnerabilities, performance issues, and AI-powered fixes">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+    <style>
+        /* Override some styles for report page while maintaining functionality */
+        body {
+            background: var(--dark-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
 
-		.issue-card:hover {
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		}
+        .container-fluid {
+            padding-top: 2rem;
+        }
 
-		.issue-card.critical {
-			border-left-color: #dc3545;
-		}
+        /* Cards with glassmorphism */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
 
-		.issue-card.high {
-			border-left-color: #fd7e14;
-		}
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
 
-		.issue-card.medium {
-			border-left-color: #ffc107;
-		}
+        .card-header {
+            border-radius: 16px 16px 0 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-		.issue-card.low {
-			border-left-color: #28a745;
-		}
+        /* Score cards with gradient */
+        .score-card {
+            background: var(--primary-gradient);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
 
-		.code-block {
-			background-color: #f8f9fa;
-			border: 1px solid #dee2e6;
-			border-radius: 4px;
-			padding: 15px;
-			margin: 10px 0;
-			font-family: 'Courier New', monospace;
-			font-size: 14px;
-			overflow-x: auto;
-			position: relative;
-		}
+        .score-card:hover {
+            transform: scale(1.05);
+        }
 
-		.copy-button {
-			position: absolute;
-			top: 5px;
-			right: 5px;
-			padding: 5px 10px;
-			font-size: 12px;
-		}
+        .score-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
 
-		.fix-section {
-			background-color: #e8f5e9;
-			border: 1px solid #4caf50;
-			border-radius: 8px;
-			padding: 15px;
-			margin: 15px 0;
-		}
+        /* Issue cards */
+        .issue-card {
+            border-left: 4px solid #dee2e6;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
 
-		.search-replace {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 20px;
-		}
+        .issue-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transform: translateX(5px);
+        }
 
-		.severity-badge {
-			padding: 4px 8px;
-			border-radius: 4px;
-			font-size: 12px;
-			font-weight: bold;
-		}
+        .issue-card.critical { border-left-color: #dc3545; }
+        .issue-card.high { border-left-color: #fd7e14; }
+        .issue-card.medium { border-left-color: #ffc107; }
+        .issue-card.low { border-left-color: #28a745; }
 
-		.severity-badge.critical {
-			background-color: #dc3545;
-			color: white;
-		}
+        /* Table styling */
+        .table {
+            background: transparent;
+            color: var(--text-primary);
+        }
 
-		.severity-badge.high {
-			background-color: #fd7e14;
-			color: white;
-		}
+        .table th {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-weight: 600;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
 
-		/* Orange highlighting for HIGH severity issues */
-		.high-severity-badge {
-			background-color: #fd7e14 !important;
-			color: white !important;
-		}
+        .table td {
+            border-color: rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+        }
 
-		.severity-badge.medium {
-			background-color: #ffc107;
-			color: dark;
-		}
+        .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
 
-		.severity-badge.low {
-			background-color: #28a745;
-			color: white;
-		}
+        /* Code blocks */
+        .code-block, pre {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            position: relative;
+            color: #e0e0e0;
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            max-width: 100%;
+        }
 
-		.score-card {
-			text-align: center;
-			padding: 20px;
-			border-radius: 8px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: white;
-		}
+        /* Copy button styling */
+        .copy-button, .btn-outline-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s ease;
+        }
 
-		.score-value {
-			font-size: 48px;
-			font-weight: bold;
-		}
+        .copy-button:hover, .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
 
-		.collapsible-section {
-			cursor: pointer;
-		}
+        /* Fix sections */
+        .fix-section, .inline-fix {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
 
-		.collapsible-section:hover {
-			background-color: #f8f9fa;
-		}
+        .inline-fix .card-body {
+            background: transparent !important;
+        }
 
-		.table th,
-		.table td {
-			vertical-align: middle;
-		}
+        /* Badges */
+        .severity-badge, .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
 
-		.table td:nth-child(3) {
-			/* Issue column */
-			width: 40%;
-			max-width: 400px;
-		}
+        .badge.bg-danger { background-color: #dc3545 !important; }
+        .badge.bg-warning { background-color: #fd7e14 !important; color: white !important; }
+        .badge.bg-info { background-color: #0dcaf0 !important; color: white !important; }
+        .badge.bg-success { background-color: #28a745 !important; }
 
-		.table td:nth-child(4) {
-			/* File column */
-			width: 20%;
-			max-width: 200px;
-			word-break: break-all;
-		}
+        /* Alert styling */
+        .alert {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid;
+            color: white;
+        }
 
-		/* Inline fix display styling */
-		.inline-fix {
-			background-color: #f8f9fa;
-			border-top: 2px solid #e9ecef;
-		}
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
 
-		.inline-fix .card-body {
-			padding: 20px;
-		}
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
 
-		.inline-fix .row {
-			margin-top: 15px;
-		}
+        .alert-info {
+            background: rgba(13, 202, 240, 0.1);
+            border-color: rgba(13, 202, 240, 0.3);
+        }
 
-		/* Hide rows without CVE data */
-		.no-cve {
-			display: none;
-		}
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            transition: all 0.3s ease;
+        }
 
-		/* Ensure consistent badge styling */
-		.badge {
-			font-size: 0.75rem;
-			font-weight: 600;
-			padding: 0.375rem 0.75rem;
-		}
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
 
-		/* Specific styling for HIGH severity in performance table */
-		.table .badge.bg-warning {
-			background-color: #fd7e14 !important;
-			color: #ffffff !important;
-		}
+        /* Navigation bar */
+        .navbar-report {
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-		.bg-warning {
-			background-color: #fd7e14 !important;
-			color: #fff !important;
-		}
+        /* Section headers */
+        .section-header {
+            background: var(--primary-gradient);
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            margin: 0;
+        }
 
-		.bg-info {
-			background-color: #0dcaf0 !important;
-			color: #000 !important;
-		}
+        .border-danger { border-color: rgba(220, 53, 69, 0.5) !important; }
+        .border-warning { border-color: rgba(245, 158, 11, 0.5) !important; }
+        .border-primary { border-color: rgba(102, 126, 234, 0.5) !important; }
 
-		.bg-danger,
-		.bg-warning,
-		.bg-success,
-		.bg-secondary {
-			color: #fff !important;
-		}
+        /* Custom collapse styles */
+        .custom-collapse-row {
+            display: none;
+            transition: all 0.3s ease-in-out;
+        }
 
-		/* Override Bootstrap's yellow warning with orange */
-		.badge.bg-warning {
-			background-color: #fd7e14 !important;
-		}
+        .custom-collapse-row.show {
+            display: table-row;
+        }
 
-		/* Fix for table row highlighting */
-		.table .badge {
-			font-size: 0.8rem;
-		}
+        .custom-toggle-btn {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid var(--accent-color);
+            color: white;
+            transition: all 0.3s ease;
+        }
 
-		/* Word wrap for search/replace pre blocks */
-		pre {
-			white-space: pre-wrap !important;
-			word-wrap: break-word !important;
-			word-break: break-word !important;
-			overflow-wrap: break-word !important;
-			max-width: 100%;
-		}
+        .custom-toggle-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
 
-		/* SOLUTION: Custom collapse styles that don't interfere with each other */
-		.custom-collapse-row {
-			display: none;
-			transition: all 0.3s ease-in-out;
-		}
+        .custom-toggle-btn.collapsed .bi-chevron-down {
+            transform: rotate(0deg);
+            transition: transform 0.3s ease;
+        }
 
-		.custom-collapse-row.show {
-			display: table-row;
-		}
+        .custom-toggle-btn:not(.collapsed) .bi-chevron-down {
+            transform: rotate(180deg);
+            transition: transform 0.3s ease;
+        }
 
-		.custom-toggle-btn.collapsed .bi-chevron-down {
-			transform: rotate(0deg);
-			transition: transform 0.3s ease;
-		}
+        /* Links */
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
 
-		.custom-toggle-btn:not(.collapsed) .bi-chevron-down {
-			transform: rotate(180deg);
-			transition: transform 0.3s ease;
-		}
+        a:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .navbar-report, .btn {
+                display: none;
+            }
+        }
+
+        /* Icon colors */
+        .bi-x-octagon-fill { color: #dc3545; }
+        .bi-exclamation-triangle-fill { color: #fd7e14; }
+        .bi-exclamation-circle-fill { color: #0dcaf0; }
+        .bi-info-circle-fill { color: #28a745; }
+        .bi-shield-exclamation { color: #dc3545; }
+        .bi-code-slash { color: #3b82f6; }
+    </style>
+	<!-- Print Styles -->
+	<style media="print">
+	    /* Reset for print */
+	    * {
+	        background: transparent !important;
+	        color: black !important;
+	        box-shadow: none !important;
+	        text-shadow: none !important;
+	    }
+	    
+	    body {
+	        font-family: 'Arial', 'Helvetica', sans-serif;
+	        font-size: 11pt;
+	        line-height: 1.5;
+	        background: white;
+	        margin: 0;
+	        padding: 20px;
+	    }
+	    
+	    /* Hide navigation and buttons */
+	    .navbar-report,
+	    .btn,
+	    .copy-btn,
+	    .custom-toggle-btn,
+	    footer,
+	    .btn-close {
+	        display: none !important;
+	    }
+	    
+	    /* Professional header */
+	    .print-header {
+	        display: block !important;
+	        text-align: center;
+	        margin-bottom: 30px;
+	        padding-bottom: 20px;
+	        border-bottom: 2px solid #333;
+	    }
+	    
+	    .print-header h1 {
+	        font-size: 24pt;
+	        margin-bottom: 10px;
+	        color: #333;
+	    }
+	    
+	    .print-header .subtitle {
+	        font-size: 12pt;
+	        color: #666;
+	    }
+	    
+	    /* Main content styling */
+	    h1, h2, h3, h4, h5, h6 {
+	        color: #333 !important;
+	        page-break-after: avoid;
+	        margin-top: 20px;
+	        margin-bottom: 10px;
+	    }
+	    
+	    h1 { font-size: 20pt; }
+	    h2 { font-size: 16pt; }
+	    h3 { font-size: 14pt; }
+	    h4 { font-size: 12pt; }
+	    
+	    /* Cards and sections */
+	    .card {
+	        border: 1px solid #ddd !important;
+	        border-radius: 0 !important;
+	        margin-bottom: 20px !important;
+	        page-break-inside: avoid;
+	        background: white !important;
+	    }
+	    
+	    .card-header {
+	        background: #f5f5f5 !important;
+	        border-bottom: 2px solid #333 !important;
+	        padding: 10px 15px !important;
+	        font-weight: bold;
+	    }
+	    
+	    .card-body {
+	        padding: 15px !important;
+	        background: white !important;
+	    }
+	    
+	    /* Tables */
+	    .table {
+	        width: 100% !important;
+	        border-collapse: collapse !important;
+	        margin-bottom: 20px;
+	        font-size: 10pt;
+	    }
+	    
+	    .table th {
+	        background: #f0f0f0 !important;
+	        border: 1px solid #ddd !important;
+	        padding: 8px !important;
+	        font-weight: bold;
+	        text-align: left;
+	    }
+	    
+	    .table td {
+	        border: 1px solid #ddd !important;
+	        padding: 6px 8px !important;
+	        background: white !important;
+	    }
+	    
+	    .table tr:nth-child(even) td {
+	        background: #f9f9f9 !important;
+	    }
+	    
+	    /* Score displays */
+	    .score-card {
+	        border: 1px solid #ddd !important;
+	        padding: 10px !important;
+	        text-align: center !important;
+	        background: white !important;
+	        margin-bottom: 10px;
+	    }
+	    
+	    .score-value {
+	        font-size: 24pt !important;
+	        font-weight: bold !important;
+	        color: #333 !important;
+	    }
+	    
+	    /* Badges */
+	    .badge {
+	        border: 1px solid #333 !important;
+	        background: white !important;
+	        color: #333 !important;
+	        padding: 2px 6px !important;
+	        font-size: 9pt !important;
+	        font-weight: normal !important;
+	    }
+	    
+	    .badge.bg-danger { 
+	        background: #fee !important; 
+	        border-color: #c00 !important;
+	        color: #c00 !important;
+	    }
+	    .badge.bg-warning { 
+	        background: #ffe !important; 
+	        border-color: #f90 !important;
+	        color: #f90 !important;
+	    }
+	    .badge.bg-info { 
+	        background: #e6f3ff !important; 
+	        border-color: #06c !important;
+	        color: #06c !important;
+	    }
+	    .badge.bg-success { 
+	        background: #efe !important; 
+	        border-color: #090 !important;
+	        color: #090 !important;
+	    }
+	    
+	    /* Code blocks */
+	    pre, code {
+	        border: 1px solid #ddd !important;
+	        background: #f5f5f5 !important;
+	        padding: 10px !important;
+	        font-family: 'Courier New', monospace !important;
+	        font-size: 9pt !important;
+	        white-space: pre-wrap !important;
+	        word-wrap: break-word !important;
+	        page-break-inside: avoid;
+	    }
+	    
+	    /* Links */
+	    a {
+	        color: #333 !important;
+	        text-decoration: underline !important;
+	    }
+	    
+	    /* Page breaks */
+	    .page-break {
+	        page-break-before: always;
+	    }
+	    
+	    /* Hide collapsed content - show all for print */
+	    .custom-collapse-row {
+	        display: table-row !important;
+	    }
+	    
+	    .collapse:not(.show) {
+	        display: block !important;
+	    }
+	    
+	    /* Summary section */
+	    .summary-grid {
+	        display: table !important;
+	        width: 100% !important;
+	        margin-bottom: 20px;
+	    }
+	    
+	    .summary-grid .row {
+	        display: table-row !important;
+	    }
+	    
+	    .summary-grid .col-md-6 {
+	        display: table-cell !important;
+	        width: 50% !important;
+	        padding: 10px !important;
+	    }
+	    
+	    /* Footer for each page */
+	    @page {
+	        margin: 1in 0.75in;
+	        size: letter;
+	    }
+	    
+	    .print-footer {
+	        display: block !important;
+	        position: fixed;
+	        bottom: 0;
+	        left: 0;
+	        right: 0;
+	        text-align: center;
+	        font-size: 9pt;
+	        color: #666;
+	        padding: 10px;
+	        border-top: 1px solid #ddd;
+	    }
+	    
+	    /* Alert boxes */
+	    .alert {
+	        border: 1px solid #ddd !important;
+	        background: #f9f9f9 !important;
+	        padding: 10px !important;
+	        margin-bottom: 15px !important;
+	        border-radius: 0 !important;
+	    }
+	    
+	    .alert-warning {
+	        background: #fff9e6 !important;
+	        border-color: #f90 !important;
+	    }
+	    
+	    .alert-success {
+	        background: #f0fff0 !important;
+	        border-color: #090 !important;
+	    }
+	    
+	    .alert-info {
+	        background: #e6f3ff !important;
+	        border-color: #06c !important;
+	    }
+	    
+	    /* Issue cards */
+	    .inline-fix {
+	        background: white !important;
+	        border-top: 2px solid #ddd !important;
+	        page-break-inside: avoid;
+	    }
+	    
+	    /* Repository info */
+	    .repo-info {
+	        font-size: 10pt;
+	        color: #666;
+	        margin-bottom: 10px;
+	    }
 	</style>
+
+	<!-- Additional print-only content -->
+	<div class="print-header" style="display: none;">
+	    <h1>SmartCode 2.0 - Code Analysis Report</h1>
+	    <div class="subtitle">
+	        Professional AI-Powered Code Review
+	    </div>
+	    <div class="repo-info">
+	        Generated on: <span th:text="${#dates.format(report.date, 'MMMM dd, yyyy HH:mm')}"></span>
+	    </div>
+	</div>
+
+	<div class="print-footer" style="display: none;">
+	    <span>SmartCode 2.0 Analysis Report - Page <span class="page-number"></span></span>
+	</div>
 </head>
 
 <body>
-	<div class="container-fluid mt-4">
-		<!-- Header -->
-		<div class="row mb-4">
-			<div class="col-12">
-				<div class="d-flex justify-content-between align-items-center">
-					<h1><i class="bi bi-file-earmark-code"></i> Code Analysis Report</h1>
-					<div>
-						<button class="btn btn-outline-primary" onclick="window.print()">
-							<i class="bi bi-printer"></i> Print Report
-						</button>
-						<a th:href="@{/repository(sessionId=${sessionId})}" class="btn btn-primary">
-							<i class="bi bi-arrow-repeat"></i> New Analysis
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
+    <!-- Navigation -->
+    <nav class="navbar-report">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand" href="/" style="color: white; text-decoration: none;">
+                    <i class="fas fa-code-branch me-2"></i>SmartCode 2.0
+                </a>
+                <div class="d-flex gap-3">
+                    <a href="https://somdip.dev" class="nav-link-custom" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i>Somdip.dev
+                    </a>
+                    <button class="btn btn-outline-light btn-sm" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Print Report
+                    </button>
+                    <a th:href="@{/repository(sessionId=${sessionId})}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-arrow-repeat"></i> New Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-		<!-- Summary Section -->
-		<div class="row mb-4">
-			<div class="col-md-8">
-				<div class="card">
-					<div class="card-body">
-						<h5 class="card-title">Analysis Summary</h5>
-						<div class="row">
-							<div class="col-md-6">
-								<p><strong><i class="bi bi-github"></i> Repository:</strong>
-									<a th:href="${'https://github.com/' + report.repository}"
-										th:text="${report.repository}" target="_blank">repository</a>
-								</p>
-								<p><strong><i class="bi bi-git"></i> Branch:</strong>
-									<span th:text="${report.branch}">main</span>
-								</p>
-								<p><strong><i class="bi bi-calendar3"></i> Analysis Date:</strong>
-									<span th:text="${#dates.format(report.date, 'MMM dd, yyyy HH:mm')}">Date</span>
-								</p>
-							</div>
-							<div class="col-md-6">
-								<p><strong><i class="bi bi-file-code"></i> Files Analyzed:</strong>
-									<span th:text="${report.filesAnalyzed}">0</span>
-								</p>
-								<p><strong><i class="bi bi-exclamation-triangle"></i> Total Issues:</strong>
-									<span th:text="${report.totalIssues}">0</span>
-								</p>
-								<p><strong><i class="bi bi-clock"></i> Processing Time:</strong>
-									<span th:text="${(report.processingTime / 1000.0) + ' seconds'}">0s</span>
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="bi bi-file-earmark-code"></i> Code Analysis Report
+                </h1>
+            </div>
+        </div>
 
-			<!-- Scores Section -->
-			<div class="col-md-4" th:if="${report.scores != null}">
-				<div class="card">
-					<div class="card-body">
-						<h5 class="card-title">Overall Scores Out of 100 </h5>
-						<div class="row text-center">
-							<div class="col-4" th:if="${report.scores.containsKey('security')}">
-								<div class="score-card">
-									<div class="score-value"
-										th:text="${#numbers.formatDecimal(report.scores['security'], 0, 0)}">0</div>
-									<div>Security</div>
-								</div>
-							</div>
-							<div class="col-4" th:if="${report.scores.containsKey('performance')}">
-								<div class="score-card">
-									<div class="score-value"
-										th:text="${#numbers.formatDecimal(report.scores['performance'], 0, 0)}">0</div>
-									<div>Performance</div>
-								</div>
-							</div>
-							<div class="col-4" th:if="${report.scores.containsKey('quality')}">
-								<div class="score-card">
-									<div class="score-value"
-										th:text="${#numbers.formatDecimal(report.scores['quality'], 0, 0)}">0</div>
-									<div>Quality</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+        <!-- Summary Section -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-clipboard-data me-2"></i>Analysis Summary
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong><i class="bi bi-github"></i> Repository:</strong>
+                                    <a th:href="${'https://github.com/' + report.repository}"
+                                        th:text="${report.repository}" target="_blank">repository</a>
+                                </p>
+                                <p><strong><i class="bi bi-git"></i> Branch:</strong>
+                                    <span th:text="${report.branch}">main</span>
+                                </p>
+                                <p><strong><i class="bi bi-calendar3"></i> Analysis Date:</strong>
+                                    <span th:text="${#dates.format(report.date, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong><i class="bi bi-file-code"></i> Files Analyzed:</strong>
+                                    <span th:text="${report.filesAnalyzed}">0</span>
+                                </p>
+                                <p><strong><i class="bi bi-exclamation-triangle"></i> Total Issues:</strong>
+                                    <span th:text="${report.totalIssues}">0</span>
+                                </p>
+                                <p><strong><i class="bi bi-clock"></i> Processing Time:</strong>
+                                    <span th:text="${(report.processingTime / 1000.0) + ' seconds'}">0s</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-		<!-- Issues by Severity -->
-		<div class="row mb-4">
-			<div class="col-12">
-				<div class="card">
-					<div class="card-body">
-						<h5 class="card-title">Issues by Severity</h5>
-						<div class="row">
-							<div class="col-md-3">
-								<div class="d-flex justify-content-between align-items-center p-3 border rounded">
-									<span><i class="bi bi-x-octagon-fill text-danger"></i> Critical</span>
-									<span class="badge bg-danger" th:text="${report.criticalCount}">0</span>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="d-flex justify-content-between align-items-center p-3 border rounded">
-									<span><i class="bi bi-exclamation-triangle-fill text-warning"></i> High</span>
-									<span class="badge bg-warning" th:text="${report.highCount}">0</span>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="d-flex justify-content-between align-items-center p-3 border rounded">
-									<span><i class="bi bi-exclamation-circle-fill text-info"></i> Medium</span>
-									<span class="badge bg-info" th:text="${report.mediumCount}">0</span>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="d-flex justify-content-between align-items-center p-3 border rounded">
-									<span><i class="bi bi-info-circle-fill text-success"></i> Low</span>
-									<span class="badge bg-success" th:text="${report.lowCount}">0</span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+            <!-- Scores Section -->
+            <div class="col-md-4" th:if="${report.scores != null}">
+                <div class="card h-100">
+                    <div class="card-body p-0">
+                        <h5 class="card-title text-center pt-3">Overall Scores</h5>
+                        <div class="row g-2 p-3">
+                            <div class="col-4" th:if="${report.scores.containsKey('security')}">
+                                <div class="score-card">
+                                    <div class="score-value"
+                                        th:text="${#numbers.formatDecimal(report.scores['security'], 0, 0)}">0</div>
+                                    <div>Security</div>
+                                </div>
+                            </div>
+                            <div class="col-4" th:if="${report.scores.containsKey('performance')}">
+                                <div class="score-card">
+                                    <div class="score-value"
+                                        th:text="${#numbers.formatDecimal(report.scores['performance'], 0, 0)}">0</div>
+                                    <div>Performance</div>
+                                </div>
+                            </div>
+                            <div class="col-4" th:if="${report.scores.containsKey('quality')}">
+                                <div class="score-card">
+                                    <div class="score-value"
+                                        th:text="${#numbers.formatDecimal(report.scores['quality'], 0, 0)}">0</div>
+                                    <div>Quality</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		<!-- Security Issues Section -->
-		<div class="row mb-4" th:if="${securityIssues != null and !securityIssues.isEmpty()}">
-			<div class="col-12">
-				<div class="card border-danger">
-					<div class="card-header bg-danger text-white">
-						<h3 class="mb-0"><i class="bi bi-shield-exclamation"></i> Security Issues</h3>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table table-hover">
-								<thead>
-									<tr>
-										<th>CVE ID</th>
-										<th>CVE Score</th>
-										<th>Issue</th>
-										<th>File</th>
-										<th>Line</th>
-										<th>Action</th>
-									</tr>
-								</thead>
-								<tbody>
-									<th:block th:each="issue : ${securityIssues}">
-										<!-- FIX 3: Only show rows with actionable suggestions AND CVE data -->
-										<tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
-									                 issue.suggestion.immediateFix.searchCode != null and 
-									                 !issue.suggestion.immediateFix.searchCode.isEmpty() and
-									                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
-									                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required') and
-									                 (issue.cveId != null or issue.cveScore != null)}">
-											<td>
-												<span th:text="${issue.cveId ?: '-'}">-</span>
-											</td>
-											<td>
-												<span class="badge bg-danger" th:if="${issue.cveScore != null}"
-													th:text="${#numbers.formatDecimal(issue.cveScore, 1, 1)}">-</span>
-												<span th:unless="${issue.cveScore != null}">-</span>
-											</td>
-											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
-												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
-											<td><code
-													th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
-											</td>
-											<td th:text="${issue.line}"></td>
-											<td>
-												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
-													type="button" th:data-target="'security-detail-' + ${issue.issueId}"
-													onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
-													aria-expanded="false">
-													View Fix <i class="bi bi-chevron-down"></i>
-												</button>
-											</td>
-										</tr>
-										<!-- SOLUTION: Custom collapse row without Bootstrap dependencies -->
-										<tr class="custom-collapse-row" th:id="'security-detail-' + ${issue.issueId}"
-											th:attr="data-parent-issue=${issue.issueId}">
-											<td colspan="6" class="p-0 inline-fix">
-												<div class="card border-0 rounded-0">
-													<div class="card-body bg-light">
-														<h6 class="mb-3"><i
-																class="bi bi-exclamation-triangle text-warning"></i>
-															Issue Description</h6>
-														<div class="alert alert-warning mb-3">
-															<p class="mb-0"
-																th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : 'No description available')}">
-																This
-																issue can be exploited...</p>
-														</div>
+        <!-- Issues by Severity -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-bar-chart me-2"></i>Issues by Severity
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="d-flex justify-content-between align-items-center p-3 border rounded"
+                                     style="background: rgba(220, 53, 69, 0.1); border-color: rgba(220, 53, 69, 0.3) !important;">
+                                    <span><i class="bi bi-x-octagon-fill text-danger"></i> Critical</span>
+                                    <span class="badge bg-danger" th:text="${report.criticalCount}">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex justify-content-between align-items-center p-3 border rounded"
+                                     style="background: rgba(253, 126, 20, 0.1); border-color: rgba(253, 126, 20, 0.3) !important;">
+                                    <span><i class="bi bi-exclamation-triangle-fill text-warning"></i> High</span>
+                                    <span class="badge bg-warning" th:text="${report.highCount}">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex justify-content-between align-items-center p-3 border rounded"
+                                     style="background: rgba(13, 202, 240, 0.1); border-color: rgba(13, 202, 240, 0.3) !important;">
+                                    <span><i class="bi bi-exclamation-circle-fill text-info"></i> Medium</span>
+                                    <span class="badge bg-info" th:text="${report.mediumCount}">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex justify-content-between align-items-center p-3 border rounded"
+                                     style="background: rgba(40, 167, 69, 0.1); border-color: rgba(40, 167, 69, 0.3) !important;">
+                                    <span><i class="bi bi-info-circle-fill text-success"></i> Low</span>
+                                    <span class="badge bg-success" th:text="${report.lowCount}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-														<h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
-															Recommended Fix</h6>
-														<p class="mb-3"
-															th:text="${issue.suggestion.immediateFix.explanation}">Fix
-															explanation</p>
+        <!-- Security Issues Section -->
+        <div class="row mb-4" th:if="${securityIssues != null and !securityIssues.isEmpty()}">
+            <div class="col-12">
+                <div class="card border-danger">
+                    <div class="card-header section-header bg-danger text-white">
+                        <h3 class="mb-0"><i class="bi bi-shield-exclamation"></i> Security Issues</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>CVE ID</th>
+                                        <th>CVE Score</th>
+                                        <th>Issue</th>
+                                        <th>File</th>
+                                        <th>Line</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <th:block th:each="issue : ${securityIssues}">
+                                        <!-- Only show rows with actionable suggestions AND CVE data -->
+                                        <tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
+                                                     issue.suggestion.immediateFix.searchCode != null and 
+                                                     !issue.suggestion.immediateFix.searchCode.isEmpty() and
+                                                     !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
+                                                     !issue.suggestion.immediateFix.searchCode.contains('Manual review required') and
+                                                     (issue.cveId != null or issue.cveScore != null)}">
+                                            <td>
+                                                <span th:text="${issue.cveId ?: '-'}">-</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-danger" th:if="${issue.cveScore != null}"
+                                                    th:text="${#numbers.formatDecimal(issue.cveScore, 1, 1)}">-</span>
+                                                <span th:unless="${issue.cveScore != null}">-</span>
+                                            </td>
+                                            <td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
+                                                (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
+                                            <td><code
+                                                    th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
+                                            </td>
+                                            <td th:text="${issue.line}"></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
+                                                    type="button" th:data-target="'security-detail-' + ${issue.issueId}"
+                                                    onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
+                                                    aria-expanded="false">
+                                                    View Fix <i class="bi bi-chevron-down"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <!-- Custom collapse row -->
+                                        <tr class="custom-collapse-row" th:id="'security-detail-' + ${issue.issueId}"
+                                            th:attr="data-parent-issue=${issue.issueId}">
+                                            <td colspan="6" class="p-0 inline-fix">
+                                                <div class="card border-0 rounded-0">
+                                                    <div class="card-body">
+                                                        <h6 class="mb-3"><i
+                                                                class="bi bi-exclamation-triangle text-warning"></i>
+                                                            Issue Description</h6>
+                                                        <div class="alert alert-warning mb-3">
+                                                            <p class="mb-0"
+                                                                th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : 'No description available')}">
+                                                                This issue can be exploited...</p>
+                                                        </div>
 
-														<div class="row">
-															<div class="col-md-6">
-																<h6 class="text-danger">Search for:</h6>
-																<div class="position-relative">
-																	<button
-																		class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:data-copy-target="'sec-search-' + ${issue.issueId}"
-																		onclick="copyToClipboardByDataTarget(this)">
-																		<i class="bi bi-clipboard"></i>
-																	</button>
-																	<pre class="bg-white border rounded p-3"
-																		th:id="'sec-search-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
-																</div>
-															</div>
-															<div class="col-md-6">
-																<h6 class="text-success">Replace with:</h6>
-																<div class="position-relative">
-																	<button
-																		class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:data-copy-target="'sec-replace-' + ${issue.issueId}"
-																		onclick="copyToClipboardByDataTarget(this)">
-																		<i class="bi bi-clipboard"></i>
-																	</button>
-																	<pre class="bg-white border rounded p-3"
-																		th:id="'sec-replace-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</th:block>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+                                                        <h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
+                                                            Recommended Fix</h6>
+                                                        <p class="mb-3"
+                                                            th:text="${issue.suggestion.immediateFix.explanation}">Fix
+                                                            explanation</p>
 
-		<!-- Additional Security Improvements Section -->
-		<div class="row mb-4" th:if="${additionalSecurityIssues != null and !additionalSecurityIssues.isEmpty()}">
-			<div class="col-12">
-				<div class="card border-warning">
-					<div class="card-header bg-warning text-dark">
-						<h3 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Additional Security Improvements
-						</h3>
-						<small>These issues require manual review and don't have automated fixes</small>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table table-hover">
-								<thead>
-									<tr>
-										<th>Issue Type</th>
-										<th>Description</th>
-										<th>File</th>
-										<th>Line</th>
-										<th>Priority</th>
-										<th>Action</th>
-									</tr>
-								</thead>
-								<tbody>
-									<th:block th:each="issue : ${additionalSecurityIssues}">
-										<tr>
-											<td><span class="badge bg-warning text-dark"
-													th:text="${issue.type}">Type</span></td>
-											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
-		                                        (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
-											<td><code
-													th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
-											</td>
-											<td th:text="${issue.line}"></td>
-											<td>
-												<span class="badge bg-danger"
-													th:if="${issue.severity == 'CRITICAL'}">CRITICAL</span>
-												<span class="badge bg-warning"
-													th:if="${issue.severity == 'HIGH'}">HIGH</span>
-												<span class="badge bg-info"
-													th:if="${issue.severity == 'MEDIUM'}">MEDIUM</span>
-												<span class="badge bg-success"
-													th:if="${issue.severity == 'LOW'}">LOW</span>
-											</td>
-											<td>
-												<button
-													class="btn btn-sm btn-outline-warning custom-toggle-btn collapsed"
-													type="button"
-													th:data-target="'additional-security-detail-' + ${issue.issueId}"
-													onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
-													aria-expanded="false">
-													View Fix <i class="bi bi-chevron-down"></i>
-												</button>
-											</td>
-										</tr>
-										<!-- SOLUTION: Custom collapse row without Bootstrap dependencies -->
-										<tr class="custom-collapse-row"
-											th:id="'additional-security-detail-' + ${issue.issueId}"
-											th:attr="data-parent-issue=${issue.issueId}">
-											<td colspan="6" class="p-0 inline-fix">
-												<div class="card border-0 rounded-0">
-													<div class="card-body bg-light">
-														<h6 class="mb-3"><i
-																class="bi bi-exclamation-triangle text-warning"></i>
-															Issue Description</h6>
-														<div class="alert alert-warning mb-3">
-															<p class="mb-0"
-																th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : 'No description available')}">
-																This
-																issue can be exploited...</p>
-														</div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-danger">Search for:</h6>
+                                                                <div class="position-relative">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+                                                                        th:data-copy-target="'sec-search-' + ${issue.issueId}"
+                                                                        onclick="copyToClipboardByDataTarget(this)">
+                                                                        <i class="bi bi-clipboard"></i>
+                                                                    </button>
+                                                                    <pre class="bg-dark border rounded p-3"
+                                                                        th:id="'sec-search-' + ${issue.issueId}"
+                                                                        th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-success">Replace with:</h6>
+                                                                <div class="position-relative">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+                                                                        th:data-copy-target="'sec-replace-' + ${issue.issueId}"
+                                                                        onclick="copyToClipboardByDataTarget(this)">
+                                                                        <i class="bi bi-clipboard"></i>
+                                                                    </button>
+                                                                    <pre class="bg-dark border rounded p-3"
+                                                                        th:id="'sec-replace-' + ${issue.issueId}"
+                                                                        th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-														<h6 class="mb-3"><i class="bi bi-lightbulb text-warning"></i>
-															Manual Review Required</h6>
+        <!-- Additional Security Improvements Section -->
+        <div class="row mb-4" th:if="${additionalSecurityIssues != null and !additionalSecurityIssues.isEmpty()}">
+            <div class="col-12">
+                <div class="card border-warning">
+                    <div class="card-header section-header bg-warning text-dark">
+                        <h3 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Additional Security Improvements
+                        </h3>
+                        <small>These issues require manual review and don't have automated fixes</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Issue Type</th>
+                                        <th>Description</th>
+                                        <th>File</th>
+                                        <th>Line</th>
+                                        <th>Priority</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <th:block th:each="issue : ${additionalSecurityIssues}">
+                                        <tr>
+                                            <td><span class="badge bg-warning text-dark"
+                                                    th:text="${issue.type}">Type</span></td>
+                                            <td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
+                                                (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
+                                            <td><code
+                                                    th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
+                                            </td>
+                                            <td th:text="${issue.line}"></td>
+                                            <td>
+                                                <span class="badge bg-danger"
+                                                    th:if="${issue.severity == 'CRITICAL'}">CRITICAL</span>
+                                                <span class="badge bg-warning"
+                                                    th:if="${issue.severity == 'HIGH'}">HIGH</span>
+                                                <span class="badge bg-info"
+                                                    th:if="${issue.severity == 'MEDIUM'}">MEDIUM</span>
+                                                <span class="badge bg-success"
+                                                    th:if="${issue.severity == 'LOW'}">LOW</span>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-outline-warning custom-toggle-btn collapsed"
+                                                    type="button"
+                                                    th:data-target="'additional-security-detail-' + ${issue.issueId}"
+                                                    onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
+                                                    aria-expanded="false">
+                                                    View Details <i class="bi bi-chevron-down"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <!-- Custom collapse row -->
+                                        <tr class="custom-collapse-row"
+                                            th:id="'additional-security-detail-' + ${issue.issueId}"
+                                            th:attr="data-parent-issue=${issue.issueId}">
+                                            <td colspan="6" class="p-0 inline-fix">
+                                                <div class="card border-0 rounded-0">
+                                                    <div class="card-body">
+                                                        <h6 class="mb-3"><i
+                                                                class="bi bi-exclamation-triangle text-warning"></i>
+                                                            Issue Description</h6>
+                                                        <div class="alert alert-warning mb-3">
+                                                            <p class="mb-0"
+                                                                th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : 'No description available')}">
+                                                                This issue can be exploited...</p>
+                                                        </div>
 
-														<!-- Show explanation if available -->
-														<div
-															th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null}">
-															<p class="mb-3"
-																th:text="${issue.suggestion.immediateFix.explanation}">
-																This issue requires manual security review.</p>
-														</div>
+                                                        <h6 class="mb-3"><i class="bi bi-lightbulb text-warning"></i>
+                                                            Manual Review Required</h6>
 
-														<!-- Show generic guidance if no specific explanation -->
-														<div
-															th:if="${issue.suggestion == null or issue.suggestion.immediateFix == null or issue.suggestion.immediateFix.explanation == null}">
-															<p class="mb-3">This security issue requires manual review
-																and implementation of appropriate security measures.
-																Please refer to security best practices for <span
-																	th:text="${issue.type}">this issue type</span>.</p>
-														</div>
+                                                        <!-- Show explanation if available -->
+                                                        <div
+                                                            th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null}">
+                                                            <p class="mb-3"
+                                                                th:text="${issue.suggestion.immediateFix.explanation}">
+                                                                This issue requires manual security review.</p>
+                                                        </div>
 
-														<!-- Show code details if available -->
-														<div th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}"
-															class="row">
-															<div class="col-md-6">
-																<h6 class="text-danger">Code to Review:</h6>
-																<div class="position-relative">
-																	<button
-																		class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:data-copy-target="'additional-search-' + ${issue.issueId}"
-																		onclick="copyToClipboardByDataTarget(this)">
-																		<i class="bi bi-clipboard"></i>
-																	</button>
-																	<pre class="bg-white border rounded p-3"
-																		th:id="'additional-search-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.searchCode != null ? issue.suggestion.immediateFix.searchCode : 'Review code at line ' + issue.line + ' in file: ' + issue.file}">Search code</pre>
-																</div>
-															</div>
-															<div class="col-md-6">
-																<h6 class="text-success">Recommended Action:</h6>
-																<div class="position-relative">
-																	<button
-																		class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:data-copy-target="'additional-replace-' + ${issue.issueId}"
-																		onclick="copyToClipboardByDataTarget(this)">
-																		<i class="bi bi-clipboard"></i>
-																	</button>
-																	<pre class="bg-white border rounded p-3"
-																		th:id="'additional-replace-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.replaceCode != null ? issue.suggestion.immediateFix.replaceCode : 'Apply appropriate security measures for ' + issue.type + ' vulnerability. Refer to OWASP guidelines.'}">Replace code</pre>
-																</div>
-															</div>
-														</div>
+                                                        <!-- Show generic guidance if no specific explanation -->
+                                                        <div
+                                                            th:if="${issue.suggestion == null or issue.suggestion.immediateFix == null or issue.suggestion.immediateFix.explanation == null}">
+                                                            <p class="mb-3">This security issue requires manual review
+                                                                and implementation of appropriate security measures.
+                                                                Please refer to security best practices for <span
+                                                                    th:text="${issue.type}">this issue type</span>.</p>
+                                                        </div>
 
-														<!-- Show generic guidance if no suggestion details -->
-														<div th:if="${issue.suggestion == null or issue.suggestion.immediateFix == null}"
-															class="alert alert-info">
-															<h6><i class="bi bi-info-circle"></i> Security
-																Recommendations:</h6>
-															<ul class="mb-0">
-																<li>Review the code at line <span
-																		th:text="${issue.line}">X</span> in <code
-																		th:text="${issue.file}">filename</code></li>
-																<li>Implement appropriate security controls for <span
-																		th:text="${issue.type}">this issue type</span>
-																</li>
-																<li>Follow OWASP security guidelines</li>
-																<li>Consider security testing and code review</li>
-															</ul>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</th:block>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+                                                        <!-- Show code details if available -->
+                                                        <div th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null}"
+                                                            class="row">
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-danger">Code to Review:</h6>
+                                                                <div class="position-relative">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+                                                                        th:data-copy-target="'additional-search-' + ${issue.issueId}"
+                                                                        onclick="copyToClipboardByDataTarget(this)">
+                                                                        <i class="bi bi-clipboard"></i>
+                                                                    </button>
+                                                                    <pre class="bg-dark border rounded p-3"
+                                                                        th:id="'additional-search-' + ${issue.issueId}"
+                                                                        th:text="${issue.suggestion.immediateFix.searchCode != null ? issue.suggestion.immediateFix.searchCode : 'Review code at line ' + issue.line + ' in file: ' + issue.file}">Search code</pre>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-success">Recommended Action:</h6>
+                                                                <div class="position-relative">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+                                                                        th:data-copy-target="'additional-replace-' + ${issue.issueId}"
+                                                                        onclick="copyToClipboardByDataTarget(this)">
+                                                                        <i class="bi bi-clipboard"></i>
+                                                                    </button>
+                                                                    <pre class="bg-dark border rounded p-3"
+                                                                        th:id="'additional-replace-' + ${issue.issueId}"
+                                                                        th:text="${issue.suggestion.immediateFix.replaceCode != null ? issue.suggestion.immediateFix.replaceCode : 'Apply appropriate security measures for ' + issue.type + ' vulnerability. Refer to OWASP guidelines.'}">Replace code</pre>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-		<!-- Performance and Code Issues Section -->
-		<div class="row mb-4" th:if="${otherIssues != null and !otherIssues.isEmpty()}">
-			<div class="col-12">
-				<div class="card border-primary">
-					<div class="card-header bg-primary text-white">
-						<h3 class="mb-0"><i class="bi bi-code-slash"></i> Performance and Code Issues</h3>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table table-hover">
-								<thead>
-									<tr>
-										<th>Type</th>
-										<th>Issue</th>
-										<th>File</th>
-										<th>Line</th>
-										<th>Action</th>
-									</tr>
-								</thead>
-								<tbody>
-									<th:block th:each="issue : ${otherIssues}">
-										<!-- Only show if it has actionable suggestions -->
-										<tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
-																			                 issue.suggestion.immediateFix.searchCode != null and 
-																			                 !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
-																			                 !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}"
-											th:style="${issue.severity == 'HIGH'} ? 'background-color: #fff3cd;' : ''"
-											th:classappend="${issue.severity == 'CRITICAL'} ? 'table-danger' : ''"
-											th:attr="data-issue-id=${issue.issueId}">
-											<td>
-												<span class="badge" th:classappend="
-																							        ${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
-																							        (${issue.severity == 'HIGH'} ? 'bg-warning' : 
-																							        (${issue.severity == 'MEDIUM'} ? 'bg-info' : 
-																							        (${issue.severity == 'LOW'} ? 'bg-success' : 'bg-secondary')))"
-													th:text="${issue.severity}">HIGH</span>
-											</td>
-											<td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
-												(issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
-											<td><code
-													th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
-											</td>
-											<td th:text="${issue.line}"></td>
-											<td>
-												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
-													type="button" th:data-target="'other-detail-' + ${issue.issueId}"
-													onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
-													aria-expanded="false">
-													View Fix <i class="bi bi-chevron-down"></i>
-												</button>
-											</td>
-										</tr>
-										<!-- SOLUTION: Custom collapse row without Bootstrap dependencies -->
-										<tr class="custom-collapse-row" th:id="'other-detail-' + ${issue.issueId}"
-											th:attr="data-parent-issue=${issue.issueId}">
-											<td colspan="5" class="p-0 inline-fix">
-												<div class="card border-0 rounded-0">
-													<div class="card-body bg-light">
-														<h6 class="mb-3"><i
-																class="bi bi-exclamation-triangle text-warning"></i>
-															Issue Description</h6>
-														<div class="alert alert-warning mb-3">
-															<p class="mb-0"
-																th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : (issue.title != null ? issue.title : 'No description available'))}">
-																This
-																issue can be exploited...</p>
-														</div>
+                                                        <!-- Show generic guidance if no suggestion details -->
+                                                        <div th:if="${issue.suggestion == null or issue.suggestion.immediateFix == null}"
+                                                            class="alert alert-info">
+                                                            <h6><i class="bi bi-info-circle"></i> Security
+                                                                Recommendations:</h6>
+                                                            <ul class="mb-0">
+                                                                <li>Review the code at line <span
+                                                                        th:text="${issue.line}">X</span> in <code
+                                                                        th:text="${issue.file}">filename</code></li>
+                                                                <li>Implement appropriate security controls for <span
+                                                                        th:text="${issue.type}">this issue type</span>
+                                                                </li>
+                                                                <li>Follow OWASP security guidelines</li>
+                                                                <li>Consider security testing and code review</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-														<h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
-															Recommended Fix</h6>
-														<p class="mb-3"
-															th:text="${issue.suggestion.immediateFix.explanation}">Fix
-															explanation</p>
+        <!-- Performance and Code Issues Section -->
+        <div class="row mb-4" th:if="${otherIssues != null and !otherIssues.isEmpty()}">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-header section-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="bi bi-code-slash"></i> Performance and Code Issues</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Severity</th>
+                                        <th>Issue</th>
+                                        <th>File</th>
+                                        <th>Line</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <th:block th:each="issue : ${otherIssues}">
+                                        <!-- Only show if it has actionable suggestions -->
+                                        <tr th:if="${issue.suggestion != null and issue.suggestion.immediateFix != null and 
+                                                     issue.suggestion.immediateFix.searchCode != null and 
+                                                     !issue.suggestion.immediateFix.searchCode.contains('Review the identified') and
+                                                     !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}"
+                                            th:attr="data-issue-id=${issue.issueId}">
+                                            <td>
+                                                <span class="badge" th:classappend="
+                                                    ${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
+                                                    (${issue.severity == 'HIGH'} ? 'bg-warning' : 
+                                                    (${issue.severity == 'MEDIUM'} ? 'bg-info' : 
+                                                    (${issue.severity == 'LOW'} ? 'bg-success' : 'bg-secondary')))"
+                                                    th:text="${issue.severity}">HIGH</span>
+                                            </td>
+                                            <td th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
+                                                (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}"></td>
+                                            <td><code
+                                                    th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
+                                            </td>
+                                            <td th:text="${issue.line}"></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
+                                                    type="button" th:data-target="'other-detail-' + ${issue.issueId}"
+                                                    onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
+                                                    aria-expanded="false">
+                                                    View Fix <i class="bi bi-chevron-down"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <!-- Custom collapse row -->
+                                        <tr class="custom-collapse-row" th:id="'other-detail-' + ${issue.issueId}"
+                                            th:attr="data-parent-issue=${issue.issueId}">
+                                            <td colspan="5" class="p-0 inline-fix">
+                                                <div class="card border-0 rounded-0">
+                                                    <div class="card-body">
+                                                        <h6 class="mb-3"><i
+                                                                class="bi bi-exclamation-triangle text-warning"></i>
+                                                            Issue Description</h6>
+                                                        <div class="alert alert-warning mb-3">
+                                                            <p class="mb-0"
+                                                                th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : (issue.title != null ? issue.title : 'No description available'))}">
+                                                                This issue can impact performance...</p>
+                                                        </div>
 
-														<div class="row">
-															<div class="col-md-6">
-																<h6 class="text-danger">Search for:</h6>
-																<div class="position-relative">
-																	<button
-																		class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:data-copy-target="'other-search-' + ${issue.issueId}"
-																		onclick="copyToClipboardByDataTarget(this)">
-																		<i class="bi bi-clipboard"></i>
-																	</button>
-																	<pre class="bg-white border rounded p-3"
-																		th:id="'other-search-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
-																</div>
-															</div>
-															<div class="col-md-6">
-																<h6 class="text-success">Replace with:</h6>
-																<div class="position-relative">
-																	<button
-																		class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-																		th:data-copy-target="'other-replace-' + ${issue.issueId}"
-																		onclick="copyToClipboardByDataTarget(this)">
-																		<i class="bi bi-clipboard"></i>
-																	</button>
-																	<pre class="bg-white border rounded p-3"
-																		th:id="'other-replace-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
-																</div>
-															</div>
-														</div>
+                                                        <h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
+                                                            Recommended Fix</h6>
+                                                        <p class="mb-3"
+                                                            th:text="${issue.suggestion.immediateFix.explanation}">Fix
+                                                            explanation</p>
 
-														<!-- Include other suggestion sections if available -->
-														<div th:if="${issue.suggestion.bestPractice != null}"
-															class="mt-4">
-															<h6><i class="bi bi-star text-primary"></i> Best Practice
-															</h6>
-															<p th:text="${issue.suggestion.bestPractice.title}">Best
-																practice title</p>
-															<div class="code-block"
-																th:if="${issue.suggestion.bestPractice.code != null}">
-																<pre
-																	th:text="${issue.suggestion.bestPractice.code}">best practice code</pre>
-															</div>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</th:block>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-danger">Search for:</h6>
+                                                                <div class="position-relative">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+                                                                        th:data-copy-target="'other-search-' + ${issue.issueId}"
+                                                                        onclick="copyToClipboardByDataTarget(this)">
+                                                                        <i class="bi bi-clipboard"></i>
+                                                                    </button>
+                                                                    <pre class="bg-dark border rounded p-3"
+                                                                        th:id="'other-search-' + ${issue.issueId}"
+                                                                        th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-success">Replace with:</h6>
+                                                                <div class="position-relative">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
+                                                                        th:data-copy-target="'other-replace-' + ${issue.issueId}"
+                                                                        onclick="copyToClipboardByDataTarget(this)">
+                                                                        <i class="bi bi-clipboard"></i>
+                                                                    </button>
+                                                                    <pre class="bg-dark border rounded p-3"
+                                                                        th:id="'other-replace-' + ${issue.issueId}"
+                                                                        th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-		<!-- No Issues Message -->
-		<div class="row"
-			th:if="${(securityIssues == null or securityIssues.isEmpty()) and (otherIssues == null or otherIssues.isEmpty())}">
-			<div class="col-12">
-				<div class="alert alert-success text-center">
-					<i class="bi bi-check-circle-fill"></i> No issues found in the analyzed code!
-				</div>
-			</div>
-		</div>
+                                                        <!-- Include other suggestion sections if available -->
+                                                        <div th:if="${issue.suggestion.bestPractice != null}"
+                                                            class="mt-4">
+                                                            <h6><i class="bi bi-star text-primary"></i> Best Practice
+                                                            </h6>
+                                                            <p th:text="${issue.suggestion.bestPractice.title}">Best
+                                                                practice title</p>
+                                                            <div class="code-block"
+                                                                th:if="${issue.suggestion.bestPractice.code != null}">
+                                                                <pre
+                                                                    th:text="${issue.suggestion.bestPractice.code}">best practice code</pre>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		<!-- Footer -->
-		<div class="row mt-5 mb-3">
-			<div class="col-12 text-center text-muted">
-				<p>Report generated by Smart Code Review Platform |
-					Analysis ID: <code th:text="${analysisId}">ID</code></p>
-			</div>
-		</div>
-	</div>
+        <!-- No Issues Message -->
+        <div class="row"
+            th:if="${(securityIssues == null or securityIssues.isEmpty()) and (otherIssues == null or otherIssues.isEmpty())}">
+            <div class="col-12">
+                <div class="alert alert-success text-center">
+                    <i class="bi bi-check-circle-fill"></i> No issues found in the analyzed code!
+                </div>
+            </div>
+        </div>
 
-	<!-- JavaScript for Copy Functionality -->
-	<script>
-		function copyToClipboard(button, elementId) {
-			const element = document.getElementById(elementId);
-			if (!element) {
-				console.error('Element not found:', elementId);
-				return;
-			}
+        <!-- Footer -->
+        <div class="row mt-5 mb-3">
+            <div class="col-12 text-center text-muted">
+                <p>Report generated by SmartCode 2.0 | Built by 
+                    <a href="https://somdip.dev" target="_blank" class="text-info">Somdip Roy</a> |
+                    Analysis ID: <code th:text="${analysisId}">ID</code>
+                </p>
+            </div>
+        </div>
+    </div>
 
-			const textToCopy = element.textContent || element.innerText;
+    <!-- JavaScript for Copy Functionality and Collapse -->
+    <script>
+        function copyToClipboard(button, elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                console.error('Element not found:', elementId);
+                return;
+            }
 
-			if (navigator.clipboard && navigator.clipboard.writeText) {
-				navigator.clipboard.writeText(textToCopy).then(() => {
-					showCopySuccess(button);
-				}).catch(err => {
-					console.error('Failed to copy:', err);
-					fallbackCopyToClipboard(textToCopy, button);
-				});
-			} else {
-				fallbackCopyToClipboard(textToCopy, button);
-			}
+            const textToCopy = element.textContent || element.innerText;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showCopySuccess(button);
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    fallbackCopyToClipboard(textToCopy, button);
+                });
+            } else {
+                fallbackCopyToClipboard(textToCopy, button);
+            }
+        }
+
+        // New function that uses data attributes instead of concatenated parameters
+        function copyToClipboardByDataTarget(button) {
+            const targetId = button.getAttribute('data-copy-target');
+            if (!targetId) {
+                console.error('No data-copy-target found');
+                return;
+            }
+
+            const element = document.getElementById(targetId);
+            if (!element) {
+                console.error('Element not found:', targetId);
+                return;
+            }
+
+            const textToCopy = element.textContent || element.innerText;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showCopySuccess(button);
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    fallbackCopyToClipboard(textToCopy, button);
+                });
+            } else {
+                fallbackCopyToClipboard(textToCopy, button);
+            }
+        }
+
+        function showCopySuccess(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-outline-secondary');
+
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-secondary');
+            }, 2000);
+        }
+
+        function fallbackCopyToClipboard(text, button) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showCopySuccess(button);
+            } catch (err) {
+                console.error('Fallback: Unable to copy', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // Custom collapse function
+        function toggleCustomCollapse(targetId, button) {
+            const targetElement = document.getElementById(targetId);
+            if (!targetElement) {
+                console.error('Target element not found:', targetId);
+                return;
+            }
+
+            const isCurrentlyVisible = targetElement.classList.contains('show');
+
+            if (isCurrentlyVisible) {
+                // Hide the element
+                targetElement.classList.remove('show');
+                button.classList.add('collapsed');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                // Show the element
+                targetElement.classList.add('show');
+                button.classList.remove('collapsed');
+                button.setAttribute('aria-expanded', 'true');
+            }
+        }
+		
+		// Enhanced print functionality
+		function printReport() {
+		    // Add print-specific class to body
+		    document.body.classList.add('printing');
+		    
+		    // Expand all collapsed sections before printing
+		    const collapsedElements = document.querySelectorAll('.custom-collapse-row');
+		    collapsedElements.forEach(el => {
+		        el.classList.add('show');
+		    });
+		    
+		    // Trigger print dialog
+		    window.print();
+		    
+		    // Remove print class after printing
+		    setTimeout(() => {
+		        document.body.classList.remove('printing');
+		        // Restore original collapsed state if needed
+		        collapsedElements.forEach(el => {
+		            if (!el.querySelector('.custom-toggle-btn:not(.collapsed)')) {
+		                el.classList.remove('show');
+		            }
+		        });
+		    }, 1000);
 		}
 
-		// New function that uses data attributes instead of concatenated parameters
-		function copyToClipboardByDataTarget(button) {
-			const targetId = button.getAttribute('data-copy-target');
-			if (!targetId) {
-				console.error('No data-copy-target found');
-				return;
-			}
-
-			const element = document.getElementById(targetId);
-			if (!element) {
-				console.error('Element not found:', targetId);
-				return;
-			}
-
-			const textToCopy = element.textContent || element.innerText;
-
-			if (navigator.clipboard && navigator.clipboard.writeText) {
-				navigator.clipboard.writeText(textToCopy).then(() => {
-					showCopySuccess(button);
-				}).catch(err => {
-					console.error('Failed to copy:', err);
-					fallbackCopyToClipboard(textToCopy, button);
-				});
-			} else {
-				fallbackCopyToClipboard(textToCopy, button);
-			}
-		}
-
-		function showCopySuccess(button) {
-			const originalText = button.innerHTML;
-			button.innerHTML = '<i class="bi bi-check"></i> Copied!';
-			button.classList.add('btn-success');
-			button.classList.remove('btn-outline-secondary');
-
-			setTimeout(() => {
-				button.innerHTML = originalText;
-				button.classList.remove('btn-success');
-				button.classList.add('btn-outline-secondary');
-			}, 2000);
-		}
-
-		function fallbackCopyToClipboard(text, button) {
-			const textArea = document.createElement("textarea");
-			textArea.value = text;
-			textArea.style.position = "fixed";
-			textArea.style.left = "-999999px";
-			document.body.appendChild(textArea);
-			textArea.focus();
-			textArea.select();
-
-			try {
-				document.execCommand('copy');
-				showCopySuccess(button);
-			} catch (err) {
-				console.error('Fallback: Unable to copy', err);
-			}
-
-			document.body.removeChild(textArea);
-		}
-
-		// SOLUTION: Custom collapse function that doesn't interfere with Bootstrap
-		function toggleCustomCollapse(targetId, button) {
-			const targetElement = document.getElementById(targetId);
-			if (!targetElement) {
-				console.error('Target element not found:', targetId);
-				return;
-			}
-
-			const isCurrentlyVisible = targetElement.classList.contains('show');
-
-			if (isCurrentlyVisible) {
-				// Hide the element
-				targetElement.classList.remove('show');
-				button.classList.add('collapsed');
-				button.setAttribute('aria-expanded', 'false');
-			} else {
-				// Show the element
-				targetElement.classList.add('show');
-				button.classList.remove('collapsed');
-				button.setAttribute('aria-expanded', 'true');
-			}
-		}
-	</script>
-
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-	<script>
-		// Initialize Bootstrap components when DOM is loaded (kept for other components)
-		document.addEventListener('DOMContentLoaded', function () {
-			console.log('DOM loaded, custom collapse system initialized...');
-
-			// Check if Bootstrap is loaded
-			if (typeof bootstrap !== 'undefined') {
-				console.log('Bootstrap is loaded successfully');
-			} else {
-				console.error('Bootstrap is not loaded!');
-			}
+		// Update the print button to use the enhanced function
+		window.addEventListener('load', function() {
+		    const printBtn = document.querySelector('button[onclick="window.print()"]');
+		    if (printBtn) {
+		        printBtn.setAttribute('onclick', 'printReport()');
+		    }
 		});
-	</script>
+		
+        // Add smooth scrolling when opening collapse
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('SmartCode 2.0 Report initialized');
+            
+            // Add loading effect to page
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease-in';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
 </body>
-
 </html>

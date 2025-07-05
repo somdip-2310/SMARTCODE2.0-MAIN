@@ -3,135 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Repository - Smart Code Review</title>
+    <title>Select Repository - SmartCode 2.0</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Select GitHub repository for AI-powered code review and security analysis">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
     <style>
+        .repo-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .repo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
         .github-connection {
-            border: 2px dashed #28a745;
-            background: #f8fff9;
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px dashed rgba(16, 185, 129, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
         }
+        
         .github-disconnected {
-            border: 2px dashed #6c757d;
-            background: #f8f9fa;
+            background: rgba(156, 163, 175, 0.1);
+            border: 2px dashed rgba(156, 163, 175, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
         }
+        
         .private-repo-hint {
-            background: linear-gradient(45deg, #fff3cd, #fff8db);
-            border-left: 4px solid #ffc107;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(102, 126, 234, 0.1) 100%);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .session-info-card {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .input-group-custom {
+            position: relative;
+        }
+        
+        .input-group-custom .form-control-custom {
+            padding-left: 45px;
+            padding-right: 120px;
+        }
+        
+        .input-group-text-custom {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            color: var(--text-secondary);
+        }
+        
+        .validate-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid var(--accent-color);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .validate-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .example-link {
+            color: #60a5fa;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .example-link:hover {
+            color: #93bbfc;
+            text-decoration: underline;
+        }
+        
+        .recent-repo-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .recent-repo-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+        
+        #urlFeedback .alert {
+            margin-bottom: 0;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        
+        .alert-success-custom {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        .alert-danger-custom {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        .alert-info-custom {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+        
+        .alert-warning-custom {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+        
+        .footer-info {
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        code {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #60a5fa;
         }
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="mt-3">Loading repository information...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-code-branch me-2"></i>SmartCode 2.0
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="https://somdip.dev" class="nav-link-custom" target="_blank">
+                    <i class="fas fa-external-link-alt me-1"></i>Somdip.dev
+                </a>
+                <a href="/" class="nav-link-custom">
+                    <i class="fas fa-sign-out-alt me-1"></i>New Session
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-10">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
+                <div class="repo-card">
+                    <div class="card-header bg-primary text-white p-4" style="background: var(--primary-gradient); border: none;">
                         <h4 class="mb-0">
-                            <i class="bi bi-github"></i> Smart Code Review - Repository Selection
+                            <i class="bi bi-github me-2"></i>Smart Code Review - Repository Selection
                         </h4>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <!-- Session Info -->
-                        <div class="alert alert-success" role="alert">
-                            <h5><i class="bi bi-check-circle"></i> Welcome! Your session is verified.</h5>
-                            <p class="mb-1">You have <strong th:text="${remainingScans}">3</strong> scans remaining in this session.</p>
-                            <small class="text-muted">Session expires in approximately 1 hour</small>
+                        <div class="session-info-card">
+                            <h5 class="mb-3"><i class="bi bi-check-circle text-success"></i> Welcome! Your session is verified.</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
+                                        You have <strong th:text="${remainingScans}" class="text-info">3</strong> scans remaining
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <i class="bi bi-clock me-2"></i>
+                                        <small class="text-secondary">Session expires in approximately 1 hour</small>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                         
-						<!-- GitHub Connection Status -->
-						<div class="alert alert-success" role="alert">
-						    <h6><i class="bi bi-check-circle"></i> GitHub Connected</h6>
-						    <p class="mb-1">✅ You can analyze both public and private repositories</p>
-						    <small class="text-muted">Your GitHub token is active for this session only</small>
-						</div>
+                        <!-- GitHub Connection Status -->
+                        <div class="github-connection">
+                            <h6 class="mb-2"><i class="bi bi-check-circle text-success"></i> GitHub Connected</h6>
+                            <p class="mb-1 text-secondary">✅ You can analyze both public and private repositories</p>
+                            <small class="text-secondary opacity-75">
+                                <i class="fas fa-lock me-1"></i>Your GitHub token is active for this session only
+                            </small>
+                        </div>
                         
                         <!-- Repository URL Form -->
                         <form action="/repository/branches" method="get" id="repoForm">
                             <input type="hidden" name="sessionId" th:value="${sessionId}">
                             
-                            <div class="mb-3">
-                                <label for="repoUrl" class="form-label">
-                                    <i class="bi bi-link-45deg"></i> GitHub Repository URL
+                            <div class="mb-4">
+                                <label for="repoUrl" class="form-label text-light">
+                                    <i class="bi bi-link-45deg me-1"></i>GitHub Repository URL
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
+                                <div class="input-group-custom">
+                                    <span class="input-group-text-custom">
                                         <i class="bi bi-github"></i>
                                     </span>
-                                    <input type="url" class="form-control" id="repoUrl" name="repoUrl" 
-                                           placeholder="https://github.com/username/repository" required>
-                                    <button type="button" class="btn btn-outline-secondary" id="validateBtn">
-                                        <i class="bi bi-search"></i> Validate
+                                    <input type="url" 
+                                           class="form-control form-control-custom" 
+                                           id="repoUrl" 
+                                           name="repoUrl" 
+                                           placeholder="https://github.com/username/repository" 
+                                           required>
+                                    <button type="button" class="validate-btn" id="validateBtn">
+                                        <i class="bi bi-search me-1"></i>Validate
                                     </button>
                                 </div>
-                                <div class="form-text">
+                                <div class="form-text text-secondary mt-2">
                                     Enter the full GitHub repository URL you want to analyze
                                 </div>
                                 
                                 <!-- URL Validation Feedback -->
-                                <div id="urlFeedback" class="mt-2"></div>
+                                <div id="urlFeedback" class="mt-3"></div>
                             </div>
                             
                             <!-- Repository Examples -->
-                            <div class="private-repo-hint p-3 rounded mb-3">
-                                <h6><i class="bi bi-lightbulb"></i> Example Repositories</h6>
+                            <div class="private-repo-hint">
+                                <h6 class="mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>Example Repositories</h6>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <strong>Public Repositories:</strong>
-                                        <ul class="list-unstyled small">
-                                            <li><a href="#" onclick="fillExample('https://github.com/spring-projects/spring-boot')">Spring Boot</a></li>
-                                            <li><a href="#" onclick="fillExample('https://github.com/microsoft/vscode')">VS Code</a></li>
-                                            <li><a href="#" onclick="fillExample('https://github.com/facebook/react')">React</a></li>
+                                        <strong class="text-light">Public Repositories:</strong>
+                                        <ul class="list-unstyled small mt-2">
+                                            <li class="mb-1">
+                                                <a href="#" onclick="fillExample('https://github.com/spring-projects/spring-boot')" class="example-link">
+                                                    <i class="fas fa-leaf me-1"></i>Spring Boot
+                                                </a>
+                                            </li>
+                                            <li class="mb-1">
+                                                <a href="#" onclick="fillExample('https://github.com/microsoft/vscode')" class="example-link">
+                                                    <i class="fas fa-code me-1"></i>VS Code
+                                                </a>
+                                            </li>
+                                            <li class="mb-1">
+                                                <a href="#" onclick="fillExample('https://github.com/facebook/react')" class="example-link">
+                                                    <i class="fab fa-react me-1"></i>React
+                                                </a>
+                                            </li>
                                         </ul>
                                     </div>
                                     <div class="col-md-6">
-                                        <strong>Supported Formats:</strong>
-                                        <ul class="list-unstyled small">
-                                            <li>✅ https://github.com/user/repo</li>
-                                            <li>✅ https://github.com/user/repo.git</li>
-                                            <li>❌ git@github.com:user/repo.git</li>
+                                        <strong class="text-light">Supported Formats:</strong>
+                                        <ul class="list-unstyled small mt-2 text-secondary">
+                                            <li class="mb-1">✅ https://github.com/user/repo</li>
+                                            <li class="mb-1">✅ https://github.com/user/repo.git</li>
+                                            <li class="mb-1">❌ git@github.com:user/repo.git</li>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                                    <i class="bi bi-arrow-right-circle"></i> Fetch Repository Branches
+                                <button type="submit" class="btn btn-primary-custom btn-lg" id="submitBtn">
+                                    <i class="bi bi-arrow-right-circle me-2"></i>Fetch Repository Branches
                                 </button>
                             </div>
                         </form>
                         
                         <!-- Recent Repositories (if any) -->
                         <div th:if="${session.scans != null and !session.scans.isEmpty()}" class="mt-4">
-                            <h6><i class="bi bi-clock-history"></i> Recently Analyzed</h6>
-                            <div class="list-group">
-                                <div th:each="scan : ${session.scans}" class="list-group-item list-group-item-action">
+                            <h6 class="text-light mb-3">
+                                <i class="bi bi-clock-history me-2"></i>Recently Analyzed
+                            </h6>
+                            <div class="recent-repos">
+                                <div th:each="scan : ${session.scans}" class="recent-repo-item">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <strong th:text="${scan.repository}">repository</strong>
+                                            <strong th:text="${scan.repository}" class="text-info">repository</strong>
                                             <br>
-                                            <small class="text-muted">
-                                                Branch: <span th:text="${scan.branch}">main</span> • 
-                                                Scan #<span th:text="${scan.scanNumber}">1</span>
+                                            <small class="text-secondary">
+                                                <i class="bi bi-git me-1"></i>Branch: <span th:text="${scan.branch}">main</span> • 
+                                                <i class="bi bi-hash me-1"></i>Scan #<span th:text="${scan.scanNumber}">1</span>
                                             </small>
                                         </div>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" 
+                                        <button type="button" 
+                                                class="btn btn-outline-light btn-sm" 
                                                 onclick="fillExample(this.dataset.repo)" 
                                                 th:data-repo="${scan.repository}">
-                                            <i class="bi bi-arrow-repeat"></i> Re-analyze
+                                            <i class="bi bi-arrow-repeat me-1"></i>Re-analyze
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <hr>
-                        <div class="text-muted text-center">
-                            <small>
+                        <div class="footer-info">
+                            <small class="text-secondary">
                                 Session ID: <code th:text="${sessionId}">session-id</code> • 
-                                <i class="bi bi-shield-lock"></i> Secure Analysis • 
-                                <i class="bi bi-cpu"></i> Powered by Amazon Nova
+                                <i class="bi bi-shield-lock me-1"></i>Secure Analysis • 
+                                <i class="bi bi-cpu me-1"></i>Powered by Amazon Nova
                             </small>
                         </div>
                     </div>
@@ -139,7 +347,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <p class="text-secondary mb-0">
+            Professional code analysis by SmartCode 2.0
+        </p>
+    </footer>
     
+    <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // URL validation patterns
@@ -151,17 +367,39 @@
         
         function showFeedback(type, message) {
             const feedback = document.getElementById('urlFeedback');
+            const alertClass = type === 'success' ? 'alert-success-custom' : 
+                             type === 'danger' ? 'alert-danger-custom' : 
+                             type === 'warning' ? 'alert-warning-custom' : 
+                             'alert-info-custom';
+            
             feedback.innerHTML = `
-                <div class="alert alert-${type} alert-sm">
-                    <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <div class="alert ${alertClass} alert-sm fade show">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : 
+                                      type === 'danger' ? 'exclamation-triangle' : 
+                                      type === 'warning' ? 'exclamation-triangle' : 
+                                      'info-circle'} me-2"></i>
                     ${message}
                 </div>
             `;
+            
+            // Add fade-in animation
+            const alertEl = feedback.querySelector('.alert');
+            alertEl.style.opacity = '0';
+            setTimeout(() => {
+                alertEl.style.transition = 'opacity 0.3s ease-in';
+                alertEl.style.opacity = '1';
+            }, 10);
         }
         
         function fillExample(url) {
             document.getElementById('repoUrl').value = url;
             validateUrl();
+            // Add animation
+            const input = document.getElementById('repoUrl');
+            input.style.animation = 'pulse 0.5s ease-out';
+            setTimeout(() => {
+                input.style.animation = '';
+            }, 500);
         }
         
         function validateUrl() {
@@ -175,9 +413,13 @@
             
             if (validateGitHubUrl(url)) {
                 showFeedback('success', '✅ Valid GitHub repository URL format');
+                urlInput.classList.remove('is-invalid');
+                urlInput.classList.add('is-valid');
                 return true;
             } else {
                 showFeedback('danger', '❌ Invalid GitHub URL format. Please use: https://github.com/username/repository');
+                urlInput.classList.remove('is-valid');
+                urlInput.classList.add('is-invalid');
                 return false;
             }
         }
@@ -207,6 +449,16 @@
                 showFeedback('danger', '❌ Please enter a valid GitHub repository URL');
                 return false;
             }
+            
+            // Show loading screen
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Fetching branches...';
+            
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'flex';
+                document.getElementById('loadingScreen').style.opacity = '1';
+            }, 300);
         });
         
         // Auto-validate on page load if URL is pre-filled
@@ -215,7 +467,26 @@
             if (urlInput.value.trim()) {
                 validateUrl();
             }
+            
+            // Add fade-in animation
+            document.querySelector('.repo-card').style.opacity = '0';
+            setTimeout(() => {
+                document.querySelector('.repo-card').style.transition = 'opacity 0.5s ease-in';
+                document.querySelector('.repo-card').style.opacity = '1';
+            }, 100);
         });
+        
+        // Add pulse animation to CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.02); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
+    <script th:src="@{/js/app.js}"></script>
 </body>
 </html>

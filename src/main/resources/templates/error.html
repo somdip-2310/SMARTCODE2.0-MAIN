@@ -1,15 +1,192 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Error - Smart Code Review</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - SmartCode 2.0</title>
+    
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+    <style>
+        .error-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .error-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .error-code {
+            font-size: 6rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .glitch {
+            position: relative;
+            animation: glitch 2s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .suggestion-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .suggestion-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+        
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0.5;
+            animation: float 10s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>Oops! Something went wrong</h1>
-        <p th:if="${error}" th:text="${error}" class="alert alert-danger"></p>
-        <a href="/" class="btn btn-primary">Go Home</a>
+    <!-- Floating Particles -->
+    <div class="particle" style="top: 10%; left: 10%; font-size: 20px;">⚠️</div>
+    <div class="particle" style="top: 20%; right: 20%; font-size: 25px; animation-delay: 2s;">🔧</div>
+    <div class="particle" style="bottom: 30%; left: 15%; font-size: 18px; animation-delay: 4s;">💻</div>
+    <div class="particle" style="bottom: 20%; right: 10%; font-size: 22px; animation-delay: 6s;">🛠️</div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-code-branch me-2"></i>SmartCode 2.0
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="https://somdip.dev" class="nav-link-custom" target="_blank">
+                    <i class="fas fa-external-link-alt me-1"></i>Somdip.dev
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Error Content -->
+    <div class="container">
+        <div class="error-container">
+            <div class="glass-container text-center" style="max-width: 800px;">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle text-warning glitch"></i>
+                </div>
+                
+                <h1 class="error-code" th:text="${status}">404</h1>
+                
+                <h2 class="mb-4" th:text="${error}">Page Not Found</h2>
+                
+                <p class="text-secondary lead mb-5" th:text="${message}">
+                    The page you're looking for seems to have wandered off into the digital void.
+                </p>
+                
+                <div class="suggestions-grid">
+                    <a href="/" class="suggestion-card text-decoration-none">
+                        <i class="fas fa-home fa-2x mb-3"></i>
+                        <h6>Go Home</h6>
+                        <small class="text-secondary">Start a new analysis</small>
+                    </a>
+                    
+                    <a href="/dashboard" class="suggestion-card text-decoration-none">
+                        <i class="fas fa-chart-line fa-2x mb-3"></i>
+                        <h6>Dashboard</h6>
+                        <small class="text-secondary">View your reports</small>
+                    </a>
+                    
+                    <a href="https://somdip.dev" target="_blank" class="suggestion-card text-decoration-none">
+                        <i class="fas fa-question-circle fa-2x mb-3"></i>
+                        <h6>Get Help</h6>
+                        <small class="text-secondary">Contact support</small>
+                    </a>
+                    
+                    <a href="javascript:history.back()" class="suggestion-card text-decoration-none">
+                        <i class="fas fa-arrow-left fa-2x mb-3"></i>
+                        <h6>Go Back</h6>
+                        <small class="text-secondary">Previous page</small>
+                    </a>
+                </div>
+                
+                <!-- Error Details (for debugging) -->
+                <div class="mt-5" th:if="${trace}">
+                    <details class="text-start">
+                        <summary class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-bug me-2"></i>Technical Details
+                        </summary>
+                        <div class="mt-3 p-3 bg-dark rounded">
+                            <pre class="text-secondary small mb-0" th:text="${trace}"></pre>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add some dynamic elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate error code on load
+            const errorCode = document.querySelector('.error-code');
+            if (errorCode) {
+                errorCode.style.opacity = '0';
+                errorCode.style.transform = 'scale(0.5)';
+                setTimeout(() => {
+                    errorCode.style.transition = 'all 0.5s ease-out';
+                    errorCode.style.opacity = '1';
+                    errorCode.style.transform = 'scale(1)';
+                }, 100);
+            }
+            
+            // Add hover effect to suggestion cards
+            const cards = document.querySelectorAll('.suggestion-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.querySelector('i').style.transform = 'scale(1.2)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.querySelector('i').style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
