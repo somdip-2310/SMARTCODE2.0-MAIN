@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
+import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Service that orchestrates the three-tier analysis process
  * Coordinates GitHub code fetching and Lambda invocations
@@ -43,6 +44,9 @@ public class AnalysisOrchestrator {
     private final ConcurrentHashMap<String, Analysis> analysisProgress = new ConcurrentHashMap<>();
     @Autowired
     private BalancedAllocationService balancedAllocationService;
+    
+    @Autowired
+    private ApplicationContext applicationContext;
     
     @Autowired
     public AnalysisOrchestrator(SessionService sessionService,
@@ -85,8 +89,9 @@ public class AnalysisOrchestrator {
         // Store in progress map
         analysisProgress.put(analysisId, analysis);
         
-        // Start async analysis
-        processAnalysisAsync(analysisId, sessionId, repoUrl, branch, githubToken, scanNumber);
+     // Start async analysis - use self-invocation proxy to ensure @Async works
+        AnalysisOrchestrator self = applicationContext.getBean(AnalysisOrchestrator.class);
+        self.processAnalysisAsync(analysisId, sessionId, repoUrl, branch, githubToken, scanNumber);
         
         return analysisId;
     }
