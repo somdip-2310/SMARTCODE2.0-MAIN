@@ -1096,9 +1096,9 @@
 											th:attr="data-issue-id=${issue.issueId}">
 											<td>
 												<span class="badge" th:classappend="
-												                                                    ${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
-												                                                    (${issue.severity == 'HIGH'} ? 'bg-warning text-dark' : 
-                                                    (${issue.severity == 'MEDIUM'} ? 'bg-info' : 
+																								                                                    ${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
+																								                                                    (${issue.severity == 'HIGH'} ? 'bg-danger' : 
+												                                                    (${issue.severity == 'MEDIUM'} ? 'bg-warning text-dark' : 'bg-info' : 
                                                     (${issue.severity == 'LOW'} ? 'bg-success' : 'bg-secondary')))"
 													th:text="${issue.severity}">HIGH</span>
 											</td>

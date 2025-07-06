@@ -667,47 +667,110 @@ public class DataAggregationService {
 		issue.setTitle(title);
 
 		// First try to get enhanced description from suggestion
-		String description = null;
-		Map<String, Object> suggestion = (Map<String, Object>) issueData.get("suggestion");
-		if (suggestion != null) {
-			description = getStringValue(suggestion, "issueDescription");
-		}
+		// Priority 1: Try to get enhanced description from suggestion
+				String description = null;
+				Map<String, Object> suggestion = (Map<String, Object>) issueData.get("suggestion");
+				if (suggestion != null) {
+					// Check multiple possible fields where description might be
+					description = getStringValue(suggestion, "issueDescription");
+					if (description == null || description.isEmpty()) {
+						description = getStringValue(suggestion, "description");
+					}
+				}
 
-		// Fallback to basic description if no suggestion description
+				// Priority 2: Get description from detection results (this should always exist)
 				if (description == null || description.isEmpty()) {
 					description = getStringValue(issueData, "description");
+					if (description != null && !description.isEmpty()) {
+						log.debug("✓ Using description from detection results for issue {}", getStringValue(issueData, "id"));
+					}
 				}
 				
-				// Generate description if still empty
+				// Priority 3: Check if description is nested in other fields
+				if (description == null || description.isEmpty()) {
+					// Sometimes the description might be in a nested structure
+					Object descObj = issueData.get("description");
+					if (descObj instanceof Map) {
+						Map<String, Object> descMap = (Map<String, Object>) descObj;
+						description = getStringValue(descMap, "text");
+						if (description == null || description.isEmpty()) {
+							description = getStringValue(descMap, "value");
+						}
+					}
+				}
+				
+				// Final fallback: This should rarely happen if Lambda is working correctly
 				if (description == null || description.isEmpty()) {
 					String type = getStringValue(issueData, "type", "Unknown");
 					String severity = getStringValue(issueData, "severity", "MEDIUM");
-					description = String.format("This %s issue has been detected with %s severity. Manual review is recommended to assess the impact and determine the appropriate fix.", type.replace("_", " ").toLowerCase(), severity.toLowerCase());
+					String category = getStringValue(issueData, "category", "general");
+					
+					log.error("❌ No description found from Lambda for {} issue. This indicates a problem with the Lambda response.", type);
+					
+					// Create a meaningful fallback that indicates the issue
+					description = String.format("Description not provided by analysis engine for this %s issue (severity: %s). The issue was detected in the %s category but detailed information is missing. Please review the code manually.", 
+						type.replace("_", " ").toLowerCase(), 
+						severity.toLowerCase(),
+						category);
 				}
 
 				issue.setDescription(description);
 		issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM").toUpperCase());
 		issue.setCategory(getStringValue(issueData, "category", "GENERAL"));
 		// Enhanced file path extraction with validation
-		String filePath = getStringValue(issueData, "file");
-		if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
-			// Try to extract from other possible fields
-			filePath = getStringValue(issueData, "path");
-			if (filePath == null || filePath.trim().isEmpty()) {
-				filePath = getStringValue(issueData, "filename");
-			}
-
-			if (filePath == null || filePath.trim().isEmpty()) {
-				filePath = "Unknown File";
-				log.warn("⚠️ File path is null/empty for issue {}, type: {}, using default",
-						getStringValue(issueData, "id"), getStringValue(issueData, "type"));
-			}
-		}
-		issue.setFile(filePath);
+		// Enhanced file path extraction with multiple fallback strategies
+				String filePath = getStringValue(issueData, "file");
+				if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+					// Try multiple possible field names
+					String[] possibleFields = {"path", "filePath", "filename", "fileName", "location", "source"};
+					for (String field : possibleFields) {
+						String value = getStringValue(issueData, field);
+						if (value != null && !value.trim().isEmpty() && !"unknown".equalsIgnoreCase(value)) {
+							filePath = value;
+							break;
+						}
+					}
+					
+					// If still not found, try to extract from code snippet or description
+					if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+						String code = getStringValue(issueData, "code");
+						String codeSnippet = getStringValue(issueData, "codeSnippet");
+						if (code != null && code.contains("// File:")) {
+							int start = code.indexOf("// File:") + 8;
+							int end = code.indexOf("\n", start);
+							if (end > start) {
+								filePath = code.substring(start, end).trim();
+							}
+						} else if (codeSnippet != null && codeSnippet.contains("// File:")) {
+							int start = codeSnippet.indexOf("// File:") + 8;
+							int end = codeSnippet.indexOf("\n", start);
+							if (end > start) {
+								filePath = codeSnippet.substring(start, end).trim();
+							}
+						}
+					}
+					
+					if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+						// Generate a meaningful default based on issue type
+						String type = getStringValue(issueData, "type", "issue");
+						filePath = String.format("%s.java", type.toLowerCase().replace("_", "-"));
+						log.warn("⚠️ File path not found for issue {}, type: {}, generated default: {}",
+								getStringValue(issueData, "id"), type, filePath);
+					}
+				}
+				issue.setFile(filePath);
 
 		// Enhanced line number extraction
-		Integer lineNumber = extractLineNumber(issueData);
-		issue.setLine(lineNumber != null ? lineNumber : 1); // Default to 1 instead of 0
+				// Enhanced line number extraction
+				Integer lineNumber = extractLineNumber(issueData);
+				if (lineNumber == null || lineNumber <= 0) {
+					// If we couldn't extract line number, log it
+					String type = getStringValue(issueData, "type");
+					String file = issue.getFile();
+					log.warn("⚠️ No line number found for {} issue in file {}, defaulting to 1", type, file);
+					lineNumber = 1;
+				}
+				issue.setLine(lineNumber);
 		issue.setColumn(getIntValue(issueData, "column"));
 		issue.setCode(getStringValue(issueData, "code"));
 		issue.setLanguage(getStringValue(issueData, "language"));
@@ -762,73 +825,127 @@ public class DataAggregationService {
 	/**
 	 * Extract line number from various possible formats
 	 */
+	/**
+	 * Extract line number from various possible formats - Enhanced version
+	 */
 	private Integer extractLineNumber(Map<String, Object> issueData) {
-		// Try multiple possible keys for line number
+		// First priority: Try direct line fields
 		String[] lineKeys = { "line", "lineNumber", "startLine", "line_number", "lineNum" };
-
+		
 		for (String key : lineKeys) {
 			Object lineValue = issueData.get(key);
 			if (lineValue != null) {
 				try {
-					if (lineValue instanceof Number) {
-						int line = ((Number) lineValue).intValue();
-						return line > 0 ? line : 1; // Ensure positive line numbers
-					} else {
-						int line = Integer.parseInt(lineValue.toString());
-						return line > 0 ? line : 1;
+					String lineStr = lineValue.toString().trim();
+					// Handle various formats
+					if (lineStr.matches("\\d+")) {
+						// Pure number
+						int line = Integer.parseInt(lineStr);
+						if (line > 0) {
+							log.debug("✓ Found line number {} from field '{}'", line, key);
+							return line;
+						}
+					} else if (lineStr.contains("-")) {
+						// Range format: "10-15"
+						String firstPart = lineStr.split("-")[0].trim();
+						if (firstPart.matches("\\d+")) {
+							int line = Integer.parseInt(firstPart);
+							if (line > 0) {
+								log.debug("✓ Found line number {} from range in field '{}'", line, key);
+								return line;
+							}
+						}
 					}
-				} catch (NumberFormatException e) {
+				} catch (Exception e) {
 					// Continue to next key
 				}
 			}
 		}
-
-		// Try to extract from location string if available
+		
+		// Second priority: Extract from code snippet that contains line number comments
+		String codeSnippet = getStringValue(issueData, "code");
+		if (codeSnippet == null || codeSnippet.isEmpty()) {
+			codeSnippet = getStringValue(issueData, "codeSnippet");
+		}
+		
+		if (codeSnippet != null && !codeSnippet.isEmpty()) {
+			// Look for line number comments added by screening Lambda
+			// Patterns: "// Line 123", "# Line 123", "// L123"
+			java.util.regex.Pattern[] patterns = {
+				java.util.regex.Pattern.compile("//\\s*Line\\s*(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
+				java.util.regex.Pattern.compile("#\\s*Line\\s*(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
+				java.util.regex.Pattern.compile("//\\s*L(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE)
+			};
+			
+			for (java.util.regex.Pattern pattern : patterns) {
+				java.util.regex.Matcher matcher = pattern.matcher(codeSnippet);
+				if (matcher.find()) {
+					try {
+						int line = Integer.parseInt(matcher.group(1));
+						if (line > 0) {
+							log.debug("✓ Extracted line number {} from code snippet comment", line);
+							return line;
+						}
+					} catch (NumberFormatException e) {
+						// Continue to next pattern
+					}
+				}
+			}
+		}
+		
+		// Third priority: Extract from description if it mentions line number
+		String description = getStringValue(issueData, "description");
+		if (description != null && !description.isEmpty()) {
+			// Look for patterns like "at line 45", "on line 123", "line: 123"
+			java.util.regex.Pattern descPattern = java.util.regex.Pattern.compile(
+				"(?:at|on|in)?\\s*line[\\s:]+([0-9]+)", 
+				java.util.regex.Pattern.CASE_INSENSITIVE
+			);
+			java.util.regex.Matcher matcher = descPattern.matcher(description);
+			if (matcher.find()) {
+				try {
+					int line = Integer.parseInt(matcher.group(1));
+					if (line > 0) {
+						log.debug("✓ Extracted line number {} from description", line);
+						return line;
+					}
+				} catch (NumberFormatException e) {
+					// Continue
+				}
+			}
+		}
+		
+		// Fourth priority: Try location field
 		String location = getStringValue(issueData, "location");
 		if (location != null && location.contains(":")) {
 			try {
-				String lineStr = location.substring(location.lastIndexOf(":") + 1);
-				int line = Integer.parseInt(lineStr.trim());
-				return line > 0 ? line : 1;
-			} catch (Exception e) {
-				// Ignore parsing errors
-			}
-		}
-
-		// Try to extract from file path with line number (format: file.java:123)
-		String filePath = getStringValue(issueData, "file");
-		if (filePath != null && filePath.contains(":")) {
-			try {
-				String lineStr = filePath.substring(filePath.lastIndexOf(":") + 1);
-				int line = Integer.parseInt(lineStr.trim());
-				return line > 0 ? line : 1;
-			} catch (Exception e) {
-				// Ignore parsing errors
-			}
-		}
-
-		// Try to extract from code snippet context if available
-		String codeSnippet = getStringValue(issueData, "codeSnippet");
-		if (codeSnippet != null && codeSnippet.contains("line")) {
-			try {
-				// Look for patterns like "line 45" or "Line: 123"
-				java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("line[\\s:]+([0-9]+)",
-						java.util.regex.Pattern.CASE_INSENSITIVE);
-				java.util.regex.Matcher matcher = pattern.matcher(codeSnippet);
-				if (matcher.find()) {
-					int line = Integer.parseInt(matcher.group(1));
-					return line > 0 ? line : 1;
+				String lineStr = location.substring(location.lastIndexOf(":") + 1).trim();
+				if (lineStr.matches("\\d+")) {
+					int line = Integer.parseInt(lineStr);
+					if (line > 0) {
+						log.debug("✓ Extracted line number {} from location field", line);
+						return line;
+					}
 				}
 			} catch (Exception e) {
-				// Ignore parsing errors
+				// Continue
 			}
 		}
-
-		log.warn(
-				"⚠️ Could not extract line number from issue data. Issue ID: {}, Type: {}, File: {}, Available keys: {}",
-				getStringValue(issueData, "id"), getStringValue(issueData, "type"), getStringValue(issueData, "file"),
-				issueData.keySet());
-		return 1; // Default to line 1 instead of null/0
+		
+		// Log detailed information about what we tried
+		log.warn("⚠️ Could not extract line number from issue data. Tried fields: {}, Code snippet length: {}, Description length: {}",
+				issueData.keySet(),
+				codeSnippet != null ? codeSnippet.length() : 0,
+				description != null ? description.length() : 0);
+		
+		// Log sample of code snippet to debug
+		if (codeSnippet != null && codeSnippet.length() > 0) {
+			String sample = codeSnippet.substring(0, Math.min(200, codeSnippet.length()));
+			log.debug("Code snippet sample: {}", sample);
+		}
+		
+		// Return 1 as default
+		return 1;
 	}
 
 	/**
