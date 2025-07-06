@@ -870,9 +870,9 @@
 
 														<h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
 															Recommended Fix</h6>
-														<p class="mb-3"
-															th:text="${issue.suggestion.immediateFix.explanation}">Fix
-															explanation</p>
+															<p class="mb-3"
+																th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'This issue requires analysis to determine the appropriate fix based on your specific implementation context.'}">Fix
+																explanation</p>
 
 														<div class="row">
 															<div class="col-md-6">
@@ -1163,9 +1163,9 @@
 
 														<h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
 															Recommended Fix</h6>
-														<p class="mb-3"
-															th:text="${issue.suggestion.immediateFix.explanation}">Fix
-															explanation</p>
+															<p class="mb-3"
+																th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'This issue requires analysis to determine the appropriate fix based on your specific implementation context.'}">Fix
+																explanation</p>
 
 														<div class="row">
 															<div class="col-md-6">
