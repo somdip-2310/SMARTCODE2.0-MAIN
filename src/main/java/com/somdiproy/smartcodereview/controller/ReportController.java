@@ -79,6 +79,8 @@ public class ReportController {
                     securityIssues.size(), otherIssues.size(), additionalSecurityIssues.size());
             
             model.addAttribute("securityIssues", securityIssues);
+            // Sort other issues by severity before adding to model
+            otherIssues.sort(com.somdiproy.smartcodereview.util.SeverityComparator.BY_SEVERITY_DESC);
             model.addAttribute("otherIssues", otherIssues);
             model.addAttribute("additionalSecurityIssues", additionalSecurityIssues);
         }

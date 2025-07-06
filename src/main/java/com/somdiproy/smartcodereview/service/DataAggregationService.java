@@ -659,7 +659,6 @@ public class DataAggregationService {
 		issue.setAnalysisId(analysisId);
 		issue.setIssueId(getStringValue(issueData, "id", UUID.randomUUID().toString()));
 		issue.setType(getStringValue(issueData, "type"));
-		// Set title with fallback to type if title is null
 		// Set title with enhanced fallback logic
 		String title = getStringValue(issueData, "title");
 		if (title == null || title.isEmpty()) {
@@ -675,11 +674,18 @@ public class DataAggregationService {
 		}
 
 		// Fallback to basic description if no suggestion description
-		if (description == null || description.isEmpty()) {
-			description = getStringValue(issueData, "description");
-		}
+				if (description == null || description.isEmpty()) {
+					description = getStringValue(issueData, "description");
+				}
+				
+				// Generate description if still empty
+				if (description == null || description.isEmpty()) {
+					String type = getStringValue(issueData, "type", "Unknown");
+					String severity = getStringValue(issueData, "severity", "MEDIUM");
+					description = String.format("This %s issue has been detected with %s severity. Manual review is recommended to assess the impact and determine the appropriate fix.", type.replace("_", " ").toLowerCase(), severity.toLowerCase());
+				}
 
-		issue.setDescription(description);
+				issue.setDescription(description);
 		issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM").toUpperCase());
 		issue.setCategory(getStringValue(issueData, "category", "GENERAL"));
 		// Enhanced file path extraction with validation
