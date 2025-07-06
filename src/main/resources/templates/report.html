@@ -832,10 +832,18 @@
 												th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
-											<td><code
-													th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
+											<td>
+											    <code th:if="${issue.file != null and !issue.file.isEmpty()}" 
+											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+											          th:title="${issue.file}">
+											        filename.java
+											    </code>
+											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
 											</td>
-											<td th:text="${issue.line}"></td>
+											<td>
+											    <span th:if="${issue.line != null and issue.line > 0}" th:text="${issue.line}">1</span>
+											    <span th:unless="${issue.line != null and issue.line > 0}">-</span>
+											</td>
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
 													type="button" th:data-target="'security-detail-' + ${issue.issueId}"
@@ -940,10 +948,18 @@
 												th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
-											<td><code
-													th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
+											<td>
+											    <code th:if="${issue.file != null and !issue.file.isEmpty()}" 
+											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+											          th:title="${issue.file}">
+											        filename.java
+											    </code>
+											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
 											</td>
-											<td th:text="${issue.line}"></td>
+											<td>
+											    <span th:if="${issue.line != null and issue.line > 0}" th:text="${issue.line}">1</span>
+											    <span th:unless="${issue.line != null and issue.line > 0}">-</span>
+											</td>
 											<td>
 												<span class="badge bg-danger"
 													th:if="${issue.severity == 'CRITICAL'}">CRITICAL</span>
@@ -1095,21 +1111,28 @@
                                                      !issue.suggestion.immediateFix.searchCode.contains('Manual review required')}"
 											th:attr="data-issue-id=${issue.issueId}">
 											<td>
-												<span class="badge" th:classappend="
-																								                                                    ${issue.severity == 'CRITICAL'} ? 'bg-danger' : 
-																								                                                    (${issue.severity == 'HIGH'} ? 'bg-danger' : 
-												                                                    (${issue.severity == 'MEDIUM'} ? 'bg-warning text-dark' : 'bg-info' : 
-                                                    (${issue.severity == 'LOW'} ? 'bg-success' : 'bg-secondary')))"
+												<span class="badge" th:classappend="${issue.severity == 'CRITICAL' ? 'bg-danger' : 
+												                                      (issue.severity == 'HIGH' ? 'bg-danger' : 
+												                                       (issue.severity == 'MEDIUM' ? 'bg-warning text-dark' : 
+												                                        (issue.severity == 'LOW' ? 'bg-success' : 'bg-info')))}"
 													th:text="${issue.severity}">HIGH</span>
 											</td>
 											<td
 												th:text="${issue.title != null and !issue.title.isEmpty() ? issue.title : 
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
-											<td><code
-													th:text="${issue.file != null ? (issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file) : 'Unknown File'}">File</code>
+											<td>
+											    <code th:if="${issue.file != null and !issue.file.isEmpty()}" 
+											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+											          th:title="${issue.file}">
+											        filename.java
+											    </code>
+											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
 											</td>
-											<td th:text="${issue.line}"></td>
+											<td>
+											    <span th:if="${issue.line != null and issue.line > 0}" th:text="${issue.line}">1</span>
+											    <span th:unless="${issue.line != null and issue.line > 0}">-</span>
+											</td>
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
 													type="button" th:data-target="'other-detail-' + ${issue.issueId}"
