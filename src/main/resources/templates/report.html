@@ -894,9 +894,13 @@
                                                                 class="bi bi-exclamation-triangle text-warning"></i>
                                                             Issue Description</h6>
                                                         <div class="alert alert-warning mb-3">
-                                                            <p class="mb-0"
-                                                                th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : 'No description available')}">
-                                                                This issue can be exploited...</p>
+															<p class="mb-0"
+															    th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null and !issue.suggestion.issueDescription.isEmpty()) ? 
+															               issue.suggestion.issueDescription : 
+															               (issue.description != null and !issue.description.isEmpty() ? 
+															                issue.description : 
+															                'This ' + issue.type + ' issue was detected but requires manual review to determine the specific exploitation method and impact.')}">
+															    This issue can be exploited...</p>
                                                         </div>
 
                                                         <h6 class="mb-3"><i class="bi bi-lightbulb text-warning"></i>
@@ -1041,9 +1045,13 @@
                                                                 class="bi bi-exclamation-triangle text-warning"></i>
                                                             Issue Description</h6>
                                                         <div class="alert alert-warning mb-3">
-                                                            <p class="mb-0"
-                                                                th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null) ? issue.suggestion.issueDescription : (issue.description != null ? issue.description : (issue.title != null ? issue.title : 'No description available'))}">
-                                                                This issue can impact performance...</p>
+															<p class="mb-0"
+															    th:text="${(issue.suggestion != null and issue.suggestion.issueDescription != null and !issue.suggestion.issueDescription.isEmpty()) ? 
+															               issue.suggestion.issueDescription : 
+															               (issue.description != null and !issue.description.isEmpty() ? 
+															                issue.description : 
+															                'This ' + issue.type + ' issue can impact performance but requires analysis to determine the specific bottleneck and optimization approach.')}">
+															    This issue can impact performance...</p>
                                                         </div>
 
                                                         <h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>

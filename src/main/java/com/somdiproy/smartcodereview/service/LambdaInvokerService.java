@@ -124,16 +124,23 @@ public class LambdaInvokerService {
 			enforceRateLimit("screening");
 
 			List<Map<String, Object>> fileInputs = files.stream().map(file -> {
-				Map<String, Object> fileMap = new HashMap<>();
-				fileMap.put("path", file.getPath());
-				fileMap.put("name", file.getName());
-				fileMap.put("content", file.getContent());
-				fileMap.put("size", file.getSize());
-				fileMap.put("sha", file.getSha());
-				fileMap.put("language", file.getLanguage());
-				fileMap.put("mimeType", file.getMimeType());
-				fileMap.put("encoding", "UTF-8");
-				return fileMap;
+			    Map<String, Object> fileMap = new HashMap<>();
+			    // Ensure path is never null
+			    String fullPath = file.getPath();
+			    if (fullPath == null || fullPath.trim().isEmpty()) {
+			        fullPath = file.getName();
+			        log.warn("⚠️ File path is null/empty for {}, using name as fallback", file.getName());
+			    }
+			    fileMap.put("path", fullPath);
+			    fileMap.put("name", file.getName());
+			    fileMap.put("content", file.getContent());
+			    fileMap.put("size", file.getSize());
+			    fileMap.put("sha", file.getSha());
+			    fileMap.put("language", file.getLanguage());
+			    fileMap.put("mimeType", file.getMimeType());
+			    fileMap.put("encoding", "UTF-8");
+			    log.debug("📁 Screening input - File: {} Path: {}", file.getName(), fullPath);
+			    return fileMap;
 			}).collect(Collectors.toList());
 
 			String testPayloadJson = objectMapper.writeValueAsString(Map.of("files", fileInputs));
@@ -158,13 +165,21 @@ public class LambdaInvokerService {
 	 * Enhanced detection invocation with aggressive rate limiting
 	 */
 	public List<Map<String, Object>> invokeDetection(String sessionId, String analysisId, String repository,
-			String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
+	        String branch, List<Map<String, Object>> screenedFiles, int scanNumber) {
 
-		String lockKey = "detection_" + analysisId;
-		if (!acquireAnalysisLock(lockKey)) {
-			log.warn("⚠️ Another detection process is already running for analysis {}", analysisId);
-			return new ArrayList<>();
-		}
+	    String lockKey = "detection_" + analysisId;
+	    if (!acquireAnalysisLock(lockKey)) {
+	        log.warn("⚠️ Another detection process is already running for analysis {}", analysisId);
+	        return new ArrayList<>();
+	    }
+	    
+	    // Debug: Log file paths being sent to detection
+	    if (log.isDebugEnabled()) {
+	        log.debug("🔍 Detection input files for analysis {}:", analysisId);
+	        screenedFiles.forEach(file -> {
+	            log.debug("  File: {} Path: {}", file.get("name"), file.get("path"));
+	        });
+	    }
 
 		try {
 			if (isCircuitBreakerOpen("detection")) {
@@ -1014,6 +1029,11 @@ public class LambdaInvokerService {
 		}
 
 		List<Map<String, Object>> screenedFiles = (List<Map<String, Object>>) responseMap.get("files");
+		if (screenedFiles != null && log.isDebugEnabled()) {
+		    screenedFiles.forEach(file -> {
+		        log.debug("📁 Screened file - Name: {}, Path: {}", file.get("name"), file.get("path"));
+		    });
+		}
 		return screenedFiles != null ? screenedFiles : new ArrayList<>();
 	}
 
@@ -1101,6 +1121,13 @@ public class LambdaInvokerService {
 		}
 
 		List<Map<String, Object>> issues = (List<Map<String, Object>>) responseMap.get("issues");
+		if (issues != null && log.isDebugEnabled()) {
+		    log.debug("🐛 Detection found {} issues:", issues.size());
+		    issues.forEach(issue -> {
+		        log.debug("  Issue: {} in file: {} (path: {})", 
+		                 issue.get("type"), issue.get("file"), issue.get("path"));
+		    });
+		}
 		return issues != null ? issues : new ArrayList<>();
 	}
 
@@ -1350,15 +1377,27 @@ public class LambdaInvokerService {
 	}
 
 	private Map<String, Object> createBatchPayload(String sessionId, String analysisId, String repository,
-			String branch, List<Map<String, Object>> items, String stage, int scanNumber, int batchNumber,
-			int totalBatches) {
+	        String branch, List<Map<String, Object>> items, String stage, int scanNumber, int batchNumber,
+	        int totalBatches) {
 
-		Map<String, Object> payload = new HashMap<>();
-		payload.put("sessionId", sessionId);
-		payload.put("analysisId", analysisId);
-		payload.put("repository", repository);
-		payload.put("branch", branch);
-		payload.put(stage.equals("screening") ? "files" : "files", items);
+	    // Validate file paths before creating payload
+	    if (log.isDebugEnabled()) {
+	        log.debug("📦 Creating batch payload for {} (batch {}/{})", stage, batchNumber, totalBatches);
+	        items.forEach(item -> {
+	            String path = (String) item.get("path");
+	            String name = (String) item.get("name");
+	            if (path == null || path.trim().isEmpty()) {
+	                log.warn("⚠️ Missing path for file: {} in {} batch", name, stage);
+	            }
+	        });
+	    }
+
+	    Map<String, Object> payload = new HashMap<>();
+	    payload.put("sessionId", sessionId);
+	    payload.put("analysisId", analysisId);
+	    payload.put("repository", repository);
+	    payload.put("branch", branch);
+	    payload.put(stage.equals("screening") ? "files" : "files", items);
 		payload.put("stage", stage);
 		payload.put("scanNumber", scanNumber);
 		payload.put("batchInfo",

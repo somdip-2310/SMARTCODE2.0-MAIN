@@ -5,8 +5,10 @@ import com.somdiproy.smartcodereview.model.AnalysisResult;
 import com.somdiproy.smartcodereview.model.Issue;
 import com.somdiproy.smartcodereview.repository.AnalysisRepository;
 import com.somdiproy.smartcodereview.repository.IssueDetailsRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.somdiproy.smartcodereview.util.SeverityComparator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +20,8 @@ import java.util.Map;
 @Service
 public class ReportService {
     
-    private static final Logger log = LoggerFactory.getLogger(ReportService.class);
-    
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LambdaInvokerService.class);
+
     private final AnalysisRepository analysisRepository;
     private final IssueDetailsRepository issueDetailsRepository;
     
@@ -40,8 +42,16 @@ public class ReportService {
 		AnalysisResult analysis = analysisRepository.findById(analysisId)
 				.orElseThrow(() -> new RuntimeException("Analysis not found"));
 
+		// Get all issues for this analysis
 		List<Issue> issues = issueDetailsRepository.findByAnalysisId(analysisId);
 
+		// Ensure issues are sorted consistently
+		if (issues != null && !issues.isEmpty()) {
+		    issues.sort(SeverityComparator.BY_SEVERITY_DESC);
+		    log.debug("📊 Sorted {} issues for report display", issues.size());
+		}
+
+		// Calculate counts
 		// Enrich issues with CVE data
 		issues.forEach(issue -> {
 			// Ensure description is populated
