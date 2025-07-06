@@ -49,6 +49,7 @@ public class Issue {
         this.issueId = issueId;
     }
     
+    @DynamoDbAttribute("type")
     public String getType() {
         return type;
     }
@@ -57,6 +58,7 @@ public class Issue {
         this.type = type;
     }
     
+    @DynamoDbAttribute("title")
     public String getTitle() {
         return title;
     }
@@ -65,6 +67,7 @@ public class Issue {
         this.title = title;
     }
     
+    @DynamoDbAttribute("description")
     public String getDescription() {
         return description;
     }
@@ -73,6 +76,7 @@ public class Issue {
         this.description = description;
     }
     
+    @DynamoDbAttribute("severity")
     public String getSeverity() {
         return severity;
     }
@@ -81,6 +85,7 @@ public class Issue {
         this.severity = severity;
     }
     
+    @DynamoDbAttribute("category")
     public String getCategory() {
         return category;
     }
@@ -89,6 +94,7 @@ public class Issue {
         this.category = category;
     }
     
+    @DynamoDbAttribute("file")
     public String getFile() {
         return file;
     }
@@ -97,6 +103,7 @@ public class Issue {
         this.file = file;
     }
     
+    @DynamoDbAttribute("line")
     public Integer getLine() {
         return line;
     }
@@ -105,6 +112,7 @@ public class Issue {
         this.line = line;
     }
     
+    @DynamoDbAttribute("column")
     public Integer getColumn() {
         return column;
     }
@@ -113,6 +121,7 @@ public class Issue {
         this.column = column;
     }
     
+    @DynamoDbAttribute("code")
     public String getCode() {
         return code;
     }
@@ -121,6 +130,7 @@ public class Issue {
         this.code = code;
     }
     
+    @DynamoDbAttribute("language")
     public String getLanguage() {
         return language;
     }
@@ -129,6 +139,7 @@ public class Issue {
         this.language = language;
     }
     
+    @DynamoDbAttribute("cwe")
     public String getCwe() {
         return cwe;
     }
@@ -137,6 +148,7 @@ public class Issue {
         this.cwe = cwe;
     }
     
+    @DynamoDbAttribute("cvssScore")
     public Double getCvssScore() {
         return cvssScore;
     }
@@ -146,7 +158,8 @@ public class Issue {
     public void setCvssScore(Double cvssScore) {
 		this.cvssScore = cvssScore;
 	}
-
+    
+    @DynamoDbAttribute("cveId")
 	public String getCveId() {
         return cveId;
     }
@@ -155,6 +168,7 @@ public class Issue {
         this.cveId = cveId;
     }
     
+    @DynamoDbAttribute("cveScore")
     public Double getCveScore() {
         return cveScore;
     }
@@ -163,6 +177,7 @@ public class Issue {
         this.cveScore = cveScore;
     }
     
+    @DynamoDbAttribute("suggestion")
     public Suggestion getSuggestion() {
         return suggestion;
     }

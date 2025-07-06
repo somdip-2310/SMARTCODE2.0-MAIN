@@ -187,9 +187,9 @@
                         </div>
                         <h5>Stage 3: Fix Generation</h5>
                         <p class="mb-1">Status: <span id="suggestion-status">Pending</span></p>
-                        <p class="mb-0"><small>LLM 3 is crafting solutions...</small></p>
+                        <p class="mb-0"><small>LLM 3 is filtering & crafting solutions...</small></p>
                         <div class="mt-2">
-                            <small class="text-muted">Est. time: 30-45 seconds</small>
+                            <small class="text-muted">Est. time: 2-3 mins</small>
                         </div>
                     </div>
                 </div>
@@ -429,7 +429,7 @@
                 } else if (stage === 'detection' && data.issuesFound) {
                     updateFunMessage(`🔍 Found ${data.issuesFound} issues so far...`);
                 } else if (stage === 'suggestion' && data.issuesFound) {
-                    updateFunMessage(`🔧 Generating fixes for ${data.issuesFound} issues...`);
+                    updateFunMessage(`🔧 FIltering ${data.issuesFound} issues from actual v/s dummy...`);
                 }
             } else if (status === 'completed') {
                 stageCard.classList.remove('active');

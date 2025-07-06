@@ -717,21 +717,51 @@ public class DataAggregationService {
 				issue.setDescription(description);
 		issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM").toUpperCase());
 		issue.setCategory(getStringValue(issueData, "category", "GENERAL"));
-		// Enhanced file path extraction with validation
 		// Enhanced file path extraction with multiple fallback strategies
 				String filePath = getStringValue(issueData, "file");
+				
+				// Debug logging to trace the issue
+				log.debug("Extracting file path for issue {} - initial value: {}", getStringValue(issueData, "id"), filePath);
+
 				if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
 					// Try multiple possible field names
-					String[] possibleFields = {"path", "filePath", "filename", "fileName", "location", "source"};
+					String[] possibleFields = {"path", "filePath", "filename", "fileName", "location", "source", "fileInput"};
 					for (String field : possibleFields) {
 						String value = getStringValue(issueData, field);
 						if (value != null && !value.trim().isEmpty() && !"unknown".equalsIgnoreCase(value)) {
 							filePath = value;
+							log.debug("Found file path in field '{}': {}", field, filePath);
 							break;
 						}
 					}
 					
-					// If still not found, try to extract from code snippet or description
+					// If still not found, check if it's nested in metadata
+					if (filePath == null || filePath.trim().isEmpty()) {
+						Map<String, Object> metadata = (Map<String, Object>) issueData.get("metadata");
+						if (metadata != null) {
+							filePath = getStringValue(metadata, "file");
+							if (filePath == null || filePath.trim().isEmpty()) {
+								filePath = getStringValue(metadata, "path");
+							}
+							if (filePath == null || filePath.trim().isEmpty()) {
+								filePath = getStringValue(metadata, "filename");
+							}
+						}
+					}
+					
+					// Check if file info is in a nested structure
+					if (filePath == null || filePath.trim().isEmpty()) {
+						Object fileObj = issueData.get("fileInput");
+						if (fileObj instanceof Map) {
+							Map<String, Object> fileMap = (Map<String, Object>) fileObj;
+							filePath = getStringValue(fileMap, "path");
+							if (filePath == null || filePath.trim().isEmpty()) {
+								filePath = getStringValue(fileMap, "name");
+							}
+						}
+					}
+					
+					// Try to extract from code snippet or description
 					if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
 						String code = getStringValue(issueData, "code");
 						String codeSnippet = getStringValue(issueData, "codeSnippet");
@@ -749,15 +779,19 @@ public class DataAggregationService {
 							}
 						}
 					}
-					
-					if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
-						// Generate a meaningful default based on issue type
-						String type = getStringValue(issueData, "type", "issue");
-						filePath = String.format("%s.java", type.toLowerCase().replace("_", "-"));
-						log.warn("⚠️ File path not found for issue {}, type: {}, generated default: {}",
-								getStringValue(issueData, "id"), type, filePath);
-					}
 				}
+
+				// Final validation and default
+				if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+					// Generate a meaningful default based on issue type
+					String type = getStringValue(issueData, "type", "issue");
+					filePath = String.format("%s.java", type.toLowerCase().replace("_", "-"));
+					log.warn("⚠️ File path not found for issue {}, type: {}, generated default: {}",
+							getStringValue(issueData, "id"), type, filePath);
+				} else {
+					log.info("✅ Successfully extracted file path: {} for issue: {}", filePath, getStringValue(issueData, "id"));
+				}
+				
 				issue.setFile(filePath);
 
 		// Enhanced line number extraction
