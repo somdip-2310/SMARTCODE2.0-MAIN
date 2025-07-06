@@ -276,7 +276,7 @@ public class AnalysisController {
                 .build();
         }
     }
-    
+    /*
     @GetMapping("/report/{analysisId}")
     public String showReport(@PathVariable String analysisId,
                             @RequestParam String sessionId,
@@ -407,6 +407,7 @@ public class AnalysisController {
             return "error";
         }
     }
+    */
 
     // Helper method to ensure report has all required defaults
     private void ensureReportDefaults(ReportResponse report, Analysis analysis) {
