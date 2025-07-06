@@ -807,7 +807,7 @@
 										<th>CVE Score</th>
 										<th>Issue</th>
 										<th>File</th>
-										<th>Line</th>
+										
 										<th>Action</th>
 									</tr>
 								</thead>
@@ -840,10 +840,7 @@
 											    </code>
 											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
 											</td>
-											<td>
-											    <span th:if="${issue.line != null and issue.line > 0}" th:text="${issue.line}">1</span>
-											    <span th:unless="${issue.line != null and issue.line > 0}">-</span>
-											</td>
+											
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
 													type="button" th:data-target="'security-detail-' + ${issue.issueId}"
@@ -934,7 +931,7 @@
 										<th>Issue Type</th>
 										<th>Description</th>
 										<th>File</th>
-										<th>Line</th>
+										
 										<th>Priority</th>
 										<th>Action</th>
 									</tr>
@@ -956,10 +953,7 @@
 											    </code>
 											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
 											</td>
-											<td>
-											    <span th:if="${issue.line != null and issue.line > 0}" th:text="${issue.line}">1</span>
-											    <span th:unless="${issue.line != null and issue.line > 0}">-</span>
-											</td>
+											
 											<td>
 												<span class="badge bg-danger"
 													th:if="${issue.severity == 'CRITICAL'}">CRITICAL</span>
@@ -1098,7 +1092,7 @@
 										<th>Severity</th>
 										<th>Issue</th>
 										<th>File</th>
-										<th>Line</th>
+										
 										<th>Action</th>
 									</tr>
 								</thead>
@@ -1129,10 +1123,7 @@
 											    </code>
 											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
 											</td>
-											<td>
-											    <span th:if="${issue.line != null and issue.line > 0}" th:text="${issue.line}">1</span>
-											    <span th:unless="${issue.line != null and issue.line > 0}">-</span>
-											</td>
+											
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
 													type="button" th:data-target="'other-detail-' + ${issue.issueId}"
