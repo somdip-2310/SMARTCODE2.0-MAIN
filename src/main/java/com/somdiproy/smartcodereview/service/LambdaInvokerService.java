@@ -671,12 +671,38 @@ public class LambdaInvokerService {
 	private String buildSuggestionsPayload(String sessionId, String analysisId, String repository, 
 	        String branch, List<Map<String, Object>> issues, int scanNumber) throws Exception {
 	    
+	    // Enhance issues with code context before sending
+	    List<Map<String, Object>> enhancedIssues = new ArrayList<>();
+	    for (Map<String, Object> issue : issues) {
+	        Map<String, Object> enhancedIssue = new HashMap<>(issue);
+	        enhancedIssue.put("repository", repository);
+	        enhancedIssue.put("branch", branch);
+	        enhancedIssue.put("analysisId", analysisId);
+	        
+	        // Add actual code snippet if available
+	        String codeSnippet = (String) issue.get("codeSnippet");
+	        if (codeSnippet == null || codeSnippet.isEmpty()) {
+	            codeSnippet = (String) issue.get("code");
+	        }
+	        if (codeSnippet == null || codeSnippet.isEmpty()) {
+	            // Try to get from file content if we have it
+	            String filePath = (String) issue.get("file");
+	            if (filePath != null && !filePath.isEmpty()) {
+	                codeSnippet = String.format("// Code from %s at line %s\n// Actual code context not available in this detection", 
+	                    filePath, issue.get("line"));
+	            }
+	        }
+	        enhancedIssue.put("codeSnippet", codeSnippet);
+	        enhancedIssue.put("actualCode", codeSnippet); // Duplicate for backward compatibility
+	        enhancedIssues.add(enhancedIssue);
+	    }
+	    
 	    Map<String, Object> payload = new HashMap<>();
 	    payload.put("sessionId", sessionId);
 	    payload.put("analysisId", analysisId);
 	    payload.put("repository", repository);
 	    payload.put("branch", branch);
-	    payload.put("issues", issues);
+	    payload.put("issues", enhancedIssues);
 	    payload.put("scanNumber", scanNumber);
 	    
 	    // Enhanced configuration for rate limiting

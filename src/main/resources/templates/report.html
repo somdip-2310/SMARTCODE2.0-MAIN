@@ -833,12 +833,14 @@
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
 											<td>
-											    <code th:if="${issue.file != null and !issue.file.isEmpty()}" 
+											    <code th:if="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}" 
 											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
 											          th:title="${issue.file}">
 											        filename.java
 											    </code>
-											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
+											    <code th:unless="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}">
+											        <span th:text="${issue.type != null ? issue.type.toLowerCase().replace('_', '-') + '.java' : 'unknown.java'}">unknown.java</span>
+											    </code>
 											</td>
 											
 											<td>
@@ -1116,12 +1118,14 @@
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
 											<td>
-											    <code th:if="${issue.file != null and !issue.file.isEmpty()}" 
+											    <code th:if="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}" 
 											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
 											          th:title="${issue.file}">
 											        filename.java
 											    </code>
-											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
+											    <code th:unless="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}">
+											        <span th:text="${issue.type != null ? issue.type.toLowerCase().replace('_', '-') + '.java' : 'unknown.java'}">unknown.java</span>
+											    </code>
 											</td>
 											
 											<td>

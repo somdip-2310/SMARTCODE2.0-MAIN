@@ -668,143 +668,142 @@ public class DataAggregationService {
 
 		// First try to get enhanced description from suggestion
 		// Priority 1: Try to get enhanced description from suggestion
-				String description = null;
-				Map<String, Object> suggestion = (Map<String, Object>) issueData.get("suggestion");
-				if (suggestion != null) {
-					// Check multiple possible fields where description might be
-					description = getStringValue(suggestion, "issueDescription");
-					if (description == null || description.isEmpty()) {
-						description = getStringValue(suggestion, "description");
-					}
-				}
+		String description = null;
+		Map<String, Object> suggestion = (Map<String, Object>) issueData.get("suggestion");
+		if (suggestion != null) {
+			// Check multiple possible fields where description might be
+			description = getStringValue(suggestion, "issueDescription");
+			if (description == null || description.isEmpty()) {
+				description = getStringValue(suggestion, "description");
+			}
+		}
 
-				// Priority 2: Get description from detection results (this should always exist)
-				if (description == null || description.isEmpty()) {
-					description = getStringValue(issueData, "description");
-					if (description != null && !description.isEmpty()) {
-						log.debug("✓ Using description from detection results for issue {}", getStringValue(issueData, "id"));
-					}
-				}
-				
-				// Priority 3: Check if description is nested in other fields
-				if (description == null || description.isEmpty()) {
-					// Sometimes the description might be in a nested structure
-					Object descObj = issueData.get("description");
-					if (descObj instanceof Map) {
-						Map<String, Object> descMap = (Map<String, Object>) descObj;
-						description = getStringValue(descMap, "text");
-						if (description == null || description.isEmpty()) {
-							description = getStringValue(descMap, "value");
-						}
-					}
-				}
-				
-				// Final fallback: This should rarely happen if Lambda is working correctly
-				if (description == null || description.isEmpty()) {
-					String type = getStringValue(issueData, "type", "Unknown");
-					String severity = getStringValue(issueData, "severity", "MEDIUM");
-					String category = getStringValue(issueData, "category", "general");
-					
-					log.error("❌ No description found from Lambda for {} issue. This indicates a problem with the Lambda response.", type);
-					
-					// Create a meaningful fallback that indicates the issue
-					description = String.format("Description not provided by analysis engine for this %s issue (severity: %s). The issue was detected in the %s category but detailed information is missing. Please review the code manually.", 
-						type.replace("_", " ").toLowerCase(), 
-						severity.toLowerCase(),
-						category);
-				}
+		// Priority 2: Get description from detection results (this should always exist)
+		if (description == null || description.isEmpty()) {
+			description = getStringValue(issueData, "description");
+			if (description != null && !description.isEmpty()) {
+				log.debug("✓ Using description from detection results for issue {}", getStringValue(issueData, "id"));
+			}
+		}
 
-				issue.setDescription(description);
+		// Priority 3: Check if description is nested in other fields
+		if (description == null || description.isEmpty()) {
+			// Sometimes the description might be in a nested structure
+			Object descObj = issueData.get("description");
+			if (descObj instanceof Map) {
+				Map<String, Object> descMap = (Map<String, Object>) descObj;
+				description = getStringValue(descMap, "text");
+				if (description == null || description.isEmpty()) {
+					description = getStringValue(descMap, "value");
+				}
+			}
+		}
+
+		// Final fallback: This should rarely happen if Lambda is working correctly
+		if (description == null || description.isEmpty()) {
+			String type = getStringValue(issueData, "type", "Unknown");
+			String severity = getStringValue(issueData, "severity", "MEDIUM");
+			String category = getStringValue(issueData, "category", "general");
+
+			log.error(
+					"❌ No description found from Lambda for {} issue. This indicates a problem with the Lambda response.",
+					type);
+
+			// Create a meaningful fallback that indicates the issue
+			description = generateDetailedDescription(type, severity, category);
+		}
+
+		issue.setDescription(description);
 		issue.setSeverity(getStringValue(issueData, "severity", "MEDIUM").toUpperCase());
 		issue.setCategory(getStringValue(issueData, "category", "GENERAL"));
 		// Enhanced file path extraction with multiple fallback strategies
-				String filePath = getStringValue(issueData, "file");
-				
-				// Debug logging to trace the issue
-				log.debug("Extracting file path for issue {} - initial value: {}", getStringValue(issueData, "id"), filePath);
+		String filePath = getStringValue(issueData, "file");
 
-				if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
-					// Try multiple possible field names
-					String[] possibleFields = {"path", "filePath", "filename", "fileName", "location", "source", "fileInput"};
-					for (String field : possibleFields) {
-						String value = getStringValue(issueData, field);
-						if (value != null && !value.trim().isEmpty() && !"unknown".equalsIgnoreCase(value)) {
-							filePath = value;
-							log.debug("Found file path in field '{}': {}", field, filePath);
-							break;
-						}
-					}
-					
-					// If still not found, check if it's nested in metadata
+		// Debug logging to trace the issue
+		log.debug("Extracting file path for issue {} - initial value: {}", getStringValue(issueData, "id"), filePath);
+
+		if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+			// Try multiple possible field names
+			String[] possibleFields = { "path", "filePath", "filename", "fileName", "location", "source", "fileInput" };
+			for (String field : possibleFields) {
+				String value = getStringValue(issueData, field);
+				if (value != null && !value.trim().isEmpty() && !"unknown".equalsIgnoreCase(value)) {
+					filePath = value;
+					log.debug("Found file path in field '{}': {}", field, filePath);
+					break;
+				}
+			}
+
+			// If still not found, check if it's nested in metadata
+			if (filePath == null || filePath.trim().isEmpty()) {
+				Map<String, Object> metadata = (Map<String, Object>) issueData.get("metadata");
+				if (metadata != null) {
+					filePath = getStringValue(metadata, "file");
 					if (filePath == null || filePath.trim().isEmpty()) {
-						Map<String, Object> metadata = (Map<String, Object>) issueData.get("metadata");
-						if (metadata != null) {
-							filePath = getStringValue(metadata, "file");
-							if (filePath == null || filePath.trim().isEmpty()) {
-								filePath = getStringValue(metadata, "path");
-							}
-							if (filePath == null || filePath.trim().isEmpty()) {
-								filePath = getStringValue(metadata, "filename");
-							}
-						}
+						filePath = getStringValue(metadata, "path");
 					}
-					
-					// Check if file info is in a nested structure
 					if (filePath == null || filePath.trim().isEmpty()) {
-						Object fileObj = issueData.get("fileInput");
-						if (fileObj instanceof Map) {
-							Map<String, Object> fileMap = (Map<String, Object>) fileObj;
-							filePath = getStringValue(fileMap, "path");
-							if (filePath == null || filePath.trim().isEmpty()) {
-								filePath = getStringValue(fileMap, "name");
-							}
-						}
-					}
-					
-					// Try to extract from code snippet or description
-					if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
-						String code = getStringValue(issueData, "code");
-						String codeSnippet = getStringValue(issueData, "codeSnippet");
-						if (code != null && code.contains("// File:")) {
-							int start = code.indexOf("// File:") + 8;
-							int end = code.indexOf("\n", start);
-							if (end > start) {
-								filePath = code.substring(start, end).trim();
-							}
-						} else if (codeSnippet != null && codeSnippet.contains("// File:")) {
-							int start = codeSnippet.indexOf("// File:") + 8;
-							int end = codeSnippet.indexOf("\n", start);
-							if (end > start) {
-								filePath = codeSnippet.substring(start, end).trim();
-							}
-						}
+						filePath = getStringValue(metadata, "filename");
 					}
 				}
+			}
 
-				// Final validation and default
-				if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
-					// Generate a meaningful default based on issue type
-					String type = getStringValue(issueData, "type", "issue");
-					filePath = String.format("%s.java", type.toLowerCase().replace("_", "-"));
-					log.warn("⚠️ File path not found for issue {}, type: {}, generated default: {}",
-							getStringValue(issueData, "id"), type, filePath);
-				} else {
-					log.info("✅ Successfully extracted file path: {} for issue: {}", filePath, getStringValue(issueData, "id"));
+			// Check if file info is in a nested structure
+			if (filePath == null || filePath.trim().isEmpty()) {
+				Object fileObj = issueData.get("fileInput");
+				if (fileObj instanceof Map) {
+					Map<String, Object> fileMap = (Map<String, Object>) fileObj;
+					filePath = getStringValue(fileMap, "path");
+					if (filePath == null || filePath.trim().isEmpty()) {
+						filePath = getStringValue(fileMap, "name");
+					}
 				}
-				
-				issue.setFile(filePath);
+			}
+
+			// Try to extract from code snippet or description
+			if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+				String code = getStringValue(issueData, "code");
+				String codeSnippet = getStringValue(issueData, "codeSnippet");
+				if (code != null && code.contains("// File:")) {
+					int start = code.indexOf("// File:") + 8;
+					int end = code.indexOf("\n", start);
+					if (end > start) {
+						filePath = code.substring(start, end).trim();
+					}
+				} else if (codeSnippet != null && codeSnippet.contains("// File:")) {
+					int start = codeSnippet.indexOf("// File:") + 8;
+					int end = codeSnippet.indexOf("\n", start);
+					if (end > start) {
+						filePath = codeSnippet.substring(start, end).trim();
+					}
+				}
+			}
+		}
+
+		// Final validation and default
+		if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+			// Generate a meaningful default based on issue type
+			String type = getStringValue(issueData, "type", "issue");
+			filePath = String.format("%s.java", type.toLowerCase().replace("_", "-"));
+			log.warn("⚠️ File path not found for issue {}, type: {}, generated default: {}",
+					getStringValue(issueData, "id"), type, filePath);
+		} else {
+			log.info("✅ Successfully extracted file path: {} for issue: {}", filePath, getStringValue(issueData, "id"));
+		}
+
+		issue.setFile(filePath);
 
 		// Enhanced line number extraction
-				// Enhanced line number extraction
-				Integer lineNumber = extractLineNumber(issueData);
-				if (lineNumber == null || lineNumber <= 0) {
-					// If we couldn't extract line number, log it
-					String type = getStringValue(issueData, "type");
-					String file = issue.getFile();
-					log.warn("⚠️ No line number found for {} issue in file {}, defaulting to 1", type, file);
-					lineNumber = 1;
-				}
-				issue.setLine(lineNumber);
+		// Enhanced line number extraction
+		Integer lineNumber = extractLineNumber(issueData);
+		if (lineNumber == null || lineNumber <= 0) {
+			// If we couldn't extract line number, log it
+			String type = getStringValue(issueData, "type");
+			String file = issue.getFile();
+			log.warn("⚠️ No line number found for {} issue in file {}, defaulting to 1", type, file);
+			lineNumber = 1;
+		}
+		issue.setLine(lineNumber);
 		issue.setColumn(getIntValue(issueData, "column"));
 		issue.setCode(getStringValue(issueData, "code"));
 		issue.setLanguage(getStringValue(issueData, "language"));
@@ -857,15 +856,70 @@ public class DataAggregationService {
 	}
 
 	/**
-	 * Extract line number from various possible formats
+	 * Generate detailed description based on issue type
 	 */
+	private String generateDetailedDescription(String type, String severity, String category) {
+		String cleanType = type.replace("_", " ").toLowerCase();
+
+		// Security issue descriptions
+		if ("security".equalsIgnoreCase(category)) {
+			switch (type.toUpperCase()) {
+			case "SQL_INJECTION":
+				return "SQL injection vulnerability detected where user input is directly concatenated into database queries. This allows attackers to manipulate queries and access unauthorized data. The vulnerability can lead to data breaches, unauthorized data modification, or complete database compromise.";
+			case "XSS":
+			case "CROSS_SITE_SCRIPTING":
+				return "Cross-site scripting (XSS) vulnerability found where user input is rendered without proper sanitization. Attackers can inject malicious scripts that execute in other users' browsers. This can lead to session hijacking, data theft, or defacement.";
+			case "INSECURE_DESERIALIZATION":
+				return "Insecure deserialization vulnerability detected where untrusted data is deserialized without validation. This can allow attackers to execute arbitrary code on the server. The impact includes remote code execution and complete system compromise.";
+			case "HARDCODED_CREDENTIALS":
+				return "Hardcoded credentials found in the source code, exposing sensitive authentication information. Anyone with access to the code can use these credentials to gain unauthorized access. This violates security best practices and compliance requirements.";
+			case "WEAK_CRYPTOGRAPHY":
+			case "CRYPTOGRAPHIC_WEAKNESS":
+				return "Weak cryptographic algorithm or implementation detected that can be easily broken by attackers. This compromises the confidentiality and integrity of encrypted data. Modern, secure algorithms should be used instead.";
+			case "PATH_TRAVERSAL":
+				return "Path traversal vulnerability detected where user input is used to access files without validation. Attackers can access sensitive files outside the intended directory. This can lead to information disclosure or system compromise.";
+			case "COMMAND_INJECTION":
+				return "Command injection vulnerability found where user input is passed to system commands. Attackers can execute arbitrary commands on the server. This can lead to complete system takeover.";
+			default:
+				return String.format(
+						"Security vulnerability of type '%s' detected with %s severity. This issue can compromise application security and should be addressed immediately. Review the code to apply appropriate security controls.",
+						cleanType, severity.toLowerCase());
+			}
+		}
+
+		// Performance issue descriptions
+		if ("performance".equalsIgnoreCase(category)) {
+			switch (type.toUpperCase()) {
+			case "INEFFICIENT_LOOP":
+			case "NESTED_LOOPS":
+				return "Inefficient loop structure detected that can cause performance degradation. The current implementation has high time complexity and may cause slowdowns with large datasets. Consider optimizing the algorithm or using more efficient data structures.";
+			case "MEMORY_LEAK":
+				return "Potential memory leak detected where resources are not properly released. This can lead to increased memory consumption over time and eventual application crashes. Ensure all resources are properly closed or disposed.";
+			case "DATABASE_N_PLUS_ONE":
+			case "N_PLUS_ONE_QUERY":
+				return "N+1 query problem detected where multiple database queries are executed in a loop. This causes significant performance issues as data volume grows. Use eager loading or batch queries to reduce database round trips.";
+			case "BLOCKING_IO":
+				return "Blocking I/O operation detected in a performance-critical path. This can cause thread starvation and reduced throughput. Consider using asynchronous operations or caching to improve performance.";
+			default:
+				return String.format(
+						"Performance issue of type '%s' detected that can impact application responsiveness. This %s severity issue affects system efficiency. Optimize the implementation to improve performance.",
+						cleanType, severity.toLowerCase());
+			}
+		}
+
+		// Code quality descriptions
+		return String.format(
+				"Code quality issue of type '%s' detected with %s severity. This affects code maintainability and should be refactored. Following best practices will improve code readability and reduce technical debt.",
+				cleanType, severity.toLowerCase());
+	}
+
 	/**
 	 * Extract line number from various possible formats - Enhanced version
 	 */
 	private Integer extractLineNumber(Map<String, Object> issueData) {
 		// First priority: Try direct line fields
 		String[] lineKeys = { "line", "lineNumber", "startLine", "line_number", "lineNum" };
-		
+
 		for (String key : lineKeys) {
 			Object lineValue = issueData.get(key);
 			if (lineValue != null) {
@@ -895,22 +949,21 @@ public class DataAggregationService {
 				}
 			}
 		}
-		
+
 		// Second priority: Extract from code snippet that contains line number comments
 		String codeSnippet = getStringValue(issueData, "code");
 		if (codeSnippet == null || codeSnippet.isEmpty()) {
 			codeSnippet = getStringValue(issueData, "codeSnippet");
 		}
-		
+
 		if (codeSnippet != null && !codeSnippet.isEmpty()) {
 			// Look for line number comments added by screening Lambda
 			// Patterns: "// Line 123", "# Line 123", "// L123"
 			java.util.regex.Pattern[] patterns = {
-				java.util.regex.Pattern.compile("//\\s*Line\\s*(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
-				java.util.regex.Pattern.compile("#\\s*Line\\s*(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
-				java.util.regex.Pattern.compile("//\\s*L(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE)
-			};
-			
+					java.util.regex.Pattern.compile("//\\s*Line\\s*(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
+					java.util.regex.Pattern.compile("#\\s*Line\\s*(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
+					java.util.regex.Pattern.compile("//\\s*L(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE) };
+
 			for (java.util.regex.Pattern pattern : patterns) {
 				java.util.regex.Matcher matcher = pattern.matcher(codeSnippet);
 				if (matcher.find()) {
@@ -926,15 +979,13 @@ public class DataAggregationService {
 				}
 			}
 		}
-		
+
 		// Third priority: Extract from description if it mentions line number
 		String description = getStringValue(issueData, "description");
 		if (description != null && !description.isEmpty()) {
 			// Look for patterns like "at line 45", "on line 123", "line: 123"
-			java.util.regex.Pattern descPattern = java.util.regex.Pattern.compile(
-				"(?:at|on|in)?\\s*line[\\s:]+([0-9]+)", 
-				java.util.regex.Pattern.CASE_INSENSITIVE
-			);
+			java.util.regex.Pattern descPattern = java.util.regex.Pattern
+					.compile("(?:at|on|in)?\\s*line[\\s:]+([0-9]+)", java.util.regex.Pattern.CASE_INSENSITIVE);
 			java.util.regex.Matcher matcher = descPattern.matcher(description);
 			if (matcher.find()) {
 				try {
@@ -948,7 +999,7 @@ public class DataAggregationService {
 				}
 			}
 		}
-		
+
 		// Fourth priority: Try location field
 		String location = getStringValue(issueData, "location");
 		if (location != null && location.contains(":")) {
@@ -965,19 +1016,19 @@ public class DataAggregationService {
 				// Continue
 			}
 		}
-		
+
 		// Log detailed information about what we tried
-		log.warn("⚠️ Could not extract line number from issue data. Tried fields: {}, Code snippet length: {}, Description length: {}",
-				issueData.keySet(),
-				codeSnippet != null ? codeSnippet.length() : 0,
+		log.warn(
+				"⚠️ Could not extract line number from issue data. Tried fields: {}, Code snippet length: {}, Description length: {}",
+				issueData.keySet(), codeSnippet != null ? codeSnippet.length() : 0,
 				description != null ? description.length() : 0);
-		
+
 		// Log sample of code snippet to debug
 		if (codeSnippet != null && codeSnippet.length() > 0) {
 			String sample = codeSnippet.substring(0, Math.min(200, codeSnippet.length()));
 			log.debug("Code snippet sample: {}", sample);
 		}
-		
+
 		// Return 1 as default
 		return 1;
 	}
