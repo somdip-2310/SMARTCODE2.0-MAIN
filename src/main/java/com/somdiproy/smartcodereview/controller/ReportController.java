@@ -83,11 +83,52 @@ public class ReportController {
             otherIssues.sort(com.somdiproy.smartcodereview.util.SeverityComparator.BY_SEVERITY_DESC);
             model.addAttribute("otherIssues", otherIssues);
             model.addAttribute("additionalSecurityIssues", additionalSecurityIssues);
+
+            // Log sample issues from each category to check file paths
+            if (!securityIssues.isEmpty()) {
+                Issue firstSecurity = securityIssues.get(0);
+                log.info("🔍 Sample security issue - ID: {}, Type: {}, File: '{}', File is null: {}, File is empty: {}", 
+                    firstSecurity.getIssueId(),
+                    firstSecurity.getType(), 
+                    firstSecurity.getFile(),
+                    firstSecurity.getFile() == null,
+                    firstSecurity.getFile() != null ? firstSecurity.getFile().isEmpty() : "N/A");
+                
+                // Log first 3 security issues to see pattern
+                securityIssues.stream().limit(3).forEach(issue -> {
+                    log.info("📁 Security Issue {} - File: '{}', null: {}, empty: {}", 
+                        issue.getIssueId(), 
+                        issue.getFile(),
+                        issue.getFile() == null,
+                        issue.getFile() != null ? issue.getFile().isEmpty() : "N/A");
+                });
+            }
+
+            if (!otherIssues.isEmpty()) {
+                Issue firstOther = otherIssues.get(0);
+                log.info("🔍 Sample other issue - ID: {}, Type: {}, File: '{}', File is null: {}, File is empty: {}", 
+                    firstOther.getIssueId(),
+                    firstOther.getType(), 
+                    firstOther.getFile(),
+                    firstOther.getFile() == null,
+                    firstOther.getFile() != null ? firstOther.getFile().isEmpty() : "N/A");
+                
+                // Log first 3 other issues
+                otherIssues.stream().limit(3).forEach(issue -> {
+                    log.info("📁 Other Issue {} - File: '{}', null: {}, empty: {}", 
+                        issue.getIssueId(), 
+                        issue.getFile(),
+                        issue.getFile() == null,
+                        issue.getFile() != null ? issue.getFile().isEmpty() : "N/A");
+                });
+            }
         }
-        
         model.addAttribute("analysisId", analysisId);
         model.addAttribute("report", report);
         model.addAttribute("sessionId", sessionId);
+        
+     
+        
         
         return "report";
     }

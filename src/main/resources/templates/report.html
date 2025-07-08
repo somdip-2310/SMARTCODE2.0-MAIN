@@ -807,7 +807,7 @@
 										<th>CVE Score</th>
 										<th>Issue</th>
 										<th>File</th>
-										
+
 										<th>Action</th>
 									</tr>
 								</thead>
@@ -833,16 +833,17 @@
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
 											<td>
-											    <code th:if="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}" 
-											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
-											          th:title="${issue.file}">
-											        filename.java
-											    </code>
-											    <code th:unless="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}">
-											        <span th:text="${issue.type != null ? issue.type.toLowerCase().replace('_', '-') + '.java' : 'unknown.java'}">unknown.java</span>
-											    </code>
+												<code th:if="${issue.file != null and !issue.file.isEmpty()}"
+													th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+													th:title="${issue.file}" class="text-primary">
+																						        filename.java
+																						    </code>
+												<code th:unless="${issue.file != null and !issue.file.isEmpty()}"
+													class="text-muted fst-italic">
+																						        File not available
+																						    </code>
 											</td>
-											
+
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
 													type="button" th:data-target="'security-detail-' + ${issue.issueId}"
@@ -869,9 +870,10 @@
 
 														<h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
 															Recommended Fix</h6>
-															<p class="mb-3"
-																th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'This issue requires analysis to determine the appropriate fix based on your specific implementation context.'}">Fix
-																explanation</p>
+														<p class="mb-3"
+															th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'This issue requires analysis to determine the appropriate fix based on your specific implementation context.'}">
+															Fix
+															explanation</p>
 
 														<div class="row">
 															<div class="col-md-6">
@@ -933,7 +935,7 @@
 										<th>Issue Type</th>
 										<th>Description</th>
 										<th>File</th>
-										
+
 										<th>Priority</th>
 										<th>Action</th>
 									</tr>
@@ -948,14 +950,17 @@
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
 											<td>
-											    <code th:if="${issue.file != null and !issue.file.isEmpty()}" 
-											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
-											          th:title="${issue.file}">
-											        filename.java
-											    </code>
-											    <code th:unless="${issue.file != null and !issue.file.isEmpty()}">Unknown File</code>
+												<code th:if="${issue.file != null and !issue.file.isEmpty()}"
+													th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+													th:title="${issue.file}" class="text-primary">
+																						        filename.java
+																						    </code>
+												<code th:unless="${issue.file != null and !issue.file.isEmpty()}"
+													class="text-muted fst-italic">
+																						        File not available
+																						    </code>
 											</td>
-											
+
 											<td>
 												<span class="badge bg-danger"
 													th:if="${issue.severity == 'CRITICAL'}">CRITICAL</span>
@@ -1094,7 +1099,7 @@
 										<th>Severity</th>
 										<th>Issue</th>
 										<th>File</th>
-										
+
 										<th>Action</th>
 									</tr>
 								</thead>
@@ -1118,16 +1123,17 @@
                                                 (issue.type != null ? issue.type.replace('_', ' ') : 'Unknown Issue')}">
 											</td>
 											<td>
-											    <code th:if="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}" 
-											          th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
-											          th:title="${issue.file}">
-											        filename.java
-											    </code>
-											    <code th:unless="${issue.file != null and !issue.file.isEmpty() and !issue.file.equals('unknown')}">
-											        <span th:text="${issue.type != null ? issue.type.toLowerCase().replace('_', '-') + '.java' : 'unknown.java'}">unknown.java</span>
-											    </code>
+												<code th:if="${issue.file != null and !issue.file.isEmpty()}"
+													th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+													th:title="${issue.file}" class="text-primary">
+																						        filename.java
+																						    </code>
+												<code th:unless="${issue.file != null and !issue.file.isEmpty()}"
+													class="text-muted fst-italic">
+																						        File not available
+																						    </code>
 											</td>
-											
+
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
 													type="button" th:data-target="'other-detail-' + ${issue.issueId}"
@@ -1158,9 +1164,10 @@
 
 														<h6 class="mb-3"><i class="bi bi-lightbulb text-success"></i>
 															Recommended Fix</h6>
-															<p class="mb-3"
-																th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'This issue requires analysis to determine the appropriate fix based on your specific implementation context.'}">Fix
-																explanation</p>
+														<p class="mb-3"
+															th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null and issue.suggestion.immediateFix.explanation != null ? issue.suggestion.immediateFix.explanation : 'This issue requires analysis to determine the appropriate fix based on your specific implementation context.'}">
+															Fix
+															explanation</p>
 
 														<div class="row">
 															<div class="col-md-6">
