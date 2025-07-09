@@ -686,9 +686,20 @@ public class LambdaInvokerService {
 	        if (codeSnippet == null || codeSnippet.isEmpty()) {
 	            codeSnippet = (String) issue.get("code");
 	        }
+	        // CRITICAL FIX: Preserve file path information
+	        String filePath = (String) issue.get("file");
+	        if (filePath != null && !filePath.isEmpty()) {
+	            enhancedIssue.put("file", filePath);
+	            enhancedIssue.put("filePath", filePath); // redundancy for compatibility
+	            enhancedIssue.put("path", filePath); // more redundancy
+	            log.debug("✅ Preserved file path in suggestion payload: {}", filePath);
+	        } else {
+	            log.error("❌ CRITICAL: No file path found for issue {} of type {}", 
+	                      issue.get("id"), issue.get("type"));
+	        }
 	        if (codeSnippet == null || codeSnippet.isEmpty()) {
 	            // Try to get from file content if we have it
-	            String filePath = (String) issue.get("file");
+	            //String filePath = (String) issue.get("file");
 	            if (filePath != null && !filePath.isEmpty()) {
 	                codeSnippet = String.format("// Code from %s at line %s\n// Actual code context not available in this detection", 
 	                    filePath, issue.get("line"));
