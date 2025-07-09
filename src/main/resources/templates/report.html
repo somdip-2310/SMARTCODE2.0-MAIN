@@ -728,6 +728,113 @@
 </head>
 
 <body>
+	
+	<!-- Auto-refresh logic for report preparation -->
+	<div id="report-loading-message" style="display: none; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 20px; margin: 20px 0; text-align: center;">
+	    <h4 style="color: #856404; margin-bottom: 10px;">
+	        <i class="fas fa-spinner fa-spin"></i> Your report is still being prepared...
+	    </h4>
+	    <p style="color: #856404; margin-bottom: 5px;">
+	        The analysis has completed, but we're finalizing your detailed report.
+	    </p>
+	    <p style="color: #856404; font-size: 14px;">
+	        This page will automatically refresh every 5 seconds. Maximum wait time: 5 minutes.
+	    </p>
+	    <div style="margin-top: 15px;">
+	        <small style="color: #6c757d;">Time elapsed: <span id="elapsed-time">0</span> seconds</small>
+	    </div>
+	</div>
+
+	<script th:inline="javascript">
+	    /*<![CDATA[*/
+	    (function() {
+	        // Configuration
+	        const REFRESH_INTERVAL = 5000; // 5 seconds
+	        const MAX_WAIT_TIME = 300000; // 5 minutes
+	        const START_TIME = Date.now();
+	        
+	        // Check if report data is incomplete
+	        const issues = /*[[${report?.issues}]]*/ null;
+	        const totalIssues = /*[[${report?.totalIssues}]]*/ 0;
+	        const repository = /*[[${report?.repository}]]*/ null;
+	        
+	        // Function to check if report is ready
+	        function isReportReady() {
+	            // Check multiple conditions to determine if report is ready
+	            if (!issues || issues.length === 0) return false;
+	            if (!repository || repository === 'Unknown Repository') return false;
+	            
+	            // Check if any issue is missing file information
+	            const issuesWithoutFiles = issues.filter(issue => !issue.file || issue.file.trim() === '');
+	            if (issuesWithoutFiles.length > issues.length * 0.5) { // If more than 50% missing files
+	                return false;
+	            }
+	            
+	            return true;
+	        }
+	        
+	        // Function to update elapsed time
+	        function updateElapsedTime() {
+	            const elapsed = Math.floor((Date.now() - START_TIME) / 1000);
+	            const elapsedElement = document.getElementById('elapsed-time');
+	            if (elapsedElement) {
+	                elapsedElement.textContent = elapsed;
+	            }
+	        }
+	        
+	        // Main logic
+	        if (!isReportReady()) {
+	            // Show loading message
+	            const loadingMessage = document.getElementById('report-loading-message');
+	            if (loadingMessage) {
+	                loadingMessage.style.display = 'block';
+	            }
+	            
+	            // Hide main report content temporarily
+	            const reportContent = document.querySelector('.report-content');
+	            if (reportContent) {
+	                reportContent.style.opacity = '0.5';
+	            }
+	            
+	            // Update elapsed time every second
+	            const timeInterval = setInterval(updateElapsedTime, 1000);
+	            
+	            // Set up auto-refresh
+	            const refreshTimeout = setTimeout(function() {
+	                const elapsed = Date.now() - START_TIME;
+	                
+	                if (elapsed < MAX_WAIT_TIME) {
+	                    // Refresh the page
+	                    window.location.reload();
+	                } else {
+	                    // Stop refreshing after 5 minutes
+	                    clearInterval(timeInterval);
+	                    const loadingMessage = document.getElementById('report-loading-message');
+	                    if (loadingMessage) {
+	                        loadingMessage.innerHTML = `
+	                            <h4 style="color: #721c24;">
+	                                <i class="fas fa-exclamation-triangle"></i> Report preparation timeout
+	                            </h4>
+	                            <p style="color: #721c24;">
+	                                The report is taking longer than expected. Some data may be incomplete.
+	                            </p>
+	                            <button class="btn btn-primary" onclick="window.location.reload()">
+	                                Try Refreshing Manually
+	                            </button>
+	                        `;
+	                        loadingMessage.style.backgroundColor = '#f8d7da';
+	                        loadingMessage.style.borderColor = '#f5c6cb';
+	                    }
+	                }
+	            }, REFRESH_INTERVAL);
+	            
+	            // Store timeout ID for cleanup if needed
+	            window.reportRefreshTimeout = refreshTimeout;
+	            window.reportTimeInterval = timeInterval;
+	        }
+	    })();
+	    /*]]>*/
+	</script>
 	<!-- Navigation -->
 	<nav class="navbar-report">
 		<div class="container-fluid">
