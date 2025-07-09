@@ -54,10 +54,10 @@ public class DataAggregationService {
 		// Log the first issue to verify file field is present
 		if (detectedIssues != null && !detectedIssues.isEmpty()) {
 			Map<String, Object> firstIssue = detectedIssues.get(0);
-			log.info("📊 First detected issue - Type: {}, File: {}, Keys: {}", 
-			         firstIssue.get("type"), firstIssue.get("file"), firstIssue.keySet());
+			log.info("📊 First detected issue - Type: {}, File: {}, Keys: {}", firstIssue.get("type"),
+					firstIssue.get("file"), firstIssue.keySet());
 		}
-		
+
 		getLambdaResults(analysisId).setDetectedIssues(detectedIssues);
 		log.info("Stored {} detected issues for analysis {}", detectedIssues.size(), analysisId);
 	}
@@ -246,10 +246,19 @@ public class DataAggregationService {
 			issues.sort(SeverityComparator.BY_SEVERITY_DESC);
 			log.info("📊 Sorted {} issues by severity before saving", issues.size());
 
-			issueDetailsRepository.saveAll(issues);
-
-			log.info("Successfully aggregated and saved {} issues for analysis {}", issues.size(), analysisId);
-
+			// CRITICAL: Log before save
+						issues.stream().limit(3).forEach(issue -> 
+							log.error("🚨 BEFORE SAVE - Issue {} file: '{}'", issue.getType(), issue.getFile())
+						);
+						
+						issueDetailsRepository.saveAll(issues);
+						log.info("Successfully aggregated and saved {} issues for analysis {}", issues.size(), analysisId);
+						
+						// CRITICAL: Verify after save
+						List<Issue> savedIssues = issueDetailsRepository.findByAnalysisId(analysisId);
+						savedIssues.stream().limit(3).forEach(issue -> 
+							log.error("🚨 AFTER SAVE - Issue {} file: '{}'", issue.getType(), issue.getFile())
+						);
 			// Clean up cache
 			lambdaResultsCache.remove(analysisId);
 
@@ -663,9 +672,9 @@ public class DataAggregationService {
 	 */
 	private Issue createIssue(String analysisId, Map<String, Object> issueData) {
 		// Debug logging to understand the issue structure
-		log.info("🔍 Creating issue from data - type: {}, file: {}, keys: {}", 
-		         issueData.get("type"), issueData.get("file"), issueData.keySet());
-		
+		log.info("🔍 Creating issue from data - type: {}, file: {}, keys: {}", issueData.get("type"),
+				issueData.get("file"), issueData.keySet());
+
 		Issue issue = new Issue();
 		issue.setAnalysisId(analysisId);
 		issue.setIssueId(getStringValue(issueData, "id", UUID.randomUUID().toString()));
@@ -732,19 +741,19 @@ public class DataAggregationService {
 
 		// Debug logging to trace the issue
 		// Debug logging to trace the issue
-				log.info("Extracting file path for issue {} - initial value: {}", getStringValue(issueData, "id"), filePath);
-				
-				// Log all available keys to debug
-				if (filePath == null || filePath.trim().isEmpty()) {
-				    log.info("Issue data keys available: {}", issueData.keySet());
-				    // Also check if there's a metadata field
-				    if (issueData.get("metadata") != null) {
-				        Map<String, Object> metadata = (Map<String, Object>) issueData.get("metadata");
-				        log.info("Metadata keys available: {}", metadata.keySet());
-				    }
-				}
+		log.info("Extracting file path for issue {} - initial value: {}", getStringValue(issueData, "id"), filePath);
 
-				if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+		// Log all available keys to debug
+		if (filePath == null || filePath.trim().isEmpty()) {
+			log.info("Issue data keys available: {}", issueData.keySet());
+			// Also check if there's a metadata field
+			if (issueData.get("metadata") != null) {
+				Map<String, Object> metadata = (Map<String, Object>) issueData.get("metadata");
+				log.info("Metadata keys available: {}", metadata.keySet());
+			}
+		}
+
+		if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
 			// Try multiple possible field names
 			String[] possibleFields = { "path", "filePath", "filename", "fileName", "location", "source", "fileInput" };
 			for (String field : possibleFields) {
@@ -814,6 +823,14 @@ public class DataAggregationService {
 		}
 
 		issue.setFile(filePath);
+
+		// CRITICAL DEBUG: Verify file is set
+		if (filePath == null || filePath.trim().isEmpty()) {
+			log.error("❌ CRITICAL: File path is null/empty for issue {} of type {}", issue.getIssueId(),
+					issue.getType());
+		}
+
+		// Enhanced line number extraction
 
 		// Enhanced line number extraction
 		// Enhanced line number extraction

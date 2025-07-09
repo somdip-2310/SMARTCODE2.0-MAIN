@@ -834,14 +834,14 @@
 											</td>
 											<td>
 												<code th:if="${issue.file != null and !issue.file.isEmpty()}"
-													th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
-													th:title="${issue.file}" class="text-primary">
-																						        filename.java
-																						    </code>
+												    th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+												    th:title="${issue.file}" class="text-primary">
+												    filename.java
+												</code>
 												<code th:unless="${issue.file != null and !issue.file.isEmpty()}"
-													class="text-muted fst-italic">
-																						        File not available
-																						    </code>
+												    class="text-muted fst-italic">
+												    File not available
+												</code>
 											</td>
 
 											<td>
@@ -887,7 +887,7 @@
 																	</button>
 																	<pre class="bg-dark border rounded p-3"
 																		th:id="'sec-search-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+																		th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null ? issue.suggestion.immediateFix.searchCode : 'Code not available'}">Search code</pre>
 																</div>
 															</div>
 															<div class="col-md-6">
@@ -951,14 +951,14 @@
 											</td>
 											<td>
 												<code th:if="${issue.file != null and !issue.file.isEmpty()}"
-													th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
-													th:title="${issue.file}" class="text-primary">
-																						        filename.java
-																						    </code>
+												    th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+												    th:title="${issue.file}" class="text-primary">
+												    filename.java
+												</code>
 												<code th:unless="${issue.file != null and !issue.file.isEmpty()}"
-													class="text-muted fst-italic">
-																						        File not available
-																						    </code>
+												    class="text-muted fst-italic">
+												    File not available
+												</code>
 											</td>
 
 											<td>
@@ -1124,14 +1124,14 @@
 											</td>
 											<td>
 												<code th:if="${issue.file != null and !issue.file.isEmpty()}"
-													th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
-													th:title="${issue.file}" class="text-primary">
-																						        filename.java
-																						    </code>
+												    th:text="${issue.file.contains('/') ? issue.file.substring(issue.file.lastIndexOf('/') + 1) : issue.file}"
+												    th:title="${issue.file}" class="text-primary">
+												    filename.java
+												</code>
 												<code th:unless="${issue.file != null and !issue.file.isEmpty()}"
-													class="text-muted fst-italic">
-																						        File not available
-																						    </code>
+												    class="text-muted fst-italic">
+												    File not available
+												</code>
 											</td>
 
 											<td>
@@ -1181,7 +1181,7 @@
 																	</button>
 																	<pre class="bg-dark border rounded p-3"
 																		th:id="'other-search-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.searchCode}">Search code</pre>
+																		th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null ? issue.suggestion.immediateFix.searchCode : 'Code not available'}">Search code</pre>
 																</div>
 															</div>
 															<div class="col-md-6">
@@ -1194,8 +1194,8 @@
 																		<i class="bi bi-clipboard"></i>
 																	</button>
 																	<pre class="bg-dark border rounded p-3"
-																		th:id="'other-replace-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+																	    th:id="'sec-replace-' + ${issue.issueId}"
+																	    th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null ? issue.suggestion.immediateFix.replaceCode : 'Fix not available'}">Replace code</pre>
 																</div>
 															</div>
 														</div>
