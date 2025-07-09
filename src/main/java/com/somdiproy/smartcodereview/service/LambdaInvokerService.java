@@ -134,6 +134,8 @@ public class LambdaInvokerService {
 			    fileMap.put("path", fullPath);
 			    fileMap.put("name", file.getName());
 			    fileMap.put("content", file.getContent());
+			    fileMap.put("file", fullPath);  // Add redundant field for compatibility
+			    fileMap.put("filePath", fullPath);  // Add another redundant field
 			    fileMap.put("size", file.getSize());
 			    fileMap.put("sha", file.getSha());
 			    fileMap.put("language", file.getLanguage());
@@ -1147,11 +1149,38 @@ public class LambdaInvokerService {
 		}
 
 		List<Map<String, Object>> issues = (List<Map<String, Object>>) responseMap.get("issues");
-		if (issues != null && log.isDebugEnabled()) {
-		    log.debug("🐛 Detection found {} issues:", issues.size());
+		if (issues != null) {
+		    log.info("🐛 Detection found {} issues:", issues.size());
+		    
+		    // Log the first issue structure for debugging
+		    if (!issues.isEmpty()) {
+		        Map<String, Object> firstIssue = issues.get(0);
+		        try {
+		            log.info("📊 First issue structure: {}", objectMapper.writeValueAsString(firstIssue));
+		        } catch (Exception e) {
+		            log.info("📊 First issue keys: {}", firstIssue.keySet());
+		        }
+		        log.info("📄 File field in first issue: {}", firstIssue.get("file"));
+		    }
+		    
+		    // Ensure file field is preserved from metadata if missing
 		    issues.forEach(issue -> {
-		        log.debug("  Issue: {} in file: {} (path: {})", 
-		                 issue.get("type"), issue.get("file"), issue.get("path"));
+		        String file = (String) issue.get("file");
+		        if (file == null || file.isEmpty()) {
+		            // Try to recover from metadata
+		            Map<String, Object> metadata = (Map<String, Object>) issue.get("metadata");
+		            if (metadata != null) {
+		                String filePath = (String) metadata.get("filePath");
+		                if (filePath == null || filePath.isEmpty()) {
+		                    filePath = (String) metadata.get("fileName");
+		                }
+		                if (filePath != null && !filePath.isEmpty()) {
+		                    issue.put("file", filePath);
+		                    log.info("✅ Recovered file path from metadata: {}", filePath);
+		                }
+		            }
+		        }
+		        log.debug("  Issue: {} in file: {}", issue.get("type"), issue.get("file"));
 		    });
 		}
 		return issues != null ? issues : new ArrayList<>();

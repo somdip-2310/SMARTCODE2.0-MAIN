@@ -51,6 +51,13 @@ public class DataAggregationService {
 	 * Store detection results
 	 */
 	public void storeDetectionResults(String analysisId, List<Map<String, Object>> detectedIssues) {
+		// Log the first issue to verify file field is present
+		if (detectedIssues != null && !detectedIssues.isEmpty()) {
+			Map<String, Object> firstIssue = detectedIssues.get(0);
+			log.info("📊 First detected issue - Type: {}, File: {}, Keys: {}", 
+			         firstIssue.get("type"), firstIssue.get("file"), firstIssue.keySet());
+		}
+		
 		getLambdaResults(analysisId).setDetectedIssues(detectedIssues);
 		log.info("Stored {} detected issues for analysis {}", detectedIssues.size(), analysisId);
 	}
@@ -655,6 +662,10 @@ public class DataAggregationService {
 	 * Create Issue from detected issue data
 	 */
 	private Issue createIssue(String analysisId, Map<String, Object> issueData) {
+		// Debug logging to understand the issue structure
+		log.info("🔍 Creating issue from data - type: {}, file: {}, keys: {}", 
+		         issueData.get("type"), issueData.get("file"), issueData.keySet());
+		
 		Issue issue = new Issue();
 		issue.setAnalysisId(analysisId);
 		issue.setIssueId(getStringValue(issueData, "id", UUID.randomUUID().toString()));
@@ -720,9 +731,20 @@ public class DataAggregationService {
 		String filePath = getStringValue(issueData, "file");
 
 		// Debug logging to trace the issue
-		log.debug("Extracting file path for issue {} - initial value: {}", getStringValue(issueData, "id"), filePath);
+		// Debug logging to trace the issue
+				log.info("Extracting file path for issue {} - initial value: {}", getStringValue(issueData, "id"), filePath);
+				
+				// Log all available keys to debug
+				if (filePath == null || filePath.trim().isEmpty()) {
+				    log.info("Issue data keys available: {}", issueData.keySet());
+				    // Also check if there's a metadata field
+				    if (issueData.get("metadata") != null) {
+				        Map<String, Object> metadata = (Map<String, Object>) issueData.get("metadata");
+				        log.info("Metadata keys available: {}", metadata.keySet());
+				    }
+				}
 
-		if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
+				if (filePath == null || filePath.trim().isEmpty() || "unknown".equalsIgnoreCase(filePath)) {
 			// Try multiple possible field names
 			String[] possibleFields = { "path", "filePath", "filename", "fileName", "location", "source", "fileInput" };
 			for (String field : possibleFields) {
