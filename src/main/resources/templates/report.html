@@ -347,7 +347,89 @@
 			color: #3b82f6;
 		}
 	</style>
-	<!-- Print Styles -->
+
+	<script>
+	    // Define the function before any buttons that use it
+	    window.toggleCustomCollapse = function(targetId, button) {
+	        const targetElement = document.getElementById(targetId);
+	        if (!targetElement) {
+	            console.error('Target element not found:', targetId);
+	            return;
+	        }
+
+	        const isCurrentlyVisible = targetElement.classList.contains('show');
+
+	        if (isCurrentlyVisible) {
+	            targetElement.classList.remove('show');
+	            button.classList.add('collapsed');
+	            button.setAttribute('aria-expanded', 'false');
+	        } else {
+	            targetElement.classList.add('show');
+	            button.classList.remove('collapsed');
+	            button.setAttribute('aria-expanded', 'true');
+	        }
+	    }
+
+	    window.copyToClipboardByDataTarget = function(button) {
+	        const targetId = button.getAttribute('data-copy-target');
+	        if (!targetId) {
+	            console.error('No data-copy-target found');
+	            return;
+	        }
+
+	        const element = document.getElementById(targetId);
+	        if (!element) {
+	            console.error('Element not found:', targetId);
+	            return;
+	        }
+
+	        const textToCopy = element.textContent || element.innerText;
+
+	        if (navigator.clipboard && navigator.clipboard.writeText) {
+	            navigator.clipboard.writeText(textToCopy).then(() => {
+	                showCopySuccess(button);
+	            }).catch(err => {
+	                console.error('Failed to copy:', err);
+	                fallbackCopyToClipboard(textToCopy, button);
+	            });
+	        } else {
+	            fallbackCopyToClipboard(textToCopy, button);
+	        }
+	    }
+
+	    window.showCopySuccess = function(button) {
+	        const originalText = button.innerHTML;
+	        button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+	        button.classList.add('btn-success');
+	        button.classList.remove('btn-outline-secondary');
+
+	        setTimeout(() => {
+	            button.innerHTML = originalText;
+	            button.classList.remove('btn-success');
+	            button.classList.add('btn-outline-secondary');
+	        }, 2000);
+	    }
+
+	    window.fallbackCopyToClipboard = function(text, button) {
+	        const textArea = document.createElement("textarea");
+	        textArea.value = text;
+	        textArea.style.position = "fixed";
+	        textArea.style.left = "-999999px";
+	        document.body.appendChild(textArea);
+	        textArea.focus();
+	        textArea.select();
+
+	        try {
+	            document.execCommand('copy');
+	            showCopySuccess(button);
+	        } catch (err) {
+	            console.error('Fallback: Unable to copy', err);
+	        }
+
+	        document.body.removeChild(textArea);
+	    }
+	</script>
+	</head>
 	<style media="print">
 		/* Reset for print */
 		* {
@@ -846,10 +928,10 @@
 
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
-													type="button" th:data-target="'security-detail-' + ${issue.issueId}"
-													onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
-													aria-expanded="false">
-													View Fix <i class="bi bi-chevron-down"></i>
+												    type="button" th:data-target="'security-detail-' + ${issue.issueId}"
+												    onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
+												    aria-expanded="false">
+												    View Fix <i class="bi bi-chevron-down"></i>
 												</button>
 											</td>
 										</tr>
@@ -900,8 +982,8 @@
 																		<i class="bi bi-clipboard"></i>
 																	</button>
 																	<pre class="bg-dark border rounded p-3"
-																		th:id="'sec-replace-' + ${issue.issueId}"
-																		th:text="${issue.suggestion.immediateFix.replaceCode}">Replace code</pre>
+																	    th:id="'sec-replace-' + ${issue.issueId}"
+																	    th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null ? issue.suggestion.immediateFix.replaceCode : 'Fix not available'}">Replace code</pre>
 																</div>
 															</div>
 														</div>
@@ -1136,10 +1218,10 @@
 
 											<td>
 												<button class="btn btn-sm btn-primary custom-toggle-btn collapsed"
-													type="button" th:data-target="'other-detail-' + ${issue.issueId}"
-													onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
-													aria-expanded="false">
-													View Fix <i class="bi bi-chevron-down"></i>
+												    type="button" th:data-target="'other-detail-' + ${issue.issueId}"
+												    onclick="toggleCustomCollapse(this.getAttribute('data-target'), this)"
+												    aria-expanded="false">
+												    View Fix <i class="bi bi-chevron-down"></i>
 												</button>
 											</td>
 										</tr>
@@ -1194,7 +1276,7 @@
 																		<i class="bi bi-clipboard"></i>
 																	</button>
 																	<pre class="bg-dark border rounded p-3"
-																	    th:id="'sec-replace-' + ${issue.issueId}"
+																	    th:id="'other-replace-' + ${issue.issueId}"
 																	    th:text="${issue.suggestion != null and issue.suggestion.immediateFix != null ? issue.suggestion.immediateFix.replaceCode : 'Fix not available'}">Replace code</pre>
 																</div>
 															</div>
