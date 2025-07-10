@@ -105,7 +105,12 @@ jobs:
                 {"name": "GOOGLE_ANALYTICS_ID", "value": "G-TJMD3KM77H"},
                 {"name": "GOOGLE_ANALYTICS_ENABLED", "value": "true"},
                 {"name": "JAVA_OPTS", "value": "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC"},
-                {"name": "SINGLE_INSTANCE_MODE", "value": "true"}
+                {"name": "SINGLE_INSTANCE_MODE", "value": "true"},
+                {"name": "SENDGRID_API_KEY", "value": "${{ secrets.SENDGRID_API_KEY }}"},
+                {"name": "SENDGRID_ENABLED", "value": "true"},
+                {"name": "SENDGRID_FROM_EMAIL", "value": "smartcode@somdip.dev"},
+                {"name": "SENDGRID_FROM_NAME", "value": "SmartCode Review"},
+                {"name": "logging.otp.enabled", "value": "false"}
               ],
               "logConfiguration": {
                 "logDriver": "awslogs",
