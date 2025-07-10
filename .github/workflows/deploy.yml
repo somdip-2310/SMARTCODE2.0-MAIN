@@ -110,7 +110,9 @@ jobs:
                 {"name": "SENDGRID_ENABLED", "value": "true"},
                 {"name": "SENDGRID_FROM_EMAIL", "value": "smartcode@somdip.dev"},
                 {"name": "SENDGRID_FROM_NAME", "value": "SmartCode Review"},
-                {"name": "logging.otp.enabled", "value": "false"}
+                {"name": "logging.otp.enabled", "value": "false"},
+                {"name": "MANAGEMENT_HEALTH_MAIL_ENABLED", "value": "false"},
+                {"name": "SPRING_MAIL_TEST_CONNECTION", "value": "false"}
               ],
               "logConfiguration": {
                 "logDriver": "awslogs",
