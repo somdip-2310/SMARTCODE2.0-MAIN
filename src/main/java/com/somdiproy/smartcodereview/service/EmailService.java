@@ -17,7 +17,7 @@ public class EmailService {
     
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     
-    @Value("${sendgrid.api-key}")
+    @Value("${sendgrid.api.key:}")
     private String sendGridApiKey;
     
     @Value("${sendgrid.from-email:smartcode@somdip.dev}")
@@ -37,22 +37,17 @@ public class EmailService {
      */
     public void sendOtpEmail(String toEmail, String otp) {
         try {
-            // Always log OTP in development/local mode
+            // Check if SendGrid is disabled or OTP logging is enabled
             if (!sendGridEnabled || otpLoggingEnabled) {
                 log.info("=== OTP DEBUG ===");
                 log.info("Email: {} | OTP: {}", toEmail, otp);
                 log.info("================");
                 
+                // If SendGrid is disabled, don't proceed with email sending
                 if (!sendGridEnabled) {
-                    return; // Don't send actual email if SendGrid is disabled
+                    log.info("SendGrid is disabled - Email not sent");
+                    return;
                 }
-            }
-            
-            // Log OTP in development
-            if (otpLoggingEnabled) {
-                log.info("=== OTP DEBUG ===");
-                log.info("Email: {} | OTP: {}", toEmail, otp);
-                log.info("================");
             }
             
             // Create the email
@@ -64,6 +59,12 @@ public class EmailService {
             
             Mail mail = new Mail(from, subject, to, content);
             
+           // Validate API key before sending
+            if (sendGridApiKey == null || sendGridApiKey.trim().isEmpty()) {
+                log.error("SendGrid API key is not configured");
+                throw new RuntimeException("Email service is not properly configured");
+            }
+
             // Send via SendGrid
             SendGrid sg = new SendGrid(sendGridApiKey);
             Request request = new Request();

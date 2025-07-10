@@ -20,6 +20,12 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.time.Duration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
+import com.somdiproy.smartcodereview.service.EmailService;
 /**
  * AWS SDK Configuration for Smart Code Review Platform
  * Configured for direct AWS service access (no LocalStack)
@@ -27,12 +33,18 @@ import java.time.Duration;
 @Slf4j
 @Configuration
 public class AWSConfig {
+	
+	private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+    
 
     @Value("${aws.region}")
     private String awsRegion;
 
     @Value("${aws.profile:default}")
     private String awsProfile;
+    
+    @Autowired
+    private Environment environment;
 
     /**
      * Configure AWS credentials provider
@@ -40,13 +52,21 @@ public class AWSConfig {
      */
     @Bean
     public AwsCredentialsProvider awsCredentialsProvider() {
-        // First try to use profile credentials (from ~/.aws/credentials)
-        try {
-            return ProfileCredentialsProvider.create(awsProfile);
-        } catch (Exception e) {
-            //log.info("Profile credentials not found, falling back to default chain");
-            // Fall back to default credentials provider chain
-            // This will check environment variables, system properties, etc.
+        String activeProfile = environment.getActiveProfiles().length > 0 ? 
+                              environment.getActiveProfiles()[0] : "local";
+        
+        if ("local".equals(activeProfile)) {
+            // Local development: Try profile first, then default
+            try {
+                log.info("Local profile detected - attempting to use AWS profile: {}", awsProfile);
+                return ProfileCredentialsProvider.create(awsProfile);
+            } catch (Exception e) {
+                log.info("Profile credentials not found, falling back to default chain");
+                return DefaultCredentialsProvider.create();
+            }
+        } else {
+            // Production/Container: Use default chain (ECS Task Role, Environment vars, etc.)
+            log.info("Production profile detected - using default credentials provider");
             return DefaultCredentialsProvider.create();
         }
     }
