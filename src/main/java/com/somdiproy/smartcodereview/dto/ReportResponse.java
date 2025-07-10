@@ -34,7 +34,7 @@ public class ReportResponse {
     private Integer qualityCount;
     
     // Default constructor
-    public ReportResponse() {}
+    //public ReportResponse() {}
     
     // Builder pattern
     public static ReportResponseBuilder builder() {
