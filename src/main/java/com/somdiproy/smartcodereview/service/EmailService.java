@@ -1,258 +1,326 @@
 package com.somdiproy.smartcodereview.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.Personalization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import java.io.IOException;
 
-/**
- * Service for sending emails including OTP emails
- */
 @Service
 public class EmailService {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EmailService.class);
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     
-    private final JavaMailSender mailSender;
-    private final SpringTemplateEngine templateEngine;
+    @Value("${sendgrid.api-key}")
+    private String sendGridApiKey;
     
-    @Value("${spring.mail.username:noreply@smartcodereview.com}")
+    @Value("${sendgrid.from-email:smartcode@somdip.dev}")
     private String fromEmail;
     
-    @Value("${spring.profiles.active:dev}")
-    private String activeProfile;
-
-    @Value("${session.otp-expiry:300}")
-    private int otpExpirySeconds;
+    @Value("${sendgrid.from-name:SmartCode Review}")
+    private String fromName;
     
-    @Autowired
-    public EmailService(JavaMailSender mailSender, SpringTemplateEngine templateEngine) {
-        this.mailSender = mailSender;
-        this.templateEngine = templateEngine;
-    }
+    @Value("${sendgrid.enabled:true}")
+    private boolean sendGridEnabled;
+    
+    @Value("${logging.otp.enabled:false}")
+    private boolean otpLoggingEnabled;
     
     /**
-     * Send OTP email
-     */
-    /**
-     * Send OTP email
+     * Send professional OTP email using SendGrid
      */
     public void sendOtpEmail(String toEmail, String otp) {
-        // In local/dev mode, just log the OTP and return immediately
-        if ("local".equals(activeProfile) || "dev".equals(activeProfile)) {
-            log.info("🔐 LOCAL TESTING - OTP Code for {}: {} (Valid for {} minutes)", 
-                     toEmail, otp, otpExpirySeconds / 60);
-            log.info("📧 Email: {} | 🔢 OTP: {} | ⏰ Copy this code for verification!", 
-                     toEmail, otp);
-            log.info("💡 Profile: {} | Skip Real Email: true", activeProfile);
-            return;
-        }
-        
-        // Production email sending logic
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
-            helper.setFrom(fromEmail);
-            helper.setTo(toEmail);
-            helper.setSubject("Smart Code Review - Verification Code");
-            
-            // Create email content
-            Context context = new Context();
-            context.setVariable("otp", otp);
-            context.setVariable("email", toEmail);
-            
-            String htmlContent = createOtpEmailTemplate(otp);
-            helper.setText(htmlContent, true);
-            
-            mailSender.send(message);
-            log.info("OTP email sent to: {}", toEmail);
-            
-        } catch (MessagingException e) {
-            log.error("Failed to send OTP email to: {}", toEmail, e);
-            
-            // In local/dev mode, log the OTP as fallback
-            if ("local".equals(activeProfile) || "dev".equals(activeProfile)) {
-                log.warn("📧 EMAIL FALLBACK - Since email sending failed, here's your OTP:");
-                log.warn("🔐 OTP for {}: {} (Copy this for testing)", toEmail, otp);
-                return;
+            // Always log OTP in development/local mode
+            if (!sendGridEnabled || otpLoggingEnabled) {
+                log.info("=== OTP DEBUG ===");
+                log.info("Email: {} | OTP: {}", toEmail, otp);
+                log.info("================");
+                
+                if (!sendGridEnabled) {
+                    return; // Don't send actual email if SendGrid is disabled
+                }
             }
             
-            // Fallback to simple email in production
-            sendSimpleOtpEmail(toEmail, otp);
+            // Log OTP in development
+            if (otpLoggingEnabled) {
+                log.info("=== OTP DEBUG ===");
+                log.info("Email: {} | OTP: {}", toEmail, otp);
+                log.info("================");
+            }
+            
+            // Create the email
+            Email from = new Email(fromEmail, fromName);
+            Email to = new Email(toEmail);
+            
+            String subject = "Your SmartCode Review Verification Code";
+            Content content = new Content("text/html", createProfessionalOtpTemplate(otp));
+            
+            Mail mail = new Mail(from, subject, to, content);
+            
+            // Send via SendGrid
+            SendGrid sg = new SendGrid(sendGridApiKey);
+            Request request = new Request();
+            
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            
+            Response response = sg.api(request);
+            
+            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+                log.info("✅ OTP email sent successfully to: {}", maskEmail(toEmail));
+            } else {
+                log.error("❌ Failed to send OTP email. Status: {}, Body: {}", 
+                    response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Failed to send verification email");
+            }
+            
+        } catch (IOException e) {
+            log.error("Error sending OTP email to: {}", maskEmail(toEmail), e);
+            throw new RuntimeException("Failed to send verification email", e);
         }
     }
     
     /**
-     * Send analysis complete notification
+     * Create professional HTML template for OTP email
      */
-    public void sendAnalysisCompleteEmail(String toEmail, String repository, String branch, String reportUrl) {
-    	if ("local".equals(activeProfile) || "dev".equals(activeProfile)) {
-    	    log.info("🎉 LOCAL MODE - Analysis complete for {}: {} - Branch: {} - Report URL: {}", 
-    	             toEmail, repository, branch, reportUrl);
-    	    return;
-    	}
-        
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
-            helper.setFrom(fromEmail);
-            helper.setTo(toEmail);
-            helper.setSubject("Smart Code Review - Analysis Complete");
-            
-            String htmlContent = createAnalysisCompleteEmailTemplate(repository, branch, reportUrl);
-            helper.setText(htmlContent, true);
-            
-            mailSender.send(message);
-            log.info("Analysis complete email sent to: {}", toEmail);
-            
-        } catch (MessagingException e) {
-            log.error("Failed to send analysis complete email to: {}", toEmail, e);
-        }
-    }
-    
-    /**
-     * Simple fallback OTP email
-     */
-    private void sendSimpleOtpEmail(String toEmail, String otp) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject("Smart Code Review - Verification Code");
-        message.setText(String.format(
-            "Your verification code is: %s\n\n" +
-            "This code will expire in 5 minutes.\n\n" +
-            "If you didn't request this code, please ignore this email.\n\n" +
-            "Best regards,\n" +
-            "Smart Code Review Team", 
-            otp
-        ));
-        
-        try {
-            mailSender.send(message);
-            log.info("Simple OTP email sent to: {}", toEmail);
-        } catch (Exception e) {
-            log.error("Failed to send simple OTP email to: {}", toEmail, e);
-        }
-    }
-    
-    /**
-     * Create HTML template for OTP email
-     */
-    private String createOtpEmailTemplate(String otp) {
-        return """
+    private String createProfessionalOtpTemplate(String otp) {
+        return String.format("""
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
             <head>
                 <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-                    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; }
-                    .header { background-color: #007bff; color: white; padding: 20px; text-align: center; }
-                    .content { padding: 30px 20px; }
-                    .otp-box { background-color: #f8f9fa; border: 2px solid #007bff; border-radius: 8px; 
-                               padding: 20px; margin: 20px 0; text-align: center; }
-                    .otp-code { font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 8px; }
-                    .footer { text-align: center; color: #666; font-size: 12px; padding: 20px; }
-                    .button { background-color: #007bff; color: white; padding: 12px 30px; 
-                             text-decoration: none; border-radius: 5px; display: inline-block; }
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { 
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        background-color: #f5f5f5;
+                    }
+                    .wrapper {
+                        width: 100%%;
+                        background-color: #f5f5f5;
+                        padding: 40px 20px;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        overflow: hidden;
+                    }
+                    .header {
+                        background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);
+                        color: white;
+                        padding: 40px 30px;
+                        text-align: center;
+                    }
+                    .header h1 {
+                        font-size: 28px;
+                        font-weight: 600;
+                        margin-bottom: 10px;
+                    }
+                    .header p {
+                        font-size: 16px;
+                        opacity: 0.9;
+                    }
+                    .content {
+                        padding: 40px 30px;
+                    }
+                    .greeting {
+                        font-size: 18px;
+                        color: #333;
+                        margin-bottom: 20px;
+                    }
+                    .message {
+                        font-size: 16px;
+                        color: #666;
+                        margin-bottom: 30px;
+                        line-height: 1.8;
+                    }
+                    .otp-container {
+                        background: linear-gradient(135deg, #f5f7fa 0%%, #c3cfe2 100%%);
+                        border-radius: 10px;
+                        padding: 30px;
+                        text-align: center;
+                        margin: 30px 0;
+                    }
+                    .otp-label {
+                        font-size: 14px;
+                        color: #666;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        margin-bottom: 15px;
+                    }
+                    .otp-code {
+                        font-size: 36px;
+                        font-weight: 700;
+                        color: #667eea;
+                        letter-spacing: 8px;
+                        font-family: 'Courier New', monospace;
+                    }
+                    .validity {
+                        font-size: 14px;
+                        color: #e53e3e;
+                        margin-top: 15px;
+                        font-weight: 500;
+                    }
+                    .info-box {
+                        background-color: #f7fafc;
+                        border-left: 4px solid #667eea;
+                        padding: 20px;
+                        margin: 30px 0;
+                        border-radius: 4px;
+                    }
+                    .info-box h3 {
+                        font-size: 16px;
+                        color: #333;
+                        margin-bottom: 10px;
+                    }
+                    .info-box ul {
+                        list-style: none;
+                        color: #666;
+                        font-size: 14px;
+                    }
+                    .info-box li {
+                        padding: 5px 0;
+                        padding-left: 20px;
+                        position: relative;
+                    }
+                    .info-box li:before {
+                        content: "✓";
+                        position: absolute;
+                        left: 0;
+                        color: #48bb78;
+                        font-weight: bold;
+                    }
+                    .footer {
+                        background-color: #f7fafc;
+                        padding: 30px;
+                        text-align: center;
+                        border-top: 1px solid #e2e8f0;
+                    }
+                    .footer p {
+                        font-size: 14px;
+                        color: #718096;
+                        margin-bottom: 10px;
+                    }
+                    .footer a {
+                        color: #667eea;
+                        text-decoration: none;
+                    }
+                    .social-links {
+                        margin-top: 20px;
+                    }
+                    .social-links a {
+                        display: inline-block;
+                        margin: 0 10px;
+                        color: #718096;
+                        font-size: 14px;
+                    }
+                    .warning {
+                        font-size: 13px;
+                        color: #718096;
+                        font-style: italic;
+                        margin-top: 20px;
+                        padding-top: 20px;
+                        border-top: 1px solid #e2e8f0;
+                    }
+                    @media (max-width: 600px) {
+                        .header { padding: 30px 20px; }
+                        .content { padding: 30px 20px; }
+                        .otp-code { font-size: 28px; letter-spacing: 4px; }
+                    }
                 </style>
             </head>
             <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>Smart Code Review</h1>
-                    </div>
-                    <div class="content">
-                        <h2>Verify Your Email</h2>
-                        <p>Thank you for using Smart Code Review. Please use the verification code below to complete your sign-in:</p>
-                        
-                        <div class="otp-box">
-                            <div class="otp-code">%s</div>
+                <div class="wrapper">
+                    <div class="container">
+                        <div class="header">
+                            <h1>🚀 SmartCode Review</h1>
+                            <p>AI-Powered Code Analysis Platform</p>
                         </div>
                         
-                        <p><strong>This code will expire in 5 minutes.</strong></p>
+                        <div class="content">
+                            <h2 class="greeting">Welcome to SmartCode Review!</h2>
+                            
+                            <p class="message">
+                                Thank you for choosing SmartCode Review for your code analysis needs. 
+                                To ensure the security of your session, please verify your email address 
+                                using the verification code below.
+                            </p>
+                            
+                            <div class="otp-container">
+                                <div class="otp-label">Your Verification Code</div>
+                                <div class="otp-code">%s</div>
+                                <div class="validity">⏱️ Valid for 5 minutes</div>
+                            </div>
+                            
+                            <div class="info-box">
+                                <h3>What happens next?</h3>
+                                <ul>
+                                    <li>Enter this code on the verification page</li>
+                                    <li>Get instant access to your 7-minute demo session</li>
+                                    <li>Analyze up to 3 code repositories</li>
+                                    <li>Experience AI-powered code review with Amazon Bedrock</li>
+                                </ul>
+                            </div>
+                            
+                            <p class="warning">
+                                <strong>Security Notice:</strong> If you didn't request this verification code, 
+                                please ignore this email. Someone may have entered your email address by mistake.
+                            </p>
+                        </div>
                         
-                        <p>Enter this code on the verification page to access your 1-hour session with 3 code scans.</p>
-                        
-                        <p>If you didn't request this code, please ignore this email.</p>
-                    </div>
-                    <div class="footer">
-                        <p>&copy; 2024 Smart Code Review. All rights reserved.</p>
-                        <p>Powered by Amazon Nova</p>
+                        <div class="footer">
+                            <p>
+                                <strong>SmartCode Review</strong> - Part of the Somdip.dev Portfolio
+                            </p>
+                            <p>
+                                <a href="https://smartcode.somdip.dev">smartcode.somdip.dev</a> | 
+                                <a href="https://somdip.dev">somdip.dev</a>
+                            </p>
+                            <div class="social-links">
+                                <a href="https://github.com/somdiproy">GitHub</a>
+                                <a href="https://www.linkedin.com/in/somdip-roy-b8004b111/">LinkedIn</a>
+                            </div>
+                            <p style="margin-top: 20px; font-size: 12px; color: #a0aec0;">
+                                © 2024 SmartCode Review. All rights reserved.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </body>
             </html>
-            """.formatted(otp);
+            """, otp);
     }
     
     /**
-     * Create HTML template for analysis complete email
+     * Send session expiry warning email
      */
-    private String createAnalysisCompleteEmailTemplate(String repository, String branch, String reportUrl) {
-        return """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <style>
-                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-                    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; }
-                    .header { background-color: #28a745; color: white; padding: 20px; text-align: center; }
-                    .content { padding: 30px 20px; }
-                    .repo-info { background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin: 20px 0; }
-                    .button { background-color: #28a745; color: white; padding: 12px 30px; 
-                             text-decoration: none; border-radius: 5px; display: inline-block; }
-                    .footer { text-align: center; color: #666; font-size: 12px; padding: 20px; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>Analysis Complete!</h1>
-                    </div>
-                    <div class="content">
-                        <h2>Your code analysis is ready</h2>
-                        
-                        <div class="repo-info">
-                            <p><strong>Repository:</strong> %s</p>
-                            <p><strong>Branch:</strong> %s</p>
-                        </div>
-                        
-                        <p>We've completed the analysis of your code and found several areas for improvement. 
-                           Our AI-powered analysis has generated detailed suggestions for:</p>
-                        
-                        <ul>
-                            <li>Security vulnerabilities</li>
-                            <li>Performance optimizations</li>
-                            <li>Code quality improvements</li>
-                        </ul>
-                        
-                        <p style="text-align: center; margin: 30px 0;">
-                            <a href="%s" class="button">View Full Report</a>
-                        </p>
-                        
-                        <p><small>This report will be available for 7 days.</small></p>
-                    </div>
-                    <div class="footer">
-                        <p>&copy; 2024 Smart Code Review. All rights reserved.</p>
-                        <p>Powered by Amazon Nova</p>
-                    </div>
-                </div>
-            </body>
-            </html>
-            """.formatted(repository, branch, reportUrl);
+    public void sendSessionExpiryWarning(String toEmail, int remainingMinutes) {
+        // Implementation for session expiry warning
+        log.info("Session expiry warning would be sent to: {} ({} minutes remaining)", 
+                maskEmail(toEmail), remainingMinutes);
+    }
+    
+    /**
+     * Mask email for logging
+     */
+    private String maskEmail(String email) {
+        if (email == null || email.length() < 3) return "***";
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 0) return "***";
+        return email.substring(0, Math.min(3, atIndex)) + "***" + email.substring(atIndex);
     }
 }

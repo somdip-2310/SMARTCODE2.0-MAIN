@@ -204,6 +204,12 @@
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>auth</artifactId>
 		</dependency>
+		<!-- SendGrid for Email -->
+		<dependency>
+    		<groupId>com.sendgrid</groupId>
+    		<artifactId>sendgrid-java</artifactId>
+    		<version>4.10.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
